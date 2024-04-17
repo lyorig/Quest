@@ -1,0 +1,3 @@
+[submodule "halcyon"]
+	path = halcyon
+	url = https://github.com/lyorig/halcyon
