@@ -1,0 +1,24 @@
+#pragma once
+
+#include <halcyon/event/handler.hpp>
+#include <halcyon/video/renderer.hpp>
+
+namespace HQ::State
+{
+    enum class Type
+    {
+        None,
+        Quit,
+        // Intro, <- this isn't included since the intro is a one-off
+        MainMenu,
+    };
+
+    // Base state class.
+    class Base
+    {
+    public:
+        virtual Type Update(hal::event::handler& event, hal::f64 elapsed) = 0;
+
+        virtual void Draw(hal::video::renderer& rnd) const = 0;
+    };
+}

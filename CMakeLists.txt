@@ -4,12 +4,22 @@ project(HalodaQuest)
 
 include(halcyon/config.cmake)
 
-add_executable(HalodaQuest main.cpp ${HALCYON_SOURCES})
+set(QUEST_SOURCES
+main.cpp
+app.cpp
+state/intro.cpp
+state/main_menu.cpp
+)
 
-target_compile_options(HalodaQuest PRIVATE -flto -march=native)
-target_link_options(HalodaQuest PRIVATE -flto)
+list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)
+add_executable(HalodaQuest
+${HALCYON_SOURCES}
+${QUEST_SOURCES}
+)
 
-target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS})
+# target_compile_options(HalodaQuest PRIVATE -flto -march=native)
+# target_link_options(HalodaQuest PRIVATE -flto)
+
+target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_link_libraries(HalodaQuest PRIVATE ${HALCYON_LIBRARIES})

@@ -1,0 +1,14 @@
+BasedOnStyle: WebKit
+
+IndentWidth: 4
+AccessModifierOffset: -4
+
+NamespaceIndentation: All
+IndentPPDirectives: BeforeHash
+
+BreakBeforeBraces: Allman
+
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignTrailingComments: true
