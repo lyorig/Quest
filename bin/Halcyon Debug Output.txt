@@ -1,0 +1,9 @@
+[0.000s] [init]  Initialized Halcyon context
+[0.000s] [init]  Initialized TTF context
+[0.081s] [init]  Video subsystem initialized
+[0.094s] [init]  Created window "Amogus", flags = 0x0, ID = 1
+[0.100s] [init]  Created renderer for window "Amogus", flags = 0x6
+[0.101s] [warn]  "m5x7 Medium" has different height (38px) & skip (43px). size_text() might not return accurate vertical results.
+[7.753s] [info]  Video subsystem quit
+[7.753s] [info]  Destroyed TTF context
+[7.753s] [info]  Cleaning up SDL. Last error: Unknown touch device id -1, cannot reset
