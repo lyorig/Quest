@@ -2,11 +2,33 @@
 
 using namespace HQ::State;
 
-Type MainMenu::Update(hal::event::handler& event, hal::f64 elapsed)
+MainMenu::MainMenu(const App& app)
+    : m_wndSize { app.window.size() }
+    , m_wndPos { app.window.pos() }
 {
-    while (event.poll())
+    constexpr hal::pixel_point NewSize { 1280, 720 };
+
+    const hal::pixel_rect WndRect { hal::tag::as_size, app.video.displays[app.window.display_index()].size() };
+
+    m_wndSize.Start(NewSize, 1.0);
+    m_wndPos.Start(WndRect.anchor(hal::anchor::center, NewSize), 1.0);
+}
+
+Type MainMenu::Update(App& app, hal::f64 elapsed)
+{
+    if (m_wndSize.Update(elapsed))
     {
-        switch (event.event_type())
+        app.window.size(m_wndSize.Value());
+    }
+
+    if (m_wndPos.Update(elapsed))
+    {
+        app.window.pos(m_wndPos.Value());
+    }
+
+    while (app.event.poll())
+    {
+        switch (app.event.event_type())
         {
             using enum hal::event::type;
 

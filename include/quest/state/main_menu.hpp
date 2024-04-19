@@ -1,5 +1,6 @@
 #pragma once
 
+#include <quest/animatable.hpp>
 #include <quest/state/base.hpp>
 
 namespace HQ::State
@@ -8,8 +9,12 @@ namespace HQ::State
     {
     public:
         MainMenu() = default;
+        MainMenu(const App& wnd);
 
-        Type Update(hal::event::handler& event, hal::f64 elapsed);
+        Type Update(App& event, hal::f64 elapsed);
         void Draw(hal::video::renderer& rnd) const;
+
+    private:
+        Animatable<hal::pixel_point, Easing::InOut::Parametric> m_wndSize, m_wndPos;
     };
 }

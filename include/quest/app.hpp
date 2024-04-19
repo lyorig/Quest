@@ -3,44 +3,27 @@
 #include <halcyon/event.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/state/intro.hpp>
-#include <quest/state/main_menu.hpp>
+#include <quest/arguments.hpp>
 
 namespace HQ
 {
-    class Arguments
-    {
-    public:
-        Arguments(int argc, const char* argv[]);
-
-        bool operator[](std::string_view what) const;
-
-    private:
-        std::span<const char*> m_span;
-    };
-
     class App
     {
     public:
-        App(Arguments args);
+        App(const Arguments& args);
 
-        void MainLoop();
+        void Present();
 
     private:
-        HAL_NO_SIZE hal::context m_context;
-        HAL_NO_SIZE hal::ttf::context m_ttf;
-        HAL_NO_SIZE hal::video::system m_video;
+        hal::context m_context;
 
-        hal::event::handler m_event;
+    public:
+        HAL_NO_SIZE hal::ttf::context ttf;
+        HAL_NO_SIZE hal::video::system video;
 
-        hal::video::window   m_window;
-        hal::video::renderer m_renderer;
+        hal::video::window   window;
+        hal::video::renderer renderer;
 
-        // Reference to the current state.
-        State::Base* m_state;
-
-        State::MainMenu m_menu;
-
-        bool UpdateState(State::Type tp);
+        hal::event::handler event;
     };
 }

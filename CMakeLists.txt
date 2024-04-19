@@ -5,10 +5,12 @@ project(HalodaQuest)
 include(halcyon/config.cmake)
 
 set(QUEST_SOURCES
-main.cpp
-app.cpp
 state/intro.cpp
 state/main_menu.cpp
+app.cpp
+arguments.cpp
+game.cpp
+main.cpp
 )
 
 list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
@@ -23,6 +25,8 @@ ${QUEST_SOURCES}
 
 target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_link_libraries(HalodaQuest PRIVATE ${HALCYON_LIBRARIES})
+
+target_compile_definitions(HalodaQuest PRIVATE HAL_INTEGRAL_COORD)
 
 set_target_properties(HalodaQuest PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)

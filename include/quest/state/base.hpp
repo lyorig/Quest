@@ -1,7 +1,6 @@
 #pragma once
 
-#include <halcyon/event/handler.hpp>
-#include <halcyon/video/renderer.hpp>
+#include <quest/app.hpp>
 
 namespace HQ::State
 {
@@ -17,8 +16,7 @@ namespace HQ::State
     class Base
     {
     public:
-        virtual Type Update(hal::event::handler& event, hal::f64 elapsed) = 0;
-
+        virtual Type Update(App& app, hal::f64 elapsed)    = 0;
         virtual void Draw(hal::video::renderer& rnd) const = 0;
     };
 }

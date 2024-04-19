@@ -12,10 +12,11 @@ namespace HQ::State
     public:
         Intro(hal::video::renderer& rnd, hal::ttf::context& ttf);
 
-        Type Update(hal::event::handler& event, hal::f64 elapsed);
+        Type Update(App& app, hal::f64 elapsed);
         void Draw(hal::video::renderer& rnd) const;
 
     private:
         hal::video::texture m_text;
+        hal::coord_point    m_coord;
     };
 }
