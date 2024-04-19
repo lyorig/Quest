@@ -5,6 +5,8 @@
 
 #include <quest/state/base.hpp>
 
+#include <quest/animatable.hpp>
+
 namespace HQ::State
 {
     class Intro : public Base
@@ -18,5 +20,7 @@ namespace HQ::State
     private:
         hal::video::texture m_text;
         hal::coord_point    m_coord;
+
+        Animatable<hal::u8, Easing::In::Quint> m_alpha;
     };
 }

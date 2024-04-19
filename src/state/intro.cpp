@@ -3,13 +3,23 @@
 using namespace HQ::State;
 
 Intro::Intro(hal::video::renderer& rnd, hal::ttf::context& ttf)
-    : m_text { rnd.load(ttf.load(hal::access("assets/m5x7.ttf"), 48).render("[Intro screen]", hal::palette::black).resize(2.0)) }
+    : m_text { rnd.load(ttf.load(hal::access("assets/m5x7.ttf"), 48).render("Made with Halcyon", hal::palette::black).resize(2.0)) }
     , m_coord { hal::coord_rect { hal::tag::as_size, rnd.size() }.anchor(hal::anchor::center, m_text.size()) }
+    , m_alpha { 255 }
 {
+    m_alpha.Start(0, 4.0);
 }
 
 Type Intro::Update(App& app, hal::f64 elapsed)
 {
+    if (m_alpha.Update(elapsed))
+    {
+        m_text.alpha_mod(m_alpha.Value());
+    }
+
+    else
+        return Type::MainMenu;
+
     while (app.event.poll())
     {
         switch (app.event.event_type())

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <algorithm>
 #include <halcyon/debug.hpp>
 #include <quest/types.hpp>
+#include <vector>
 
 namespace HQ
 {
@@ -12,7 +12,10 @@ namespace HQ
 
         namespace In // TODO
         {
-
+            constexpr Delta Quint(Delta t)
+            {
+                return std::pow(t, 5);
+            }
         }
 
         namespace Out // TODO
@@ -37,9 +40,12 @@ namespace HQ
     class Animatable
     {
     public:
+        using ValueType = T;
+        using DiffType  = decltype(T {} - T {});
+
         Animatable() = default;
 
-        Animatable(const T& initial)
+        Animatable(const ValueType& initial)
             : m_start { initial }
         {
         }
@@ -58,7 +64,7 @@ namespace HQ
             }
         }
 
-        void Start(const T& val, Delta time)
+        void Start(const ValueType& val, Delta time)
         {
             HAL_ASSERT(time >= 0.0, "Negative animation duration");
 
@@ -70,28 +76,79 @@ namespace HQ
         }
 
         // "Teleport" instantly to a value.
-        void Jump(const T& val)
+        void Jump(const ValueType& val)
         {
             start(val, 0.0);
         }
 
         // Change the target.
         // This is only really useful when retargeting mid-animation.
-        void Target(const T& val)
+        void Target(const ValueType& val)
         {
             m_dist = val - m_start;
         }
 
-        T Value() const
+        ValueType Value() const
         {
             return m_start + m_dist * AnimFunc(m_time == 0.0 ? 1.0 : m_elapsed / m_time);
         }
 
+        bool Done() const
+        {
+            return m_elapsed == m_time;
+        }
+
     private:
-        T m_start {},
-            m_dist {};
+        ValueType m_start {};
+
+        DiffType m_dist;
 
         Delta m_time { 0.0 },
             m_elapsed { m_time };
+    };
+
+    template <typename T, auto Func>
+    class AnimationQueue
+    {
+        struct Info
+        {
+            T     value;
+            Delta time;
+        };
+
+    public:
+        using Anim = Animatable<T, Func>;
+
+        void Add(T&& value, Delta time)
+        {
+            m_vec.emplace_back(std::move(value), time);
+        }
+
+        // Returns false if there are no more animations.
+        bool Update(Delta elapsed)
+        {
+            if (m_vec.empty())
+                return false;
+
+            if (!m_anim.Update(elapsed))
+            {
+                m_vec.pop_back();
+
+                const Info& now { m_vec.back() };
+                m_anim.Start(now.value, now.time);
+            }
+
+            return true;
+        }
+
+        const Anim& Get() const
+        {
+            return m_anim;
+        }
+
+    private:
+        Anim m_anim;
+
+        std::vector<Info> m_vec;
     };
 }
