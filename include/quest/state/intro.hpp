@@ -21,6 +21,6 @@ namespace HQ::State
         hal::video::texture m_text;
         hal::coord_point    m_coord;
 
-        Animatable<hal::u8, Easing::In::Quint> m_alpha;
+        Animatable<hal::u8, Easing::In::Parabola<8>> m_alpha;
     };
 }

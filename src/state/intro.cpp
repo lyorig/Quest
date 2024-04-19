@@ -7,7 +7,7 @@ Intro::Intro(hal::video::renderer& rnd, hal::ttf::context& ttf)
     , m_coord { hal::coord_rect { hal::tag::as_size, rnd.size() }.anchor(hal::anchor::center, m_text.size()) }
     , m_alpha { m_text.alpha_mod() }
 {
-    m_alpha.Start(0, 4.0);
+    m_alpha.Start(0, 3.0);
 }
 
 Type Intro::Update(App& app, hal::f64 elapsed)
