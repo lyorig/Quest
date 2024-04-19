@@ -18,5 +18,7 @@ namespace HQ::State
     public:
         virtual Type Update(App& app, hal::f64 elapsed)    = 0;
         virtual void Draw(hal::video::renderer& rnd) const = 0;
+
+        virtual ~Base() = default;
     };
 }

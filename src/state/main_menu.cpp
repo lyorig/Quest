@@ -45,4 +45,5 @@ Type MainMenu::Update(App& app, hal::f64 elapsed)
 
 void MainMenu::Draw(hal::video::renderer& rnd) const
 {
+    static_cast<void>(rnd);
 }

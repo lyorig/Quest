@@ -43,8 +43,7 @@ bool Game::UpdateState(State::Type tp)
         return false;
 
     case MainMenu:
-        m_menu  = m_app;
-        m_state = &m_menu;
+        m_state.reset(new State::MainMenu { m_app });
         break;
     }
 

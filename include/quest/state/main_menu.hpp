@@ -5,10 +5,9 @@
 
 namespace HQ::State
 {
-    class MainMenu : public Base
+    class MainMenu final : public Base
     {
     public:
-        MainMenu() = default;
         MainMenu(const App& wnd);
 
         Type Update(App& event, hal::f64 elapsed);

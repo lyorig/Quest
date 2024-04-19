@@ -9,7 +9,7 @@
 
 namespace HQ::State
 {
-    class Intro : public Base
+    class Intro final : public Base
     {
     public:
         Intro(hal::video::renderer& rnd, hal::ttf::context& ttf);

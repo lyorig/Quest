@@ -20,9 +20,7 @@ namespace HQ
         App m_app;
 
         // Reference to the current state.
-        State::Base* m_state;
-
-        State::MainMenu m_menu;
+        std::unique_ptr<State::Base> m_state;
 
         bool UpdateState(State::Type tp);
     };

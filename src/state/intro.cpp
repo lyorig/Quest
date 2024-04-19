@@ -5,7 +5,7 @@ using namespace HQ::State;
 Intro::Intro(hal::video::renderer& rnd, hal::ttf::context& ttf)
     : m_text { rnd.load(ttf.load(hal::access("assets/m5x7.ttf"), 48).render("Made with Halcyon", hal::palette::black).resize(2.0)) }
     , m_coord { hal::coord_rect { hal::tag::as_size, rnd.size() }.anchor(hal::anchor::center, m_text.size()) }
-    , m_alpha { 255 }
+    , m_alpha { m_text.alpha_mod() }
 {
     m_alpha.Start(0, 4.0);
 }
@@ -13,9 +13,7 @@ Intro::Intro(hal::video::renderer& rnd, hal::ttf::context& ttf)
 Type Intro::Update(App& app, hal::f64 elapsed)
 {
     if (m_alpha.Update(elapsed))
-    {
         m_text.alpha_mod(m_alpha.Value());
-    }
 
     else
         return Type::MainMenu;
@@ -29,10 +27,7 @@ Type Intro::Update(App& app, hal::f64 elapsed)
 
         case key_pressed:
             if (app.event.keyboard().button() == esc)
-            {
-                delete this;
                 return Type::MainMenu;
-            }
             break;
 
         case quit_requested:

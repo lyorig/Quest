@@ -43,8 +43,6 @@ namespace HQ
         using ValueType = T;
         using DiffType  = decltype(T {} - T {});
 
-        Animatable() = default;
-
         Animatable(const ValueType& initial)
             : m_start { initial }
         {
@@ -75,12 +73,6 @@ namespace HQ
             m_elapsed = 0.0;
         }
 
-        // "Teleport" instantly to a value.
-        void Jump(const ValueType& val)
-        {
-            start(val, 0.0);
-        }
-
         // Change the target.
         // This is only really useful when retargeting mid-animation.
         void Target(const ValueType& val)
@@ -101,7 +93,7 @@ namespace HQ
     private:
         ValueType m_start {};
 
-        DiffType m_dist;
+        DiffType m_dist {};
 
         Delta m_time { 0.0 },
             m_elapsed { m_time };
