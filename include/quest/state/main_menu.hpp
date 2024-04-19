@@ -8,12 +8,9 @@ namespace HQ::State
     class MainMenu final : public Base
     {
     public:
-        MainMenu(const App& wnd);
+        MainMenu() = default;
 
         Type Update(App& event, hal::f64 elapsed);
         void Draw(hal::video::renderer& rnd) const;
-
-    private:
-        Animatable<hal::pixel_point, Easing::InOut::Parametric> m_wndSize, m_wndPos;
     };
 }

@@ -12,7 +12,7 @@ namespace HQ
 
         namespace In // TODO
         {
-            template <std::size_t N>
+            template <std::size_t N = 2>
             constexpr Delta Parabola(Delta t)
             {
                 return std::pow(t, N);

@@ -16,7 +16,7 @@ Type Intro::Update(App& app, hal::f64 elapsed)
         m_text.alpha_mod(m_alpha.Value());
 
     else
-        return Type::MainMenu;
+        return Type::WindowExpansion;
 
     while (app.event.poll())
     {
@@ -27,7 +27,7 @@ Type Intro::Update(App& app, hal::f64 elapsed)
 
         case key_pressed:
             if (app.event.keyboard().button() == esc)
-                return Type::MainMenu;
+                return Type::WindowExpansion;
             break;
 
         case quit_requested:

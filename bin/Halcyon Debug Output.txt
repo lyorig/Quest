@@ -1,9 +1,9 @@
 [0.000s] [init]  Initialized Halcyon context
 [0.000s] [init]  Initialized TTF context
-[0.080s] [init]  Video subsystem initialized
-[0.096s] [init]  Created window "HalodaQuest", flags = 0x0, ID = 1
-[0.102s] [init]  Created renderer for window "HalodaQuest", flags = 0x6
-[0.102s] [warn]  "m5x7 Medium" has different height (38px) & skip (43px). size_text() might not return accurate vertical results.
-[5.935s] [info]  Video subsystem quit
-[5.936s] [info]  Destroyed TTF context
-[5.936s] [info]  Cleaning up SDL. Last error: [no SDL error]
+[0.024s] [init]  Video subsystem initialized
+[0.026s] [init]  Created window "HalodaQuest", flags = 0x0, ID = 1
+[0.103s] [init]  Created renderer for window "HalodaQuest", flags = 0x6
+[0.103s] [warn]  "m5x7 Medium" has different height (38px) & skip (43px). size_text() might not return accurate vertical results.
+[8.360s] [info]  Video subsystem quit
+[8.360s] [info]  Destroyed TTF context
+[8.360s] [info]  Cleaning up SDL. Last error: [no SDL error]

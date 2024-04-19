@@ -9,6 +9,7 @@ namespace HQ::State
         None,
         Quit,
         // Intro, <- this isn't included since the intro is a one-off
+        WindowExpansion,
         MainMenu,
     };
 

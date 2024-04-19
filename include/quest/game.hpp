@@ -4,8 +4,7 @@
 
 #include <quest/app.hpp>
 
-#include <quest/state/intro.hpp>
-#include <quest/state/main_menu.hpp>
+#include <quest/state/base.hpp>
 
 namespace HQ
 {
