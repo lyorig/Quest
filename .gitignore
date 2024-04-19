@@ -2,5 +2,7 @@
 
 .cache/
 
-bin/
+bin/*
+!bin/assets/
+
 build/
