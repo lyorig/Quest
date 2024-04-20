@@ -9,7 +9,7 @@ namespace HQ::State
     class WindowExpansion : public Base
     {
     public:
-        WindowExpansion(const App& app, hal::pixel_point display_size);
+        WindowExpansion(const App& app);
 
         Type Update(App& event, hal::f64 elapsed);
         void Draw(hal::video::renderer& rnd) const;

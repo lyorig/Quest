@@ -3,7 +3,6 @@
 #include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
 
-#include <quest/state/intro.hpp>
 #include <quest/state/main_menu.hpp>
 #include <quest/state/window_expansion.hpp>
 
@@ -11,7 +10,7 @@ using namespace HQ;
 
 Game::Game(Arguments args)
     : m_app { args }
-    , m_state { new State::Intro { m_app } }
+    , m_state { new State::WindowExpansion { m_app } }
 {
 }
 
@@ -45,10 +44,6 @@ bool Game::UpdateState(State::Type tp)
 
     case Quit:
         return false;
-
-    case WindowExpansion:
-        m_state.reset(new State::WindowExpansion { m_app, m_app.video.displays[m_app.window.display_index()].size() });
-        break;
 
     case MainMenu:
         m_state.reset(new State::MainMenu {});

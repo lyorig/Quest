@@ -2,16 +2,16 @@
 
 using namespace HQ::State;
 
-WindowExpansion::WindowExpansion(const App& app, hal::pixel_point display_size)
+WindowExpansion::WindowExpansion(const App& app)
     : m_wndSize { app.window.size() }
     , m_wndPos { app.window.pos() }
     , m_drawCol { app.renderer.draw_color() }
 {
     constexpr Delta Time { 1.0 };
 
-    m_wndSize.Start(display_size, Time);
+    m_wndSize.Start(app.video.displays[app.window.display_index()].size(), Time);
     m_wndPos.Start({ 0, 0 }, Time);
-    m_drawCol.Start(0x000000, Time);
+    m_drawCol.Start(hal::palette::blue, Time);
 }
 
 Type WindowExpansion::Update(App& app, hal::f64 elapsed)

@@ -5,7 +5,6 @@ project(HalodaQuest)
 include(halcyon/config.cmake)
 
 set(QUEST_SOURCES
-state/intro.cpp
 state/main_menu.cpp
 state/window_expansion.cpp
 app.cpp
