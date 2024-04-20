@@ -12,7 +12,7 @@ namespace HQ::State
     class Intro final : public Base
     {
     public:
-        Intro(hal::video::renderer& rnd, hal::ttf::context& ttf);
+        Intro(App& app);
 
         Type Update(App& app, hal::f64 elapsed);
         void Draw(hal::video::renderer& rnd) const;

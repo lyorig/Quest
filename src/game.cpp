@@ -11,7 +11,7 @@ using namespace HQ;
 
 Game::Game(Arguments args)
     : m_app { args }
-    , m_state { new State::Intro { m_app.renderer, m_app.ttf } }
+    , m_state { new State::Intro { m_app } }
 {
 }
 
@@ -47,7 +47,7 @@ bool Game::UpdateState(State::Type tp)
         return false;
 
     case WindowExpansion:
-        m_state.reset(new State::WindowExpansion { m_app.window, m_app.video.displays[m_app.window.display_index()].size() });
+        m_state.reset(new State::WindowExpansion { m_app, m_app.video.displays[m_app.window.display_index()].size() });
         break;
 
     case MainMenu:
