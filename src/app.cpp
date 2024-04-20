@@ -10,7 +10,11 @@ App::App([[maybe_unused]] const Arguments& args)
     , renderer { window, { accelerated, vsync } }
     , event { video.events }
 {
-    window.pos(hal::mouse::pos_abs().anchor(hal::anchor::center, window.size()));
+    const auto pos = hal::mouse::pos_abs();
+
+    HAL_PRINT("Captured mouse at ", pos);
+
+    window.pos(pos.anchor(hal::anchor::center, window.size()));
     renderer.draw_color(hal::palette::black);
 }
 
