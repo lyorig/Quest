@@ -7,10 +7,10 @@ using enum hal::video::renderer::flags;
 App::App([[maybe_unused]] const Arguments& args)
     : video { m_context }
     , window { video, "HalodaQuest", { 0, 0 } } // Smallest possible size, essentially.
-    , renderer { window, { accelerated, vsync } }
+    , renderer { window, { vsync } }
     , event { video.events }
 {
-    const auto pos = hal::mouse::pos_abs();
+    const auto pos = video.events.mouse.pos_abs();
 
     HAL_PRINT("Captured mouse at ", pos);
 

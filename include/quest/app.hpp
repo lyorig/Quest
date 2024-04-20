@@ -18,7 +18,6 @@ namespace HQ
         hal::context m_context;
 
     public:
-        HAL_NO_SIZE hal::ttf::context ttf;
         HAL_NO_SIZE hal::video::system video;
 
         hal::video::window   window;

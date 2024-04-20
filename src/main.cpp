@@ -1,4 +1,3 @@
-#include <halcyon/image.hpp>
 #include <quest/game.hpp>
 
 int main(int argc, const char* argv[])
