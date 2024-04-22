@@ -2,9 +2,18 @@
 
 using namespace HQ::State;
 
+MainMenu::MainMenu(App& app)
+    : m_theme { app.renderer.draw_color() }
+    , m_currentTheme { false }
+{
+}
+
 Type MainMenu::Update(App& app, hal::f64 elapsed)
 {
-    static_cast<void>(elapsed);
+    if (m_theme.Update(elapsed))
+    {
+        app.renderer.draw_color(m_theme.Value());
+    }
 
     while (app.event.poll())
     {
@@ -14,6 +23,18 @@ Type MainMenu::Update(App& app, hal::f64 elapsed)
 
         case quit_requested:
             return Type::Quit;
+
+        case key_pressed:
+            switch (app.event.keyboard().button())
+            {
+                using enum hal::keyboard::button;
+
+            case T:
+                m_theme.Start(SwitchTheme(), 1.0);
+
+            default:
+                break;
+            }
 
         default:
             break;
@@ -26,4 +47,11 @@ Type MainMenu::Update(App& app, hal::f64 elapsed)
 void MainMenu::Draw(hal::video::renderer& rnd) const
 {
     static_cast<void>(rnd);
+}
+
+hal::color MainMenu::SwitchTheme()
+{
+    constexpr hal::color colors[2] { hal::palette::red, hal::palette::black };
+    m_currentTheme = !m_currentTheme;
+    return colors[m_currentTheme];
 }

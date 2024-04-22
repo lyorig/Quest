@@ -70,7 +70,7 @@ namespace HQ
             m_start = Value();
             Target(val);
 
-            m_time    = time;
+            m_time    = time - (m_time - m_elapsed);
             m_elapsed = 0.0;
         }
 
