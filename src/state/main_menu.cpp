@@ -1,18 +1,24 @@
 #include <quest/state/main_menu.hpp>
+#include <quest/state/window_expansion.hpp>
 
 using namespace HQ::State;
 
 MainMenu::MainMenu(App& app)
     : m_theme { app.renderer.draw_color() }
-    , m_currentTheme { false }
+    , m_currentTheme { 0 }
 {
 }
 
 Type MainMenu::Update(App& app, hal::f64 elapsed)
 {
-    if (m_theme.Update(elapsed))
+    if (m_theme.Update(elapsed)) [[likely]]
     {
         app.renderer.draw_color(m_theme.Value());
+    }
+
+    else
+    {
+        m_theme.Start(SwitchTheme(), 4.0);
     }
 
     while (app.event.poll())
@@ -29,9 +35,6 @@ Type MainMenu::Update(App& app, hal::f64 elapsed)
             {
                 using enum hal::keyboard::button;
 
-            case T:
-                m_theme.Start(SwitchTheme(), 1.0);
-
             default:
                 break;
             }
@@ -44,14 +47,19 @@ Type MainMenu::Update(App& app, hal::f64 elapsed)
     return Type::None;
 }
 
-void MainMenu::Draw(hal::video::renderer& rnd) const
+void MainMenu::Draw(hal::renderer& rnd) const
 {
     static_cast<void>(rnd);
 }
 
 hal::color MainMenu::SwitchTheme()
 {
-    constexpr hal::color colors[2] { hal::palette::red, hal::palette::black };
-    m_currentTheme = !m_currentTheme;
+    using namespace hal::palette;
+
+    // Technically, this starts on the 2nd color.
+    constexpr hal::color colors[] { blue, cyan, red, white, black, orange };
+    static_assert(colors[1] != WindowExpansion::EndColor());
+    m_currentTheme = ++m_currentTheme % std::size(colors);
+
     return colors[m_currentTheme];
 }

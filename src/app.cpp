@@ -2,7 +2,7 @@
 
 using namespace HQ;
 
-using enum hal::video::renderer::flags;
+using enum hal::renderer::flags;
 
 App::App([[maybe_unused]] const Arguments& args)
     : video { m_context }

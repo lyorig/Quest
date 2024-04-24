@@ -11,13 +11,13 @@ namespace HQ::State
         MainMenu(App& app);
 
         Type Update(App& event, hal::f64 elapsed);
-        void Draw(hal::video::renderer& rnd) const;
+        void Draw(hal::renderer& rnd) const;
 
     private:
         hal::color SwitchTheme();
 
-        Animatable<hal::color, Easing::Linear> m_theme;
+        Animatable<hal::color, Easing::InOut::Bezier> m_theme;
 
-        bool m_currentTheme;
+        hal::u8 m_currentTheme;
     };
 }

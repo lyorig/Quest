@@ -2,16 +2,16 @@
 
 using namespace HQ::State;
 
-WindowExpansion::WindowExpansion(const App& app)
+WindowExpansion::WindowExpansion(App& app)
     : m_wndSize { app.window.size() }
     , m_wndPos { app.window.pos() }
-    , m_drawCol { app.renderer.draw_color() }
+    , m_drawCol { (app.renderer.draw_color(StartColor()), app.renderer.draw_color()) }
 {
     constexpr Delta Time { 1.0 };
 
     m_wndSize.Start(app.video.displays[app.window.display_index()].size(), Time);
     m_wndPos.Start({ 0, 0 }, Time);
-    m_drawCol.Start(hal::palette::blue, Time);
+    m_drawCol.Start(EndColor(), Time);
 }
 
 Type WindowExpansion::Update(App& app, hal::f64 elapsed)
@@ -50,7 +50,7 @@ Type WindowExpansion::Update(App& app, hal::f64 elapsed)
     return Type::MainMenu;
 }
 
-void WindowExpansion::Draw(hal::video::renderer& rnd) const
+void WindowExpansion::Draw(hal::renderer& rnd) const
 {
     static_cast<void>(rnd);
 }

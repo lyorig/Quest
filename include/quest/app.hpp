@@ -18,11 +18,11 @@ namespace HQ
         hal::context m_context;
 
     public:
-        HAL_NO_SIZE hal::video::system video;
+        HAL_NO_SIZE hal::system::video video;
 
-        hal::video::window   window;
-        hal::video::renderer renderer;
+        hal::window   window;
+        hal::renderer renderer;
 
-        hal::event::handler event;
+        hal::event event;
     };
 }
