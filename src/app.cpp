@@ -10,7 +10,9 @@ App::App([[maybe_unused]] const Arguments& args)
     , renderer { window.make_renderer({ vsync }) }
     , event { video.events }
 {
-    const hal::pixel_point dsz { video.displays[window.display_index()].size() / 2 };
+    using namespace hal::literals;
+
+    const hal::pixel_point dsz = video.displays[window.display_index()].size() / 2_px;
 
     window.pos(dsz.anchor(hal::anchor::center, window.size()));
     renderer.draw_color(hal::palette::black);

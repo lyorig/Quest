@@ -1,6 +1,7 @@
 #pragma once
 
 #include <quest/animatable.hpp>
+#include <quest/sprite.hpp>
 #include <quest/state/base.hpp>
 
 namespace HQ::State
@@ -17,6 +18,8 @@ namespace HQ::State
         hal::color SwitchTheme();
 
         Animatable<hal::color, Easing::InOut::Bezier> m_theme;
+
+        std::vector<Sprite> m_widgets;
 
         hal::u8 m_currentTheme;
     };

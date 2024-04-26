@@ -13,7 +13,7 @@ namespace HQ::State
 
         constexpr static hal::color StartColor()
         {
-            return hal::palette::black;
+            return hal::palette::white;
         }
 
         constexpr static hal::color EndColor()

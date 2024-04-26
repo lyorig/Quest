@@ -4,16 +4,7 @@ project(HalodaQuest)
 
 include(halcyon/config.cmake)
 
-set(QUEST_SOURCES
-state/main_menu.cpp
-state/window_expansion.cpp
-app.cpp
-arguments.cpp
-game.cpp
-main.cpp
-)
-
-list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+file(GLOB_RECURSE QUEST_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
 add_executable(HalodaQuest
 ${HALCYON_SOURCES}

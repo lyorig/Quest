@@ -19,6 +19,7 @@ namespace HQ
 
     public:
         HAL_NO_SIZE hal::system::video video;
+        HAL_NO_SIZE hal::ttf::context ttf;
 
         hal::window   window;
         hal::renderer renderer;
