@@ -14,12 +14,8 @@ MainMenu::MainMenu(App& app)
 }
 
 Type MainMenu::Update(App& app, hal::f64 elapsed) {
-    if (m_theme.Update(elapsed)) [[likely]] {
+    if (m_theme.Update(elapsed)) {
         app.renderer.draw_color(m_theme.Value());
-    }
-
-    else {
-        m_theme.Start(SwitchTheme(), 10.0);
     }
 
     while (app.event.poll()) {
@@ -42,7 +38,7 @@ Type MainMenu::Update(App& app, hal::f64 elapsed) {
             if (app.event.mouse_button().button() == hal::mouse::button::left) {
                 for (const auto& wgt : m_widgets) {
                     if (app.event.mouse_button().pos() | wgt.Hitbox()) {
-                        HAL_PRINT("Widget pressed.");
+                        m_theme.Start(SwitchTheme(), 0.5);
                         break;
                     }
                 }

@@ -1,7 +1,6 @@
 #include <quest/game.hpp>
 
-int main(int argc, const char* argv[])
-{
+int main(int argc, const char* argv[]) {
     HQ::Game m_app { { argc, argv } };
 
     m_app.MainLoop();
