@@ -3,14 +3,14 @@
 
 using namespace HQ::State;
 
-MainMenu::MainMenu(App& app)
-    : m_theme { app.renderer.draw_color() }
+MainMenu::MainMenu(hal::renderer& rnd, hal::ttf::context& ttf)
+    : m_theme { rnd.draw_color() }
     , m_currentTheme { 0 } {
-    const auto font = app.ttf.load(hal::access("assets/m5x7.ttf"), 16);
+    const auto font = ttf.load(hal::access("assets/m5x7.ttf"), 16);
 
     const auto surf = font.render("HalodaQuest");
 
-    m_widgets.push_back({ app.renderer.make_texture(surf), { 75, 0 }, hal::scale::width(app.renderer.size().x / 2)(surf.size()) });
+    m_widgets.push_back({ rnd.make_texture(surf), { 75, 0 }, hal::scale::width(rnd.size().x / 2)(surf.size()) });
 }
 
 Type MainMenu::Update(App& app, hal::f64 elapsed) {

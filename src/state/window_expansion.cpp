@@ -2,15 +2,15 @@
 
 using namespace HQ::State;
 
-WindowExpansion::WindowExpansion(App& app)
-    : m_wndSize { app.window.size() }
-    , m_wndPos { app.window.pos() }
+WindowExpansion::WindowExpansion(const hal::window& wnd, const hal::system::video& vid, hal::renderer& rnd)
+    : m_wndSize { wnd.size() }
+    , m_wndPos { wnd.pos() }
     , m_drawCol { StartColor() } {
     constexpr Delta Time { 1.0 };
 
-    app.renderer.draw_color(StartColor());
+    rnd.draw_color(StartColor());
 
-    m_wndSize.Start(app.video.displays[app.window.display_index()].size(), Time);
+    m_wndSize.Start(vid.displays[wnd.display_index()].size(), Time);
     m_wndPos.Start({ 0, 0 }, Time);
     m_drawCol.Start(EndColor(), Time);
 }

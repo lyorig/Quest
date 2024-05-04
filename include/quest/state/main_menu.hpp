@@ -4,12 +4,10 @@
 #include <quest/sprite.hpp>
 #include <quest/state/base.hpp>
 
-namespace HQ::State
-{
-    class MainMenu final : public Base
-    {
+namespace HQ::State {
+    class MainMenu final : public Base {
     public:
-        MainMenu(App& app);
+        MainMenu(hal::renderer& rnd, hal::ttf::context& ttf);
 
         Type Update(App& event, hal::f64 elapsed);
         void Draw(hal::renderer& rnd) const;

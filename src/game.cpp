@@ -10,17 +10,14 @@ using namespace HQ;
 
 Game::Game(Arguments args)
     : m_app { args }
-    , m_state { new State::WindowExpansion { m_app } }
-{
+    , m_state { new State::WindowExpansion { m_app.window, m_app.video, m_app.renderer } } {
 }
 
-void Game::MainLoop()
-{
+void Game::MainLoop() {
     hal::f64   delta;
     hal::timer timer;
 
-    while (true)
-    {
+    while (true) {
         delta = timer();
         timer.reset();
 
@@ -33,12 +30,10 @@ void Game::MainLoop()
     }
 }
 
-bool Game::UpdateState(State::Type tp)
-{
+bool Game::UpdateState(State::Type tp) {
     using enum State::Type;
 
-    switch (tp)
-    {
+    switch (tp) {
     case None:
         break;
 
@@ -46,7 +41,7 @@ bool Game::UpdateState(State::Type tp)
         return false;
 
     case MainMenu:
-        m_state.reset(new State::MainMenu { m_app });
+        m_state.reset(new State::MainMenu { m_app.renderer, m_app.ttf });
         break;
     }
 

@@ -4,20 +4,16 @@
 
 #include <quest/animatable.hpp>
 
-namespace HQ::State
-{
-    class WindowExpansion : public Base
-    {
+namespace HQ::State {
+    class WindowExpansion : public Base {
     public:
-        WindowExpansion(App& app);
+        WindowExpansion(const hal::window& wnd, const hal::system::video& vid, hal::renderer& rnd);
 
-        constexpr static hal::color StartColor()
-        {
+        constexpr static hal::color StartColor() {
             return hal::palette::white;
         }
 
-        constexpr static hal::color EndColor()
-        {
+        constexpr static hal::color EndColor() {
             return hal::palette::blue;
         }
 
