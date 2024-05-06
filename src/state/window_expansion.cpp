@@ -27,7 +27,7 @@ Type WindowExpansion::Update(App& app, hal::f64 elapsed) {
 
         while (app.event.poll()) {
             switch (app.event.event_type()) {
-                using enum hal::event::type;
+                using enum hal::event_handler::type;
 
             case quit_requested:
                 return Type::Quit;

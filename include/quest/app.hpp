@@ -5,10 +5,8 @@
 
 #include <quest/arguments.hpp>
 
-namespace HQ
-{
-    class App
-    {
+namespace HQ {
+    class App {
     public:
         App(const Arguments& args);
 
@@ -24,6 +22,6 @@ namespace HQ
         hal::window   window;
         hal::renderer renderer;
 
-        hal::event event;
+        hal::event_handler event;
     };
 }
