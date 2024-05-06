@@ -9,6 +9,9 @@ namespace HQ {
         std::vector<T> vec;
     };
 
+    // The Really Fast Entity Manager (RFEM).
+    // Its key advantage is that it makes the compiler do a lot of work.
+    // And disadvantages? 24 extra bytes per type.
     template <typename... Entities>
     class RFEMTemplate : RFEMLeaf<Entities>... {
     public:
@@ -28,7 +31,7 @@ namespace HQ {
             return RFEMLeaf<T>::vec;
         }
 
-        template <typename Functor> // This is pure cancer.
+        template <typename Functor> // clang-format turns this into cuneiform.
         void Visit(Functor&& f) {
             ([&]() {
                 for (auto& ent : RFEMLeaf<Entities>::vec)
@@ -37,6 +40,4 @@ namespace HQ {
                 ...);
         }
     };
-
-    using RFEM = RFEMTemplate<int, double, short>;
 }
