@@ -9,12 +9,16 @@ int main(int argc, char* argv[]) {
 
     std::srand(std::time(nullptr));
 
-    HQ::RFEMTemplate<std::uint16_t, std::uint32_t, std::uint64_t> rfem;
+    using List = hal::type_list<std::uint16_t, std::uint32_t, std::uint64_t>;
+    using RFEM = List::wrap<HQ::RFEMTemplate>;
+
+    RFEM       rfem;
+    hal::timer t;
 
     const std::size_t TotalElements { std::stoull(argv[1]) };
 
     for (std::size_t i { 0 }; i < TotalElements; ++i) {
-        switch (std::rand() % rfem.Types()) {
+        switch (std::rand() % List::size) {
         case 0:
             rfem.Spawn<std::uint16_t>(1);
             break;
@@ -27,10 +31,12 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    HAL_PRINT("Done generating elements");
+    HAL_PRINT("Generating elements took ", t(), 's');
+    HAL_PRINT("u16: ", rfem.Get<List::at_index<0>>().size(), ", u32: ", rfem.Get<List::at_index<1>>().size(), ", u64: ", rfem.Get<List::at_index<2>>().size());
 
     std::uint64_t sum { 0 };
-    hal::timer    t;
+
+    t.reset();
 
     rfem.Visit([&](auto&& val) { sum += val; });
 
