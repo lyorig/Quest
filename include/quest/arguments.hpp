@@ -3,16 +3,14 @@
 #include <span>
 #include <string_view>
 
-namespace HQ
-{
-    class Arguments
-    {
+namespace HQ {
+    class Arguments {
     public:
-        Arguments(int argc, const char* argv[]);
+        Arguments(int argc, char** argv);
 
         bool operator[](std::string_view what) const;
 
     private:
-        std::span<const char*> m_span;
+        std::span<char*> m_span;
     };
 }

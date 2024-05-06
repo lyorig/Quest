@@ -3,13 +3,11 @@
 
 using namespace HQ;
 
-Arguments::Arguments(int argc, const char* argv[])
-    : m_span { argv, static_cast<std::size_t>(argc) }
-{
+Arguments::Arguments(int argc, char** argv)
+    : m_span { argv, static_cast<std::size_t>(argc) } {
 }
 
-bool Arguments::operator[](std::string_view what) const
-{
+bool Arguments::operator[](std::string_view what) const {
     for (auto arg : m_span)
         if (hal::streq(arg, what.data()))
             return true;
