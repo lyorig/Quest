@@ -20,7 +20,7 @@ if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     target_compile_options(HalodaQuest PRIVATE -flto -march=native)
     target_link_options(HalodaQuest PRIVATE -flto)
 
-    target_compile_definitions(HalodaQuest PRIVATE HAL_FAST_TYPES HAL_DEBUG_ENABLED)
+    target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)
 endif()
 
 target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
