@@ -11,9 +11,9 @@
 namespace HQ::State {
     class Base {
     public:
-        virtual void  Process(const hal::event_handler& evt) = 0;
-        virtual Base* Update(Delta elapsed)                  = 0;
-        virtual void  Draw(hal::renderer& rnd) const         = 0;
+        virtual void  Process(const hal::event::handler& evt) = 0;
+        virtual Base* Update(Delta elapsed)                   = 0;
+        virtual void  Draw(hal::renderer& rnd) const          = 0;
 
         virtual ~Base() = default;
     };

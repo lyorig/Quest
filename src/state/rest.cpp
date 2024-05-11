@@ -12,9 +12,9 @@ MainMenu::MainMenu(hal::renderer& rnd, hal::ttf::context& ttf)
     m_widgets.push_back({ rnd.make_texture(surf), { 75, 0 }, hal::scale::width(rnd.size().x / 2)(surf.size()) });
 }
 
-void MainMenu::Process(const hal::event_handler& event) {
+void MainMenu::Process(const hal::event::handler& event) {
     switch (event.event_type()) {
-        using enum hal::event_handler::type;
+        using enum hal::event::handler::type;
 
     case key_pressed:
         switch (event.keyboard().button()) {

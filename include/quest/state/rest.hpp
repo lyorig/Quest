@@ -15,7 +15,7 @@ namespace HQ::State {
     public:
         MainMenu(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void  Process(const hal::event_handler& evt);
+        void  Process(const hal::event::handler& event);
         Base* Update(hal::f64 elapsed);
         void  Draw(hal::renderer& rnd) const;
 

@@ -31,7 +31,7 @@ namespace HQ {
         hal::window   m_window;
         hal::renderer m_renderer;
 
-        hal::event_handler m_event;
+        hal::event::handler m_event;
 
         // Reference to the current state.
         std::unique_ptr<State::Base> m_state;

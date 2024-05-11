@@ -37,11 +37,15 @@ void Game::MainLoop() {
 
         while (m_event.poll()) {
             switch (m_event.event_type()) {
-                using enum hal::event_handler::type;
+                using enum hal::event::handler::type;
 
                 // Handle universal events here.
             case quit_requested:
                 return;
+
+            case display_event:
+                HAL_PRINT("Got display event: ", hal::to_string(m_event.display().event_type()));
+                break;
 
                 // We aren't interested, but the current state might be.
             default:
@@ -50,7 +54,7 @@ void Game::MainLoop() {
             }
         }
 
-        if (auto ptr = m_state->Update(delta); ptr != nullptr)
+        if (State::Base* ptr = m_state->Update(delta); ptr != nullptr)
             m_state.reset(ptr);
 
         m_state->Draw(m_renderer);
