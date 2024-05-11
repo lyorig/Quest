@@ -1,22 +1,19 @@
 #pragma once
 
-#include <quest/app.hpp>
+#include <halcyon/event.hpp>
+#include <halcyon/video.hpp>
 
-namespace HQ::State
-{
-    enum class Type
-    {
-        None,
-        Quit,
-        MainMenu,
-    };
+#include <quest/types.hpp>
 
-    // Base state class.
-    class Base
-    {
+// state/base.hpp:
+// Base state class.
+
+namespace HQ::State {
+    class Base {
     public:
-        virtual Type Update(App& app, hal::f64 elapsed) = 0;
-        virtual void Draw(hal::renderer& rnd) const     = 0;
+        virtual void  Process(const hal::event_handler& evt) = 0;
+        virtual Base* Update(Delta elapsed)                  = 0;
+        virtual void  Draw(hal::renderer& rnd) const         = 0;
 
         virtual ~Base() = default;
     };
