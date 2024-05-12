@@ -1,9 +1,9 @@
 #include <quest/game.hpp>
 
 int main(int argc, char* argv[]) {
-    HQ::Game game { { argc, argv } };
+    HQ::game game { { argc, argv } };
 
-    game.MainLoop();
+    game.main_loop();
 
     return EXIT_SUCCESS;
 }

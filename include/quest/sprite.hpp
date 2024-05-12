@@ -6,13 +6,13 @@
 #include <halcyon/video/texture.hpp>
 
 namespace HQ {
-    class Sprite {
+    class sprite {
     public:
-        Sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size);
+        sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size);
 
-        void Draw(hal::renderer& rnd) const;
+        void draw(hal::renderer& rnd) const;
 
-        const hal::coord_rect& Hitbox() const;
+        const hal::coord_rect& hitbox() const;
 
     private:
         hal::texture    m_tex;

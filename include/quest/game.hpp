@@ -3,12 +3,12 @@
 #include <halcyon/events.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/state/base.hpp>
+#include <quest/state/rest.hpp>
 
 namespace HQ {
-    class Arguments {
+    class args {
     public:
-        Arguments(int argc, char** argv);
+        args(int argc, char** argv);
 
         bool operator[](std::string_view what) const;
 
@@ -16,14 +16,15 @@ namespace HQ {
         std::span<char*> m_span;
     };
 
-    class Game {
+    class game {
     public:
-        Game(Arguments args);
+        game(args a);
 
-        void MainLoop();
+        void main_loop();
+        void quit();
 
     private:
-        hal::context m_context;
+        HAL_NO_SIZE hal::context m_context;
 
         HAL_NO_SIZE hal::system::video m_video;
         HAL_NO_SIZE hal::ttf::context m_ttf;
@@ -31,9 +32,14 @@ namespace HQ {
         hal::window   m_window;
         hal::renderer m_renderer;
 
+        std::tuple<state::console> m_statics;
+
         hal::event::handler m_event;
 
         // Reference to the current state.
-        std::unique_ptr<State::Base> m_state;
+        std::unique_ptr<state::Base> m_state;
+
+        // Whether the game is not quit yet.
+        bool m_running { true };
     };
 }

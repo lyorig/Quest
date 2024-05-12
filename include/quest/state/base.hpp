@@ -8,11 +8,11 @@
 // state/base.hpp:
 // Base state class.
 
-namespace HQ::State {
+namespace HQ::state {
     class Base {
     public:
         virtual void  Process(const hal::event::handler& evt) = 0;
-        virtual Base* Update(Delta elapsed)                   = 0;
+        virtual Base* Update(delta_t elapsed)                 = 0;
         virtual void  Draw(hal::renderer& rnd) const          = 0;
 
         virtual ~Base() = default;

@@ -6,7 +6,7 @@ include(halcyon/config.cmake)
 
 file(GLOB_RECURSE QUEST_SOURCES CONFIGURE_DEPENDS src/*.cpp)
 
-add_executable(HalodaQuest WIN32
+add_executable(HalodaQuest
 ${HALCYON_SOURCES}
 ${QUEST_SOURCES}
 )
@@ -35,4 +35,4 @@ target_compile_definitions(HalodaQuest PRIVATE HAL_INTEGRAL_COORD)
 
 set_target_properties(HalodaQuest PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
-RUNTIME_OUTPUT_NAME $<TARGET_NAME:HalodaQuest>-${CMAKE_BUILD_TYPE})
+)

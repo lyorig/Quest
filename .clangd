@@ -1,2 +1,5 @@
 InlayHints:
     Enabled: No
+
+CompileFlags:
+    Add: [/std:c++latest]

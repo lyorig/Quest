@@ -1,5 +1,5 @@
 #pragma once
 
-namespace HQ::Const {
+namespace HQ::consts {
     // Unused as of yet.
 }
