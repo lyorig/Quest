@@ -33,22 +33,29 @@ namespace HQ::state {
     public:
         console(hal::ttf::font&& ttf);
 
-        void draw(hal::renderer& rnd) const;
+        void draw(hal::renderer& rnd);
 
         void log(std::string&& str);
 
+        void process(hal::keyboard::key k);
+        void process(char ch);
+
         bool active() const;
-        void toggle(hal::renderer& rnd);
 
         void show(hal::renderer& rnd);
         void hide();
 
+        void toggle(hal::renderer& rnd);
+
     private:
         std::vector<std::string> m_entries;
+        std::string              m_line;
 
         hal::ttf::font m_font;
-        hal::texture   m_tex;
 
-        bool m_active;
+        hal::texture     m_tex;
+        hal::coord_point m_size;
+
+        bool m_active, m_repaint;
     };
 }

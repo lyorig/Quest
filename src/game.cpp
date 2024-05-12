@@ -47,16 +47,25 @@ void game::main_loop() {
                 break;
 
             case key_pressed:
-                switch (m_event.keyboard().button()) {
-                    using enum hal::keyboard::button;
+                if (auto& cns = std::get<state::console>(m_statics); cns.active()) {
+                    cns.process(m_event.keyboard().key());
+                } else {
+                    switch (m_event.keyboard().key()) {
+                        using enum hal::keyboard::key;
 
-                case F1:
-                    std::get<state::console>(m_statics).toggle(m_renderer);
-                    break;
+                    case F1:
+                        std::get<state::console>(m_statics).show(m_renderer);
+                        break;
 
-                default:
+                    default:
+                        break;
+                    }
                     break;
                 }
+                break;
+
+            case text_input:
+                std::get<state::console>(m_statics).process(m_event.text_input().text()[0]);
                 break;
 
                 // We aren't interested, but the current state might be.
@@ -71,7 +80,7 @@ void game::main_loop() {
 
         m_state->draw(m_renderer);
 
-        std::apply([this](const auto& obj) { obj.draw(m_renderer); }, m_statics);
+        std::apply([this](auto& obj) { obj.draw(m_renderer); }, m_statics);
 
         m_renderer.present();
     }

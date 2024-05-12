@@ -67,15 +67,26 @@ hal::color main_menu::switch_theme() {
 
 console::console(hal::ttf::font&& fnt)
     : m_font { std::move(fnt) }
-    , m_active { false } {
+    , m_active { false }
+    , m_repaint { false } {
 }
 
-void console::draw(hal::renderer& rnd) const {
-    constexpr hal::color background { hal::palette::weezer_blue, 64 };
+void console::draw(hal::renderer& rnd) {
+    constexpr hal::color       background { 0x000B3B, 192 };
+    constexpr hal::coord_point offset { 10, 10 };
 
     if (m_active) {
         hal::renderer::color_lock lock { rnd, background };
         rnd.fill_target();
+
+        if (m_repaint && !m_line.empty()) {
+            m_repaint = false;
+            m_tex     = rnd.make_texture(m_font.render(m_line));
+            m_size    = hal::scale::height(64)(m_tex.size());
+        }
+
+        if (m_tex.valid())
+            rnd.draw(m_tex).to({ offset, m_size })();
     }
 }
 
@@ -83,22 +94,45 @@ void console::log(std::string&& str) {
     m_entries.push_back(std::move(str));
 }
 
+void console::process(hal::keyboard::key k) {
+    switch (k) {
+        using enum hal::keyboard::key;
+
+    case F1:
+        hide();
+        break;
+
+    case backspace:
+        if (!m_line.empty()) {
+            m_line.pop_back();
+            m_repaint = true;
+        }
+
+        if (m_line.empty()) {
+            m_tex.reset();
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void console::process(char ch) {
+    m_line += ch;
+    m_repaint = true;
+}
+
 bool console::active() const {
     return m_active;
 }
 
-void console::toggle(hal::renderer& rnd) {
-    if (m_active)
-        hide();
-    else
-        show(rnd);
-}
-
 void console::show(hal::renderer& rnd) {
 
-    m_active = true;
+    m_active  = true;
+    m_repaint = true;
 
-    m_tex = rnd.make_texture(m_font.render("Amogus"));
+    ::SDL_StartTextInput();
 
     HAL_PRINT("Showing console");
 }
@@ -108,5 +142,14 @@ void console::hide() {
 
     m_tex.reset();
 
+    ::SDL_StopTextInput();
+
     HAL_PRINT("Hiding console");
+}
+
+void console::toggle(hal::renderer& rnd) {
+    if (m_active)
+        hide();
+    else
+        show(rnd);
 }
