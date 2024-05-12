@@ -14,7 +14,7 @@ MainMenu::MainMenu(hal::renderer& rnd, hal::ttf::context& ttf)
 
 void MainMenu::Process(const hal::event::handler& event) {
     switch (event.event_type()) {
-        using enum hal::event::handler::type;
+        using enum hal::event::type;
 
     case key_pressed:
         switch (event.keyboard().button()) {

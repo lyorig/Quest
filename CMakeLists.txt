@@ -14,11 +14,16 @@ ${QUEST_SOURCES}
 # target_compile_options(HalodaQuest PRIVATE -flto -march=native)
 # target_link_options(HalodaQuest PRIVATE -flto)
 
-target_compile_options(HalodaQuest PRIVATE -Wall -Wextra)
+if (NOT MSVC)
+    target_compile_options(HalodaQuest PRIVATE -Wall -Wextra)
+endif()
+
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_options(HalodaQuest PRIVATE -flto -march=native)
-    target_link_options(HalodaQuest PRIVATE -flto)
+    if (NOT MSVC)
+        target_compile_options(HalodaQuest PRIVATE -flto -march=native)
+        target_link_options(HalodaQuest PRIVATE -flto)
+    endif()
 
     target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)
 endif()

@@ -37,7 +37,7 @@ void Game::MainLoop() {
 
         while (m_event.poll()) {
             switch (m_event.event_type()) {
-                using enum hal::event::handler::type;
+                using enum hal::event::type;
 
                 // Handle universal events here.
             case quit_requested:

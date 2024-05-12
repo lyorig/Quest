@@ -1,6 +1,6 @@
 #pragma once
 
-#include <halcyon/event.hpp>
+#include <halcyon/events.hpp>
 #include <halcyon/video.hpp>
 
 #include <quest/types.hpp>
