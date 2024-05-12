@@ -15,12 +15,12 @@ namespace HQ::state {
     public:
         main_menu(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void  Process(const hal::event::handler& event);
-        Base* Update(hal::f64 elapsed);
-        void  Draw(hal::renderer& rnd) const;
+        void  process(const hal::event::handler& event) override;
+        Base* update(hal::f64 elapsed) override;
+        void  draw(hal::renderer& rnd) const override;
 
     private:
-        hal::color SwitchTheme();
+        hal::color switch_theme();
 
         animatable<hal::color, easing::in_out::bezier> m_theme;
 
@@ -33,15 +33,15 @@ namespace HQ::state {
     public:
         console(hal::ttf::font&& ttf);
 
-        void Draw(hal::renderer& rnd) const;
+        void draw(hal::renderer& rnd) const;
 
-        void Log(std::string&& str);
+        void log(std::string&& str);
 
-        bool Active() const;
-        void Toggle(hal::renderer& rnd);
+        bool active() const;
+        void toggle(hal::renderer& rnd);
 
-        void Show(hal::renderer& rnd);
-        void Hide();
+        void show(hal::renderer& rnd);
+        void hide();
 
     private:
         std::vector<std::string> m_entries;

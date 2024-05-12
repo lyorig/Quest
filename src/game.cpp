@@ -51,7 +51,7 @@ void game::main_loop() {
                     using enum hal::keyboard::button;
 
                 case F1:
-                    std::get<state::console>(m_statics).Toggle(m_renderer);
+                    std::get<state::console>(m_statics).toggle(m_renderer);
                     break;
 
                 default:
@@ -61,17 +61,17 @@ void game::main_loop() {
 
                 // We aren't interested, but the current state might be.
             default:
-                m_state->Process(m_event);
+                m_state->process(m_event);
                 break;
             }
         }
 
-        if (state::Base* ptr = m_state->Update(delta); ptr != nullptr)
+        if (state::Base* ptr = m_state->update(delta); ptr != nullptr)
             m_state.reset(ptr);
 
-        m_state->Draw(m_renderer);
+        m_state->draw(m_renderer);
 
-        std::apply([this](const auto& obj) { obj.Draw(m_renderer); }, m_statics);
+        std::apply([this](const auto& obj) { obj.draw(m_renderer); }, m_statics);
 
         m_renderer.present();
     }

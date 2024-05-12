@@ -12,7 +12,7 @@ main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
     m_widgets.push_back({ rnd.make_texture(surf), { 75, 0 }, hal::scale::width(rnd.size().x / 2)(surf.size()) });
 }
 
-void main_menu::Process(const hal::event::handler& event) {
+void main_menu::process(const hal::event::handler& event) {
     switch (event.event_type()) {
         using enum hal::event::type;
 
@@ -29,7 +29,7 @@ void main_menu::Process(const hal::event::handler& event) {
         if (event.mouse_button().button() == hal::mouse::button::left) {
             for (const auto& wgt : m_widgets) {
                 if (event.mouse_button().pos() | wgt.hitbox()) {
-                    m_theme.start(SwitchTheme(), 0.5);
+                    m_theme.start(switch_theme(), 0.5);
                     break;
                 }
             }
@@ -41,13 +41,13 @@ void main_menu::Process(const hal::event::handler& event) {
     }
 }
 
-Base* main_menu::Update(delta_t elapsed) {
+Base* main_menu::update(delta_t elapsed) {
     m_theme.update(elapsed);
 
     return nullptr;
 }
 
-void main_menu::Draw(hal::renderer& rnd) const {
+void main_menu::draw(hal::renderer& rnd) const {
     rnd.draw_color(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
@@ -55,7 +55,7 @@ void main_menu::Draw(hal::renderer& rnd) const {
     }
 }
 
-hal::color main_menu::SwitchTheme() {
+hal::color main_menu::switch_theme() {
     using namespace hal::palette;
 
     // Technically, this starts on the 2nd color.
@@ -70,31 +70,31 @@ console::console(hal::ttf::font&& fnt)
     , m_active { false } {
 }
 
-void console::Draw(hal::renderer& rnd) const {
-    constexpr hal::color Background { hal::palette::weezer_blue, 64 };
+void console::draw(hal::renderer& rnd) const {
+    constexpr hal::color background { hal::palette::weezer_blue, 64 };
 
     if (m_active) {
-        hal::renderer::color_lock lock { rnd, Background };
+        hal::renderer::color_lock lock { rnd, background };
         rnd.fill_target();
     }
 }
 
-void console::Log(std::string&& str) {
+void console::log(std::string&& str) {
     m_entries.push_back(std::move(str));
 }
 
-bool console::Active() const {
+bool console::active() const {
     return m_active;
 }
 
-void console::Toggle(hal::renderer& rnd) {
+void console::toggle(hal::renderer& rnd) {
     if (m_active)
-        Hide();
+        hide();
     else
-        Show(rnd);
+        show(rnd);
 }
 
-void console::Show(hal::renderer& rnd) {
+void console::show(hal::renderer& rnd) {
 
     m_active = true;
 
@@ -103,7 +103,7 @@ void console::Show(hal::renderer& rnd) {
     HAL_PRINT("Showing console");
 }
 
-void console::Hide() {
+void console::hide() {
     m_active = false;
 
     m_tex.reset();
