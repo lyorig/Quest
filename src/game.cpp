@@ -54,7 +54,7 @@ void game::main_loop() {
                         using enum hal::keyboard::key;
 
                     case F1:
-                        std::get<state::console>(m_statics).show(m_renderer);
+                        std::get<state::console>(m_statics).show();
                         break;
 
                     default:

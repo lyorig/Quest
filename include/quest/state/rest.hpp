@@ -42,10 +42,10 @@ namespace HQ::state {
 
         bool active() const;
 
-        void show(hal::renderer& rnd);
+        void show();
         void hide();
 
-        void toggle(hal::renderer& rnd);
+        void toggle();
 
     private:
         std::vector<std::string> m_entries;

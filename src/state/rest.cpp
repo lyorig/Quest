@@ -127,7 +127,7 @@ bool console::active() const {
     return m_active;
 }
 
-void console::show(hal::renderer& rnd) {
+void console::show() {
 
     m_active  = true;
     m_repaint = true;
@@ -147,9 +147,9 @@ void console::hide() {
     HAL_PRINT("Hiding console");
 }
 
-void console::toggle(hal::renderer& rnd) {
+void console::toggle() {
     if (m_active)
         hide();
     else
-        show(rnd);
+        show();
 }
