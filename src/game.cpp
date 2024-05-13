@@ -85,10 +85,7 @@ void game::main_loop() {
             m_state.reset(ptr);
 
         m_state->draw(m_renderer);
-
-        if (m_console.active()) {
-            m_console.update(m_renderer);
-        }
+        m_console.draw(m_renderer);
 
         m_renderer.present();
     }

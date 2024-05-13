@@ -12,7 +12,7 @@ namespace HQ::state {
     public:
         console(hal::ttf::context& ttf);
 
-        void update(hal::renderer& rnd);
+        void draw(hal::renderer& rnd);
 
         void process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(char ch);

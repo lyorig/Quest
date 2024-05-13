@@ -5,8 +5,8 @@
 using namespace HQ::state;
 
 namespace consts {
-    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "lyo@Engine ~ %" };
-    constexpr hal::u8          font_size { 32 };
+    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
+    constexpr hal::font::pt_t  font_size { 64 };
 
     constexpr hal::pixel_t pfx_padding { 20 };
 
@@ -27,13 +27,18 @@ namespace {
         constexpr const char* phrases[] {
             "[enter command here]",
             "[be not afraid]",
-            "[food for thought?]",
+            "[food for thought]",
             "[waiting for user input]",
             "rm -rf / --no-preserve-root",
             "[at your service]",
             "[not POSIX compliant]",
             "[made with Halcyon]",
-            "[start typing, please]"
+            "[start typing, please]",
+            "[5/5/2022]",
+            "[commands not included]",
+            "[who needs documentation]",
+            "[your turn]",
+            "[segfaulting since 2021]"
         };
 
         return phrases[std::rand() % std::size(phrases)];
@@ -46,7 +51,10 @@ console::console(hal::ttf::context& ttf)
     , m_repaint { false } {
 }
 
-void console::update(hal::renderer& rnd) {
+void console::draw(hal::renderer& rnd) {
+    if (!active())
+        return;
+
     hal::lock::color lock { rnd, consts::bg_color };
     rnd.fill_target();
 

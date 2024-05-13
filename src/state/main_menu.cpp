@@ -2,21 +2,15 @@
 
 using namespace HQ::state;
 
-namespace consts {
-    constexpr hal::coord_point offset { 50, 50 };
-
-    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
-}
-
 main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_theme { rnd.color() }
     , m_currentTheme { 0 } {
 
     const hal::font font { ttf.load(hal::access("assets/Ubuntu Mono.ttf"), 128) };
 
-    const hal::surface surf { font.render("Main Menu")(consts::text_render_type) };
+    const hal::surface surf { font.render("Main Menu").fg(0x808080)(hal::font::render_type::blended) };
 
-    const auto pos = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::bottom_right, surf.size()) - consts::offset;
+    const auto pos = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::center, surf.size());
 
     m_widgets.push_back({ rnd.make_texture(surf), pos, surf.size() });
 }
