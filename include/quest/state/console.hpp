@@ -7,9 +7,11 @@
 #include <quest/text_field.hpp>
 
 namespace HQ::state {
+
+    // A console. Designed for use with mono fonts.
     class console {
     public:
-        console(hal::font&& ttf);
+        console(hal::ttf::context& ttf);
 
         void draw(hal::renderer& rnd);
 
@@ -22,16 +24,21 @@ namespace HQ::state {
         // Is the console active?
         bool active();
 
-        // Returns the new state.
+        // Toggles and returns the new state.
         bool toggle();
 
     private:
+        void append_char(char ch, hal::renderer& rnd);
+        void remove_chars(hal::renderer& rnd);
+
+        hal::font        m_font;
+        hal::pixel_point m_glyphSize;
+
         text_field m_field;
 
-        hal::font m_font;
+        hal::target_texture m_tex;
+        hal::coord_point    m_texSize;
 
-        sprite m_tex;
-
-        bool m_repaint;
+        text_field::op m_repaint;
     };
 }

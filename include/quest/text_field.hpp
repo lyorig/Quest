@@ -10,6 +10,12 @@
 namespace HQ {
     class text_field {
     public:
+        enum class op : hal::u8 {
+            nothing,
+            add,
+            remove
+        };
+
         text_field();
 
         // Returns the new state.
@@ -18,8 +24,8 @@ namespace HQ {
         // Process a character. Assume that changes are always made.
         void process(char ch);
 
-        // Process a key. Returns true if changes were made.
-        bool process(hal::keyboard::key k, hal::keyboard::mod_state m);
+        // Process a key. Returns the amount of characters added/removed.
+        op process(hal::keyboard::key k, hal::keyboard::mod_state m);
 
         bool               has_focus() const;
         const std::string& text() const;

@@ -17,7 +17,7 @@ void text_field::process(char ch) {
     m_text.push_back(ch);
 }
 
-bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
+text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -41,19 +41,19 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
                 m_text.pop_back();
             }
 
-            return true;
+            return op::remove;
         }
         break;
 
     case key::tab:
         m_text.append(4, ' ');
-        return true;
+        return op::add;
 
     default:
         break;
     }
 
-    return false;
+    return op::nothing;
 }
 
 bool text_field::has_focus() const {
