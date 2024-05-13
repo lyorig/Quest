@@ -1,6 +1,3 @@
-.DS_Store
-CMakeSettings.json
-
 .vs/
 .cache/
 
@@ -8,3 +5,7 @@ bin/*
 !bin/assets/
 
 build/
+
+.clangd
+.DS_Store
+CMakeSettings.json
