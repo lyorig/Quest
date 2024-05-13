@@ -31,7 +31,7 @@ namespace HQ::state {
 
     class console {
     public:
-        console(hal::ttf::font&& ttf);
+        console(hal::font&& ttf);
 
         void draw(hal::renderer& rnd);
 
@@ -51,7 +51,7 @@ namespace HQ::state {
         std::vector<std::string> m_entries;
         std::string              m_line;
 
-        hal::ttf::font m_font;
+        hal::font m_font;
 
         hal::texture     m_tex;
         hal::coord_point m_size;

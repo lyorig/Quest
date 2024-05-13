@@ -65,7 +65,7 @@ hal::color main_menu::switch_theme() {
     return colors[m_currentTheme];
 }
 
-console::console(hal::ttf::font&& fnt)
+console::console(hal::font&& fnt)
     : m_font { std::move(fnt) }
     , m_active { false }
     , m_repaint { false } {
