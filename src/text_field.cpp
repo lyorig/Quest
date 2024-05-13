@@ -14,7 +14,7 @@ bool text_field::toggle() {
 }
 
 void text_field::process(char ch) {
-    m_text.push_back(ch);
+    text.push_back(ch);
 }
 
 text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
@@ -23,22 +23,22 @@ text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_stat
         using mod = hal::keyboard::mod;
 
     case key::backspace:
-        if (!m_text.empty()) {
+        if (!text.empty()) {
             if (m[mod::ctrl]) { // delete entire word
                 std::size_t off;
 
-                if (m_text.back() == ' ') {
-                    off = m_text.find_last_not_of(' ') + 1;
+                if (text.back() == ' ') {
+                    off = text.find_last_not_of(' ') + 1;
                 } else {
-                    off = m_text.find_last_of(' ');
+                    off = text.find_last_of(' ');
                     if (off == std::string::npos)
                         off = 0;
                 }
 
-                m_text.erase(m_text.begin() + off, m_text.end());
+                text.erase(text.begin() + off, text.end());
 
             } else { // delete one character
-                m_text.pop_back();
+                text.pop_back();
             }
 
             return op::remove;
@@ -46,7 +46,7 @@ text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_stat
         break;
 
     case key::tab:
-        m_text.append(4, ' ');
+        text.append(4, ' ');
         return op::add;
 
     default:
@@ -58,8 +58,4 @@ text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_stat
 
 bool text_field::has_focus() const {
     return m_focus;
-}
-
-const std::string& text_field::text() const {
-    return m_text;
 }

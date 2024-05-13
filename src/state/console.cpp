@@ -18,6 +18,8 @@ namespace consts {
     constexpr hal::coord_point offset { 10, 10 };
 
     constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
+
+    constexpr bool clear_on_close { false };
 }
 
 namespace {
@@ -79,6 +81,10 @@ void console::show(hal::renderer& rnd) {
 void console::hide() {
     m_pfx.reset();
     m_tex.reset();
+
+    if constexpr (consts::clear_on_close) {
+        m_field.text.clear();
+    }
 }
 
 bool console::active() {
@@ -98,11 +104,11 @@ bool console::toggle(hal::renderer& rnd) {
 void console::repaint(hal::renderer& rnd) {
     hal::surface text;
 
-    if (m_field.text().empty()) {
+    if (m_field.text.empty()) {
         text = m_font.render(random_placeholder_text())
                    .fg(consts::ph_color)(consts::text_render_type);
     } else {
-        text = m_font.render(m_field.text() + '|')
+        text = m_font.render(m_field.text + '|')
                    .fg(consts::input_color)(consts::text_render_type);
     }
 

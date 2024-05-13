@@ -27,12 +27,11 @@ namespace HQ {
         // Process a key. Returns the amount of characters added/removed.
         op process(hal::keyboard::key k, hal::keyboard::mod_state m);
 
-        bool               has_focus() const;
-        const std::string& text() const;
+        bool has_focus() const;
+
+        std::string text;
 
     private:
-        std::string m_text;
-
         bool m_focus;
     };
 }
