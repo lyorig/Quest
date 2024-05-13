@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <halcyon/events/keyboard.hpp>
+#include <halcyon/video.hpp>
 
 // text_field:
 // A text field manipulated via keystrokes.
@@ -25,7 +25,7 @@ namespace HQ {
         void process(char ch);
 
         // Process a key. Returns the amount of characters added/removed.
-        op process(hal::keyboard::key k, hal::keyboard::mod_state m);
+        op process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
 
         bool has_focus() const;
 

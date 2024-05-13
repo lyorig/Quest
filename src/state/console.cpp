@@ -63,8 +63,8 @@ void console::update(hal::renderer& rnd) {
     rnd.draw(m_tex).to(pos)();
 }
 
-void console::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
-    m_repaint = m_field.process(k, m) != text_field::op::nothing;
+void console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+    m_repaint = m_field.process(k, m, c) != text_field::op::nothing;
 }
 
 void console::process(char ch) {

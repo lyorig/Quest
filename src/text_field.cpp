@@ -1,7 +1,5 @@
 #include <quest/text_field.hpp>
 
-#include <halcyon/events.hpp>
-
 using namespace HQ;
 
 text_field::text_field()
@@ -17,7 +15,7 @@ void text_field::process(char ch) {
     text.push_back(ch);
 }
 
-text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
+text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -48,6 +46,12 @@ text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_stat
     case key::tab:
         text.append(4, ' ');
         return op::add;
+
+    case key::V:
+        if (m[mod::ctrl] && c.has_text()) {
+            text += c();
+            return op::add;
+        }
 
     default:
         break;

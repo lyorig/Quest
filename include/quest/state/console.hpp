@@ -14,7 +14,7 @@ namespace HQ::state {
 
         void update(hal::renderer& rnd);
 
-        void process(hal::keyboard::key k, hal::keyboard::mod_state m);
+        void process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(char ch);
 
         void show(hal::renderer& rnd);

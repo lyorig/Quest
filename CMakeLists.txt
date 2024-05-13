@@ -15,25 +15,24 @@ text_field.cpp
 
 list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-add_executable(HalodaQuest
+add_executable(HalodaQuest WIN32
 ${HALCYON_SOURCES}
 ${QUEST_SOURCES}
 )
 
-# target_compile_options(HalodaQuest PRIVATE -flto -march=native)
-# target_link_options(HalodaQuest PRIVATE -flto)
-
 if (NOT MSVC)
     target_compile_options(HalodaQuest PRIVATE -Wall -Wextra)
 else()
-        target_compile_options(HalodaQuest PRIVATE /W4)
-
+    target_compile_options(HalodaQuest PRIVATE /W4)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     if (NOT MSVC)
         target_compile_options(HalodaQuest PRIVATE -flto -march=native)
         target_link_options(HalodaQuest PRIVATE -flto)
+    else()
+        target_compile_options(HalodaQuest PRIVATE /GL)
+        target_link_options(HalodaQuest PRIVATE /LTCG)
     endif()
 
     target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)

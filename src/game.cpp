@@ -51,7 +51,7 @@ void game::main_loop() {
 
             case key_pressed:
                 if (m_console.active()) {
-                    m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod());
+                    m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard);
                 }
 
                 switch (m_event.keyboard().key()) {
