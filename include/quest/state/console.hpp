@@ -28,17 +28,15 @@ namespace HQ::state {
         bool toggle();
 
     private:
-        void append_char(char ch, hal::renderer& rnd);
-        void remove_chars(hal::renderer& rnd);
+        void repaint(hal::renderer& rnd);
 
-        hal::font        m_font;
-        hal::pixel_point m_glyphSize;
+        hal::font m_font;
 
         text_field m_field;
 
-        hal::target_texture m_tex;
-        hal::coord_point    m_texSize;
+        hal::surface m_pfx;
+        hal::texture m_tex;
 
-        text_field::op m_repaint;
+        bool m_repaint;
     };
 }
