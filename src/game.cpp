@@ -57,7 +57,7 @@ void game::main_loop() {
                     using enum hal::keyboard::key;
 
                 case consts::console_toggle_bind:
-                    if (m_console.toggle()) {
+                    if (m_console.toggle(m_renderer)) {
                         m_video.events.text_input_start();
                     } else {
                         m_video.events.text_input_stop();

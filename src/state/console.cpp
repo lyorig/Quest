@@ -6,14 +6,13 @@ namespace consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" };
     constexpr hal::u8          font_size { 32 };
 
-    constexpr std::string_view pfx_text { ">" };
+    constexpr std::string_view pfx_text { "lyo@Engine ~ %" };
     constexpr hal::color       pfx_color { hal::palette::green };
     constexpr hal::pixel_t     pfx_padding { 20 };
 
     constexpr hal::color input_color { hal::palette::white };
 
-    constexpr std::string_view ph_text { "[enter command here...]" };
-    constexpr hal::color       ph_color { 0x808080 };
+    constexpr hal::color ph_color { 0x808080 };
 
     constexpr hal::coord_point offset { 10, 10 };
 
@@ -22,6 +21,7 @@ namespace consts {
 
 console::console(hal::ttf::context& ttf)
     : m_font { ttf.load(hal::access(consts::font_path), consts::font_size) }
+    , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::pfx_padding) }
     , m_repaint { false } {
 }
 
@@ -35,7 +35,12 @@ void console::draw(hal::renderer& rnd) {
         repaint(rnd);
     }
 
-    rnd.draw(m_tex).to(consts::offset)();
+    auto pos = consts::offset;
+
+    rnd.draw(m_pfx).to(pos)();
+
+    pos.x += m_texBegin;
+    rnd.draw(m_tex).to(pos)();
 }
 
 void console::process(hal::keyboard::key k, hal::keyboard::mod_state m) {
@@ -47,25 +52,24 @@ void console::process(char ch) {
     m_repaint = true;
 }
 
-void console::show() {
+void console::show(hal::renderer& rnd) {
     m_repaint = true;
 
-    m_pfx = m_font.render(consts::pfx_text, consts::pfx_color);
-
-    HAL_PRINT("Showing console");
+    m_pfx = rnd.make_texture(m_font.render(consts::pfx_text, consts::pfx_color).convert());
 }
 
 void console::hide() {
-    HAL_PRINT("Hiding console");
+    m_pfx.reset();
+    m_tex.reset();
 }
 
 bool console::active() {
     return m_field.has_focus();
 }
 
-bool console::toggle() {
+bool console::toggle(hal::renderer& rnd) {
     if (m_field.toggle()) {
-        show();
+        show(rnd);
         return true;
     } else {
         hide();
@@ -77,27 +81,24 @@ void console::repaint(hal::renderer& rnd) {
     hal::surface text;
 
     if (m_field.text().empty()) {
-        text = m_font.render(consts::ph_text, consts::ph_color);
+        text = m_font.render(random_placeholder_text(), consts::ph_color);
     } else {
         text = m_font.render(m_field.text() + '|', consts::input_color);
     }
 
-    hal::pixel_point size {
-        static_cast<hal::pixel_t>(m_pfx.size().x + consts::pfx_padding + text.size().x),
-        text.size().y
+    m_tex = rnd.make_texture(text);
+}
+
+std::string_view console::random_placeholder_text() {
+    constexpr std::string_view phrases[] {
+        "[enter command here]",
+        "[be not afraid]",
+        "[food for thought?]",
+        "[waiting for user input]",
+        "rm -rf / --no-preserve-root",
+        "[at your service]",
+        "[not POSIX compliant]"
     };
 
-    HAL_PRINT("Canvas size is ", size);
-
-    hal::surface canvas { size };
-
-    size.x -= text.size().x;
-    size.y = 0;
-
-    HAL_PRINT("Blitting text to ", size);
-
-    m_pfx.blit(canvas)();
-    text.blit(canvas).to(size)();
-
-    m_tex = rnd.make_texture(canvas);
+    return phrases[std::rand() % std::size(phrases)];
 }
