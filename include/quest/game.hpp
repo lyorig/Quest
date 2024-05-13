@@ -3,7 +3,8 @@
 #include <halcyon/events.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/state/rest.hpp>
+#include <quest/state/console.hpp>
+#include <quest/state/main_menu.hpp>
 
 namespace HQ {
     class args {
@@ -32,12 +33,12 @@ namespace HQ {
         hal::window   m_window;
         hal::renderer m_renderer;
 
-        std::tuple<state::console> m_statics;
+        state::console m_console;
 
         hal::event::handler m_event;
 
         // Reference to the current state.
-        std::unique_ptr<state::Base> m_state;
+        std::unique_ptr<state::base> m_state;
 
         // Whether the game is not quit yet.
         bool m_running { true };

@@ -5,17 +5,23 @@
 
 #include <halcyon/video/texture.hpp>
 
+#include <halcyon/internal/scaler.hpp>
+
 namespace HQ {
     class sprite {
     public:
+        sprite() = default;
+
+        sprite(hal::coord_point pos);
         sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size);
 
         void draw(hal::renderer& rnd) const;
 
-        const hal::coord_rect& hitbox() const;
+        void reset(hal::texture tex, hal::scaler scl);
 
-    private:
-        hal::texture    m_tex;
-        hal::coord_rect m_hitbox;
+        void pos(hal::coord_point where);
+
+        hal::texture    texture;
+        hal::coord_rect hitbox;
     };
 }

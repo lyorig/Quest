@@ -3,17 +3,23 @@
 
 using namespace HQ;
 
+sprite::sprite(hal::coord_point pos)
+    : hitbox { pos } {
+}
+
 sprite::sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size)
-    : m_tex { std::move(tex) }
-    , m_hitbox { pos, size } {
+    : texture { std::move(tex) }
+    , hitbox { pos, size } {
 }
 
 void sprite::draw(hal::renderer& rnd) const {
     hal::renderer::color_lock cl { rnd, hal::palette::green };
 
-    rnd.draw(m_tex).to(m_hitbox)();
+    if (texture.valid())
+        rnd.draw(texture).to(hitbox)();
 }
 
-const hal::coord_rect& sprite::hitbox() const {
-    return m_hitbox;
+void sprite::reset(hal::texture tex, hal::scaler scl) {
+    texture     = std::move(tex);
+    hitbox.size = scl(texture.size());
 }

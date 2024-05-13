@@ -4,7 +4,16 @@ project(HalodaQuest)
 
 include(halcyon/config.cmake)
 
-file(GLOB_RECURSE QUEST_SOURCES CONFIGURE_DEPENDS src/*.cpp)
+set(QUEST_SOURCES
+state/console.cpp
+state/main_menu.cpp
+game.cpp
+main.cpp
+sprite.cpp
+text_field.cpp
+)
+
+list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 add_executable(HalodaQuest
 ${HALCYON_SOURCES}
@@ -16,8 +25,10 @@ ${QUEST_SOURCES}
 
 if (NOT MSVC)
     target_compile_options(HalodaQuest PRIVATE -Wall -Wextra)
-endif()
+else()
+        target_compile_options(HalodaQuest PRIVATE /W4)
 
+endif()
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     if (NOT MSVC)
