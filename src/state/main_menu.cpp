@@ -2,16 +2,23 @@
 
 using namespace HQ::state;
 
+namespace consts {
+    constexpr hal::coord_point offset { 50, 50 };
+
+    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
+}
+
 main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_theme { rnd.color() }
     , m_currentTheme { 0 } {
-    const auto font = ttf.load(hal::access("assets/m5x7.ttf"), 16);
 
-    const auto surf = font.render("Main Menu")();
-    const auto sz   = hal::scale::width(rnd.size().x / 2)(surf.size());
-    const auto pos  = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::bottom_right, sz);
+    const hal::font font { ttf.load(hal::access("assets/Ubuntu Mono.ttf"), 128) };
 
-    m_widgets.push_back({ rnd.make_texture(surf), pos, sz });
+    const hal::surface surf { font.render("Main Menu")(consts::text_render_type) };
+
+    const auto pos = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::bottom_right, surf.size()) - consts::offset;
+
+    m_widgets.push_back({ rnd.make_texture(surf), pos, surf.size() });
 }
 
 void main_menu::process(const hal::event::handler& event) {

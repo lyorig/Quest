@@ -3,9 +3,8 @@
 #include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/animatable.hpp>
-#include <quest/sprite.hpp>
 #include <quest/text_field.hpp>
+#include <quest/types.hpp>
 
 namespace HQ::state {
     // A console. Designed for use with mono fonts.
@@ -13,7 +12,7 @@ namespace HQ::state {
     public:
         console(hal::ttf::context& ttf);
 
-        void update(delta_t elapsed, hal::renderer& rnd);
+        void update(hal::renderer& rnd);
 
         void process(hal::keyboard::key k, hal::keyboard::mod_state m);
         void process(char ch);
@@ -29,10 +28,6 @@ namespace HQ::state {
 
     private:
         void repaint(hal::renderer& rnd);
-
-        static std::string_view random_placeholder_text();
-
-        animatable<hal::color, easing::in::parabola<2>> m_col;
 
         hal::font m_font;
 

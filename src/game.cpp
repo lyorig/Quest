@@ -77,6 +77,8 @@ void game::main_loop() {
             default:
                 break;
             }
+
+            m_state->process(m_event);
         }
 
         if (state::base* ptr = m_state->update(delta); ptr != nullptr)
@@ -84,7 +86,9 @@ void game::main_loop() {
 
         m_state->draw(m_renderer);
 
-        m_console.update(delta, m_renderer);
+        if (m_console.active()) {
+            m_console.update(m_renderer);
+        }
 
         m_renderer.present();
     }
