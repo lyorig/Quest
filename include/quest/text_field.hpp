@@ -10,10 +10,12 @@
 namespace HQ {
     class text_field {
     public:
+        // The operation that took place.
+        // The LSB signifies if anything happened.
         enum class op : hal::u8 {
-            nothing,
-            add,
-            remove
+            nothing = 0b00,
+            add     = 0b01,
+            remove  = 0b11
         };
 
         text_field();
