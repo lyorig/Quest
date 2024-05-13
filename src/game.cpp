@@ -29,6 +29,7 @@ game::game([[maybe_unused]] args a)
     , m_event { m_video.events }
     , m_state { new state::main_menu { m_renderer, m_ttf } } {
     m_renderer.blend(hal::blend_mode::blend);
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
 }
 
 void game::main_loop() {
@@ -83,8 +84,7 @@ void game::main_loop() {
 
         m_state->draw(m_renderer);
 
-        if (m_console.active())
-            m_console.draw(m_renderer);
+        m_console.update(delta, m_renderer);
 
         m_renderer.present();
     }

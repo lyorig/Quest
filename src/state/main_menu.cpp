@@ -3,11 +3,11 @@
 using namespace HQ::state;
 
 main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
-    : m_theme { rnd.draw_color() }
+    : m_theme { rnd.color() }
     , m_currentTheme { 0 } {
     const auto font = ttf.load(hal::access("assets/m5x7.ttf"), 16);
 
-    const auto surf = font.render("Main Menu");
+    const auto surf = font.render("Main Menu")();
     const auto sz   = hal::scale::width(rnd.size().x / 2)(surf.size());
     const auto pos  = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::bottom_right, sz);
 
@@ -54,7 +54,7 @@ base* main_menu::update(delta_t elapsed) {
 }
 
 void main_menu::draw(hal::renderer& rnd) const {
-    rnd.draw_color(m_theme.value());
+    rnd.color(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
         wgt.draw(rnd);

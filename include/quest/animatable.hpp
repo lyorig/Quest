@@ -11,7 +11,7 @@ namespace HQ {
         namespace in // TODO
         {
             template <std::size_t N = 2>
-            constexpr delta_t Parabola(delta_t t) {
+            constexpr delta_t parabola(delta_t t) {
                 return std::pow(t, N);
             }
         }
@@ -38,6 +38,8 @@ namespace HQ {
         using value_t = T;
         using diff_t  = decltype(T {} - T {});
 
+        animatable() = default;
+
         animatable(const value_t& initial)
             : m_start { initial } {
         }
@@ -51,6 +53,10 @@ namespace HQ {
                 m_elapsed = std::min(m_elapsed + elapsed, m_time);
                 return true;
             }
+        }
+
+        void jump(const value_t& val) {
+            start(val, 0.0);
         }
 
         void start(const value_t& val, delta_t time) {
@@ -85,6 +91,6 @@ namespace HQ {
         diff_t m_dist {};
 
         delta_t m_time { 0.0 },
-            m_elapsed { m_time };
+            m_elapsed { 0.0 };
     };
 }

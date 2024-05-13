@@ -1,5 +1,8 @@
-#include <halcyon/video/renderer.hpp>
 #include <quest/sprite.hpp>
+
+#include <halcyon/utility/locks.hpp>
+#include <halcyon/video/renderer.hpp>
+
 
 using namespace HQ;
 
@@ -13,7 +16,7 @@ sprite::sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size)
 }
 
 void sprite::draw(hal::renderer& rnd) const {
-    hal::renderer::color_lock cl { rnd, hal::palette::green };
+    hal::lock::color cl { rnd, hal::palette::green };
 
     if (texture.valid())
         rnd.draw(texture).to(hitbox)();
