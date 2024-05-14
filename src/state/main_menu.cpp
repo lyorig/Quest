@@ -1,5 +1,7 @@
 #include <quest/state/main_menu.hpp>
 
+#include <quest/constants.hpp>
+
 using namespace HQ::state;
 
 main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)

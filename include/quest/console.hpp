@@ -1,8 +1,5 @@
 #pragma once
 
-#include <numeric>
-#include <random>
-
 #include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 

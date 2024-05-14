@@ -1,12 +1,15 @@
 #include <quest/console.hpp>
 
+#include <random>
+
 #include <halcyon/utility/locks.hpp>
+
+#include <quest/constants.hpp>
 
 using namespace HQ;
 
-namespace consts {
+namespace HQ::consts {
     constexpr std::string_view font_path { "assets/pixelmix.ttf" }, pfx_text { "root@Console ~ %" };
-    constexpr hal::font::pt_t  font_size { 32 };
 
     constexpr hal::pixel_t padding_left { 20 }, padding_right { 20 };
 
@@ -20,6 +23,21 @@ namespace consts {
     constexpr hal::font::render_type text_render_type { hal::font::render_type::solid };
 
     constexpr bool clear_on_close { false };
+}
+
+namespace {
+    hal::font find_font(hal::ttf::context& ttf, std::string_view path) {
+        constexpr hal::font::pt_t incr { 2 };
+        constexpr hal::pixel_t    desired { static_cast<hal::pixel_t>(consts::renderer_height * 0.04) };
+
+        hal::font       f;
+        hal::font::pt_t curr { 0 };
+
+        while ((f = ttf.load(hal::access(path), curr += incr)).size_text("A").y < desired)
+            ;
+
+        return f;
+    }
 }
 
 shuffle_bag::shuffle_bag()
@@ -56,7 +74,7 @@ const char* shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : m_font { ttf.load(hal::access(consts::font_path), consts::font_size) }
+    : m_font { find_font(ttf, consts::font_path) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_repaint { false } {

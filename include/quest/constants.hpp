@@ -1,5 +1,7 @@
 #pragma once
 
+#include <halcyon/types/render.hpp>
+
 namespace HQ::consts {
-    // Unused as of yet.
+    constexpr hal::pixel_t renderer_height { 720 };
 }
