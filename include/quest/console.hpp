@@ -10,11 +10,11 @@ namespace HQ {
     // A console. Designed for use with mono fonts.
     class console {
     public:
-        console(hal::ttf::context& ttf);
+        console(hal::renderer& rnd, hal::ttf::context& ttf);
 
         void draw(hal::renderer& rnd);
 
-        void process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
+        bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(char ch);
 
         void show(hal::renderer& rnd);
@@ -35,7 +35,7 @@ namespace HQ {
 
         hal::texture m_pfx;
         hal::texture m_tex;
-        hal::pixel_t m_texBegin;
+        hal::pixel_t m_texBegin, m_wrap;
 
         bool m_repaint;
     };

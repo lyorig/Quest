@@ -2,8 +2,18 @@
 
 using namespace HQ;
 
+constexpr text_field::diff_t tab_spaces { 4 };
+
 text_field::text_field()
     : m_focus { false } {
+}
+
+void text_field::show() {
+    m_focus = true;
+}
+
+void text_field::hide() {
+    m_focus = false;
 }
 
 bool text_field::toggle() {
@@ -15,7 +25,7 @@ void text_field::process(char ch) {
     text.push_back(ch);
 }
 
-text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -33,31 +43,39 @@ text_field::op text_field::process(hal::keyboard::key k, hal::keyboard::mod_stat
                         off = 0;
                 }
 
+                const std::size_t ret { text.size() - off };
+
                 text.erase(text.begin() + off, text.end());
+
+                return static_cast<diff_t>(ret);
 
             } else { // delete one character
                 text.pop_back();
+                return 1;
             }
-
-            return op::remove;
         }
         break;
 
     case key::tab:
-        text.append(4, ' ');
-        return op::add;
+        text.append(tab_spaces, ' ');
+
+        return tab_spaces;
 
     case key::V:
         if (m[mod::ctrl] && c.has_text()) {
-            text += c();
-            return op::add;
+            const auto        str = c();
+            const std::size_t sz { str.size() }; // one-time size calculation
+
+            text += std::string_view { str.c_str(), sz };
+
+            return static_cast<diff_t>(sz);
         }
 
     default:
         break;
     }
 
-    return op::nothing;
+    return 0; // Nothing changed.
 }
 
 bool text_field::has_focus() const {

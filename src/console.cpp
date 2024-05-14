@@ -5,19 +5,19 @@
 using namespace HQ;
 
 namespace consts {
-    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
-    constexpr hal::font::pt_t  font_size { 64 };
+    constexpr std::string_view font_path { "assets/pixelmix.ttf" }, pfx_text { "root@Console ~ %" };
+    constexpr hal::font::pt_t  font_size { 32 };
 
-    constexpr hal::pixel_t pfx_padding { 20 };
+    constexpr hal::pixel_t padding_left { 20 }, padding_right { 20 };
 
     constexpr hal::color input_color { hal::palette::white },
         ph_color { 0x808080 },
-        bg_color { 0x000B3B, 192 },
+        bg_color { hal::palette::black, 128 },
         pfx_color { hal::palette::green };
 
     constexpr hal::coord_point offset { 10, 10 };
 
-    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
+    constexpr hal::font::render_type text_render_type { hal::font::render_type::solid };
 
     constexpr bool clear_on_close { false };
 }
@@ -34,27 +34,28 @@ namespace {
             "[not POSIX compliant]",
             "[made with Halcyon]",
             "[start typing, please]",
-            "[5/5/2022]",
+            "[waiting for 5/5/2022]",
             "[commands not included]",
             "[who needs documentation]",
             "[your turn]",
-            "[segfaulting since 2021]"
+            "[segfaulting since 2021]",
+            "[quoth the raven, nevermore]",
+            "[sudo pacman -S neofetch]",
+            "[rand() is a bad RNG]"
         };
 
         return phrases[std::rand() % std::size(phrases)];
     }
 }
 
-console::console(hal::ttf::context& ttf)
+console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { ttf.load(hal::access(consts::font_path), consts::font_size) }
-    , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::pfx_padding) }
+    , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
+    , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_repaint { false } {
 }
 
 void console::draw(hal::renderer& rnd) {
-    if (!active())
-        return;
-
     hal::lock::color lock { rnd, consts::bg_color };
     rnd.fill_target();
 
@@ -71,8 +72,9 @@ void console::draw(hal::renderer& rnd) {
     rnd.draw(m_tex).to(pos)();
 }
 
-void console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
-    m_repaint = m_field.process(k, m, c) != text_field::op::nothing;
+bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+    m_repaint = m_field.process(k, m, c) != 0;
+    return k == hal::keyboard::key::F1;
 }
 
 void console::process(char ch) {
@@ -84,6 +86,8 @@ void console::show(hal::renderer& rnd) {
     m_repaint = true;
 
     m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
+
+    m_field.show();
 }
 
 void console::hide() {
@@ -93,6 +97,8 @@ void console::hide() {
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();
     }
+
+    m_field.hide();
 }
 
 bool console::active() {
@@ -117,6 +123,7 @@ void console::repaint(hal::renderer& rnd) {
                    .fg(consts::ph_color)(consts::text_render_type);
     } else {
         text = m_font.render(m_field.text + '|')
+                   .wrap(m_wrap)
                    .fg(consts::input_color)(consts::text_render_type);
     }
 

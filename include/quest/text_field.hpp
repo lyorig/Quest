@@ -10,15 +10,12 @@
 namespace HQ {
     class text_field {
     public:
-        // The operation that took place.
-        // The LSB signifies if anything happened.
-        enum class op : hal::u8 {
-            nothing = 0b00,
-            add     = 0b01,
-            remove  = 0b11
-        };
+        using diff_t = hal::i8;
 
         text_field();
+
+        void show();
+        void hide();
 
         // Returns the new state.
         bool toggle();
@@ -27,7 +24,7 @@ namespace HQ {
         void process(char ch);
 
         // Process a key. Returns the amount of characters added/removed.
-        op process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
+        diff_t process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
 
         bool has_focus() const;
 

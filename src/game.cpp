@@ -24,8 +24,8 @@ bool args::operator[](std::string_view what) const {
 game::game([[maybe_unused]] args a)
     : m_video { m_context }
     , m_window { m_video.make_window("HalQuest", {}, { hal::window::flags::fullscreen_borderless }) }
-    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["--no-vsync"] ? hal::renderer::flags::none : hal::renderer::flags::vsync }) }
-    , m_console { m_ttf }
+    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["-v"] ? hal::renderer::flags::vsync : hal::renderer::flags::none }) }
+    , m_console { m_renderer, m_ttf }
     , m_event { m_video.events }
     , m_state { new state::main_menu { m_renderer, m_ttf } } {
     m_renderer.blend(hal::blend_mode::blend);
@@ -51,23 +51,26 @@ void game::main_loop() {
 
             case key_pressed:
                 if (m_console.active()) {
-                    m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard);
+                    if (m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard)) {
+                        m_console.hide();
+                        m_video.events.text_input_stop();
+                    }
+
+                    continue; // Nobody else gets incoming key events while the console is active.
                 }
 
                 switch (m_event.keyboard().key()) {
                     using enum hal::keyboard::key;
 
                 case consts::console_toggle_bind:
-                    if (m_console.toggle(m_renderer)) {
-                        m_video.events.text_input_start();
-                    } else {
-                        m_video.events.text_input_stop();
-                    }
+                    m_console.show(m_renderer);
+                    m_video.events.text_input_start();
                     break;
 
                 default:
                     break;
                 }
+
                 break;
 
             case text_input:
@@ -85,7 +88,9 @@ void game::main_loop() {
             m_state.reset(ptr);
 
         m_state->draw(m_renderer);
-        m_console.draw(m_renderer);
+
+        if (m_console.active())
+            m_console.draw(m_renderer);
 
         m_renderer.present();
     }
