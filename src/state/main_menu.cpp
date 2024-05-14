@@ -35,7 +35,7 @@ void main_menu::process(const hal::event::handler& event) {
     case mouse_pressed:
         if (event.mouse_button().button() == hal::mouse::button::left) {
             for (const auto& wgt : m_widgets) {
-                if (event.mouse_button().pos() | wgt.hitbox) {
+                if (static_cast<hal::coord_point>(event.mouse_button().pos()) | wgt.hitbox) {
                     switch_theme();
                     break;
                 }
