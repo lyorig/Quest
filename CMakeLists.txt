@@ -15,7 +15,7 @@ text_field.cpp
 
 list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-add_executable(HalodaQuest WIN32
+add_executable(HalodaQuest
 ${HALCYON_SOURCES}
 ${QUEST_SOURCES}
 )

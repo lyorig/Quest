@@ -22,30 +22,37 @@ namespace consts {
     constexpr bool clear_on_close { false };
 }
 
-namespace {
-    std::string_view random_placeholder_text() {
-        constexpr const char* phrases[] {
-            "[enter command here]",
-            "[be not afraid]",
-            "[food for thought]",
-            "[waiting for user input]",
-            "rm -rf / --no-preserve-root",
-            "[at your service]",
-            "[not POSIX compliant]",
-            "[made with Halcyon]",
-            "[start typing, please]",
-            "[waiting for 5/5/2022]",
-            "[commands not included]",
-            "[who needs documentation]",
-            "[your turn]",
-            "[segfaulting since 2021]",
-            "[quoth the raven, nevermore]",
-            "[sudo pacman -S neofetch]",
-            "[rand() is a bad RNG]"
-        };
-
-        return phrases[std::rand() % std::size(phrases)];
+shuffle_bag::shuffle_bag()
+    : m_arr {
+        "[enter command here]",
+        "[be not afraid]",
+        "[food for thought]",
+        "[waiting for user input]",
+        "rm -rf / --no-preserve-root",
+        "[at your service]",
+        "[not POSIX compliant]",
+        "[made with Halcyon]",
+        "[start typing, please]",
+        "[waiting for 5/5/2022]",
+        "[commands not included]",
+        "[who needs documentation]",
+        "[your turn]",
+        "[segfaulting since 2021]",
+        "[quoth the raven, nevermore]",
+        "[sudo pacman -S neofetch]",
+        "[rand() is a bad RNG]"
     }
+    , m_index { num_texts } {
+}
+
+const char* shuffle_bag::next() {
+    if (m_index == num_texts) { // Need to refresh.
+        HAL_PRINT("Shuffling console splash texts...");
+        std::shuffle(std::begin(m_arr), std::end(m_arr), std::mt19937_64 { std::random_device {}() });
+        m_index = 0;
+    }
+
+    return m_arr[m_index++];
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
@@ -119,7 +126,7 @@ void console::repaint(hal::renderer& rnd) {
     hal::surface text;
 
     if (m_field.text.empty()) {
-        text = m_font.render(random_placeholder_text())
+        text = m_font.render(m_splash.next())
                    .fg(consts::ph_color)(consts::text_render_type);
     } else {
         text = m_font.render(m_field.text + '|')

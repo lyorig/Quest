@@ -1,5 +1,8 @@
 #pragma once
 
+#include <numeric>
+#include <random>
+
 #include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 
@@ -7,6 +10,20 @@
 #include <quest/types.hpp>
 
 namespace HQ {
+    class shuffle_bag {
+    public:
+        static constexpr hal::u8 num_texts { 17 };
+
+        shuffle_bag();
+
+        const char* next();
+
+    private:
+        const char* m_arr[num_texts];
+
+        hal::u8 m_index;
+    };
+
     // A console. Designed for use with mono fonts.
     class console {
     public:
@@ -28,6 +45,8 @@ namespace HQ {
 
     private:
         void repaint(hal::renderer& rnd);
+
+        shuffle_bag m_splash;
 
         hal::font m_font;
 

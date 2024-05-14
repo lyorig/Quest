@@ -23,7 +23,7 @@ bool args::operator[](std::string_view what) const {
 
 game::game([[maybe_unused]] args a)
     : m_video { m_context }
-    , m_window { m_video.make_window("HalQuest", {}, { hal::window::flags::fullscreen_borderless }) }
+    , m_window { m_video.make_window("HalQuest", hal::tag::fullscreen) }
     , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["-v"] ? hal::renderer::flags::vsync : hal::renderer::flags::none }) }
     , m_console { m_renderer, m_ttf }
     , m_event { m_video.events }
