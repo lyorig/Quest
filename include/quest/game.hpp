@@ -3,7 +3,7 @@
 #include <halcyon/events.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/state/console.hpp>
+#include <quest/console.hpp>
 #include <quest/state/main_menu.hpp>
 
 namespace HQ {
@@ -33,7 +33,7 @@ namespace HQ {
         hal::window   m_window;
         hal::renderer m_renderer;
 
-        state::console m_console;
+        console m_console;
 
         hal::event::handler m_event;
 

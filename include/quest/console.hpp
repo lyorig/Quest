@@ -6,7 +6,7 @@
 #include <quest/text_field.hpp>
 #include <quest/types.hpp>
 
-namespace HQ::state {
+namespace HQ {
     // A console. Designed for use with mono fonts.
     class console {
     public:

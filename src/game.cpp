@@ -25,7 +25,7 @@ game::game([[maybe_unused]] args a)
     : m_video { m_context }
     , m_window { m_video.make_window("HalQuest", {}, { hal::window::flags::fullscreen_borderless }) }
     , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["--no-vsync"] ? hal::renderer::flags::none : hal::renderer::flags::vsync }) }
-    , m_console { state::console { m_ttf } }
+    , m_console { m_ttf }
     , m_event { m_video.events }
     , m_state { new state::main_menu { m_renderer, m_ttf } } {
     m_renderer.blend(hal::blend_mode::blend);

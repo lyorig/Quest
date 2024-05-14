@@ -1,8 +1,8 @@
-#include <quest/state/console.hpp>
+#include <quest/console.hpp>
 
 #include <halcyon/utility/locks.hpp>
 
-using namespace HQ::state;
+using namespace HQ;
 
 namespace consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
