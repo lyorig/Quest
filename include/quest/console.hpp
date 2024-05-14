@@ -9,7 +9,7 @@
 namespace HQ {
     class shuffle_bag {
     public:
-        static constexpr hal::u8 num_texts { 17 };
+        static constexpr hal::u8 num_texts { 20 };
 
         shuffle_bag();
 
@@ -29,7 +29,7 @@ namespace HQ {
         void draw(hal::renderer& rnd);
 
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
-        void process(char ch);
+        void process(std::string_view inp);
 
         void show(hal::renderer& rnd);
         void hide();

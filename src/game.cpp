@@ -29,9 +29,9 @@ game::game([[maybe_unused]] args a)
     : m_video { m_context }
     , m_window { m_video.make_window("HalQuest", { 1280, 720 }) }
     , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["-v"] ? hal::renderer::flags::vsync : hal::renderer::flags::none }) }
-    , m_console { m_renderer, m_ttf }
+    , m_console { (m_renderer.size(hal::scale::height(consts::renderer_height)), console { m_renderer, m_ttf }) }
     , m_event { m_video.events }
-    , m_state { (m_renderer.size(hal::scale::height(consts::renderer_height)), new state::main_menu { m_renderer, m_ttf }) } {
+    , m_state { new state::main_menu { m_renderer, m_ttf } } {
     m_renderer.blend(hal::blend_mode::blend);
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 }
@@ -78,7 +78,7 @@ void game::main_loop() {
                 break;
 
             case text_input:
-                m_console.process(m_event.text_input().text()[0]);
+                m_console.process(m_event.text_input().text());
                 break;
 
             default:

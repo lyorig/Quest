@@ -21,8 +21,9 @@ bool text_field::toggle() {
     return has_focus();
 }
 
-void text_field::process(char ch) {
-    text.push_back(ch);
+std::size_t text_field::process(std::string_view inp) {
+    text.append(inp);
+    return inp.size();
 }
 
 text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {

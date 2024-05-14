@@ -27,18 +27,8 @@ else()
 endif()
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    if (NOT MSVC)
-        target_compile_options(HalodaQuest PRIVATE -flto -march=native)
-        target_link_options(HalodaQuest PRIVATE -flto)
-    else()
-        target_compile_options(HalodaQuest PRIVATE /GL)
-        target_link_options(HalodaQuest PRIVATE /LTCG)
-    endif()
-
     target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)
 endif()
-
-target_compile_definitions(HalodaQuest PRIVATE HAL_FAST_TYPES)
 
 target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_link_libraries(HalodaQuest PRIVATE ${HALCYON_LIBRARIES})

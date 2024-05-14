@@ -10,6 +10,7 @@
 namespace HQ {
     class text_field {
     public:
+        
         using diff_t = hal::i8;
 
         text_field();
@@ -20,8 +21,8 @@ namespace HQ {
         // Returns the new state.
         bool toggle();
 
-        // Process a character. Assume that changes are always made.
-        void process(char ch);
+        // Process a character. Returns the amount of chars that was added.
+        std::size_t process(std::string_view inp);
 
         // Process a key. Returns the amount of characters added/removed.
         diff_t process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);

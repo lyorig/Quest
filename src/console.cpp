@@ -15,7 +15,7 @@ namespace HQ::consts {
 
     constexpr hal::color input_color { hal::palette::white },
         ph_color { 0x808080 },
-        bg_color { hal::palette::black, 128 },
+        bg_color { hal::palette::black, 160 },
         pfx_color { hal::palette::green };
 
     constexpr hal::coord_point offset { 10, 10 };
@@ -46,19 +46,22 @@ shuffle_bag::shuffle_bag()
         "[be not afraid]",
         "[food for thought]",
         "[waiting for user input]",
-        "rm -rf / --no-preserve-root",
+        "[rm -rf / --no-preserve-root]",
         "[at your service]",
         "[not POSIX compliant]",
         "[made with Halcyon]",
         "[start typing, please]",
-        "[waiting for 5/5/2022]",
+        "[may 5th, 2022]",
         "[commands not included]",
         "[who needs documentation]",
         "[your turn]",
         "[segfaulting since 2021]",
         "[quoth the raven, nevermore]",
         "[sudo pacman -S neofetch]",
-        "[rand() is a bad RNG]"
+        "[redacted]",
+        "[is anyone there?]",
+        "[licensed under the WTFPL]",
+        "[openest source]"
     }
     , m_index { num_texts } {
 }
@@ -102,8 +105,8 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
     return k == hal::keyboard::key::F1;
 }
 
-void console::process(char ch) {
-    m_field.process(ch);
+void console::process(std::string_view inp) {
+    m_field.process(inp); // changes are always made here
     m_repaint = true;
 }
 
