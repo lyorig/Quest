@@ -26,7 +26,7 @@ bool args::operator[](std::string_view what) const {
     return false;
 }
 
-game::game([[maybe_unused]] args a)
+game::game(args a)
     : m_video { m_context }
     , m_event { m_video.events } {
     using enum hal::renderer::flags;
