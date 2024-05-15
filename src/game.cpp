@@ -9,7 +9,6 @@ using namespace HQ;
 
 namespace HQ::consts {
     constexpr std::string_view window_name { "HalQuest" };
-    constexpr hal::pixel_point window_size { 1280, 720 };
 
     constexpr hal::keyboard::key console_toggle_bind { hal::keyboard::key::F1 };
 }
@@ -28,23 +27,15 @@ bool args::operator[](std::string_view what) const {
     return false;
 }
 
-game::game(args a)
+game::game(args)
     : m_video { m_context }
-    , m_window { m_video.make_window(consts::window_name, consts::window_size) }
-    , m_event { m_video.events } {
-    if (a["-fs"]) {
-        m_window.size(m_video.displays[m_window.display_index()].size());
-        m_window.fullscreen(true);
-    }
-
+    , m_window { m_video.make_window(consts::window_name, hal::tag::fullscreen) }
+    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, hal::renderer::flags::vsync }) }
+    , m_console { m_renderer, m_ttf }
+    , m_event { m_video.events }
+    , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {
     using enum hal::renderer::flags;
-
-    m_renderer = m_window.make_renderer({ accelerated, a["-v"] ? vsync : none });
-
     m_renderer.blend(hal::blend_mode::blend);
-
-    m_console = { m_renderer, m_ttf };
-    m_state.reset(new state::main_menu { m_renderer, m_ttf });
 }
 
 void game::main_loop() {

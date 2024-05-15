@@ -69,7 +69,7 @@ void main_menu::switch_theme() {
     using namespace hal::palette;
 
     // Technically, this starts on the 2nd color.
-    constexpr hal::color colors[] { blue, red, black, orange };
+    constexpr hal::color colors[] { 0x000000, 0x0d0145, 0x5c0501, 0x01451a };
     m_currentTheme = ++m_currentTheme % std::size(colors);
 
     m_theme.start(colors[m_currentTheme], 0.5);
