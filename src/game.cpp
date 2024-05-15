@@ -8,6 +8,7 @@
 using namespace HQ;
 
 namespace HQ::consts {
+    constexpr std::string_view   window_name { "HalQuest" };
     constexpr hal::keyboard::key console_toggle_bind { hal::keyboard::key::F1 };
 }
 
@@ -27,13 +28,25 @@ bool args::operator[](std::string_view what) const {
 
 game::game([[maybe_unused]] args a)
     : m_video { m_context }
-    , m_window { m_video.make_window("HalQuest", { 1280, 720 }) }
-    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, a["-v"] ? hal::renderer::flags::vsync : hal::renderer::flags::none }) }
-    , m_console { (m_renderer.size(hal::scale::height(consts::renderer_height)), console { m_renderer, m_ttf }) }
-    , m_event { m_video.events }
-    , m_state { new state::main_menu { m_renderer, m_ttf } } {
+    , m_event { m_video.events } {
+    using enum hal::renderer::flags;
+
+    const hal::pixel_point     size { hal::scale::height(consts::renderer_height)(m_video.displays[0].size()) };
+    const hal::renderer::flags cond_vsync { a["-v"] ? vsync : none };
+
+    if (a["-fs"]) {
+        m_window   = m_video.make_window(consts::window_name, hal::tag::fullscreen);
+        m_renderer = m_window.make_renderer({ accelerated, cond_vsync });
+        m_renderer.size(size);
+    } else {
+        m_window   = m_video.make_window(consts::window_name, size);
+        m_renderer = m_window.make_renderer({ accelerated, cond_vsync });
+    }
+
     m_renderer.blend(hal::blend_mode::blend);
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
+
+    m_console = { m_renderer, m_ttf };
+    m_state.reset(new state::main_menu { m_renderer, m_ttf });
 }
 
 void game::main_loop() {

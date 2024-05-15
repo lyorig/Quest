@@ -24,6 +24,7 @@ namespace HQ {
     // A console. Designed for use with mono fonts.
     class console {
     public:
+        console() = default;
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
         void draw(hal::renderer& rnd);
