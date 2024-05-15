@@ -16,7 +16,6 @@ namespace HQ::consts {
 
     constexpr hal::color input_color { hal::palette::white },
         ph_color { 0x808080 },
-        bg_color { hal::palette::black, 160 },
         pfx_color { hal::palette::green };
 
     constexpr hal::coord_point offset { 10, 10 };
@@ -51,7 +50,8 @@ shuffle_bag::shuffle_bag()
         "[watch?v=lo5cG0FhWro]",
         "[no man page here, sorry]",
         "[womp womp]",
-        "[40.7736N, 29.7564W]"
+        "[40.7736N, 29.7564W]",
+        "[you can sudo, trust me]"
     }
     , m_index { num_texts } {
 }
@@ -70,13 +70,11 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
+    , m_active { false }
     , m_repaint { false } {
 }
 
 void console::draw(hal::renderer& rnd) {
-    hal::lock::color lock { rnd, consts::bg_color };
-    rnd.fill_target();
-
     if (m_repaint) {
         m_repaint = false;
         repaint(rnd);
@@ -84,6 +82,7 @@ void console::draw(hal::renderer& rnd) {
 
     auto pos = consts::offset;
 
+    rnd.draw(m_bg).to(hal::tag::fill)();
     rnd.draw(m_pfx).to(pos)();
 
     pos.x += m_texBegin;
@@ -100,27 +99,32 @@ void console::process(std::string_view inp) {
     m_repaint = true;
 }
 
-void console::show(hal::renderer& rnd) {
+void console::show(hal::renderer& rnd, const hal::image::context& ctx) {
     m_repaint = true;
 
     m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
 
-    m_field.active = true;
+    hal::surface surf { ctx.load(hal::access("assets/hampter.jpg"), hal::image::load_format::jpg) };
+    surf.alpha_mod(96);
+    m_bg = rnd.make_texture(surf);
+
+    m_active = true;
 }
 
 void console::hide() {
     m_pfx.reset();
     m_tex.reset();
+    m_bg.reset();
 
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();
     }
 
-    m_field.active = false;
+    m_active = false;
 }
 
 bool console::active() {
-    return m_field.active;
+    return m_active;
 }
 
 void console::repaint(hal::renderer& rnd) {

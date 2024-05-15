@@ -29,6 +29,7 @@ namespace HQ {
 
         HAL_NO_SIZE hal::system::video m_video;
         HAL_NO_SIZE hal::ttf::context m_ttf;
+        HAL_NO_SIZE hal::image::context m_img;
 
         hal::window   m_window;
         hal::renderer m_renderer;

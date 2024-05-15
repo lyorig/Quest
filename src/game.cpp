@@ -29,6 +29,7 @@ bool args::operator[](std::string_view what) const {
 
 game::game(args)
     : m_video { m_context }
+    , m_img { hal::image::init_format::jpg }
     , m_window { m_video.make_window(consts::window_name, hal::tag::fullscreen) }
     , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, hal::renderer::flags::vsync }) }
     , m_console { m_renderer, m_ttf }
@@ -68,7 +69,7 @@ void game::main_loop() {
                     using enum hal::keyboard::key;
 
                 case consts::console_toggle_bind:
-                    m_console.show(m_renderer);
+                    m_console.show(m_renderer, m_img);
                     m_video.events.text_input_start();
                     break;
 

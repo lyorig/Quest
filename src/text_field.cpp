@@ -4,10 +4,6 @@ using namespace HQ;
 
 constexpr text_field::diff_t tab_spaces { 4 };
 
-text_field::text_field()
-    : active { false } {
-}
-
 std::size_t text_field::process(std::string_view inp) {
     text.append(inp);
     return inp.size();

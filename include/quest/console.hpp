@@ -9,7 +9,7 @@
 namespace HQ {
     class shuffle_bag {
     public:
-        static constexpr hal::u8 num_texts { 24 };
+        static constexpr hal::u8 num_texts { 25 };
 
         shuffle_bag();
 
@@ -32,7 +32,7 @@ namespace HQ {
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);
 
-        void show(hal::renderer& rnd);
+        void show(hal::renderer& rnd, const hal::image::context& ctx);
         void hide();
 
         // Is the console active?
@@ -47,10 +47,9 @@ namespace HQ {
 
         text_field m_field;
 
-        hal::texture m_pfx;
-        hal::texture m_tex;
+        hal::texture m_pfx, m_tex, m_bg;
         hal::pixel_t m_texBegin, m_wrap;
 
-        bool m_repaint;
+        bool m_active, m_repaint;
     };
 }
