@@ -9,7 +9,7 @@
 namespace HQ {
     class shuffle_bag {
     public:
-        static constexpr hal::u8 num_texts { 20 };
+        static constexpr hal::u8 num_texts { 24 };
 
         shuffle_bag();
 
@@ -36,9 +36,6 @@ namespace HQ {
 
         // Is the console active?
         bool active();
-
-        // Toggles and returns the new state.
-        bool toggle(hal::renderer& rnd);
 
     private:
         void repaint(hal::renderer& rnd);

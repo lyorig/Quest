@@ -9,7 +9,9 @@
 using namespace HQ;
 
 namespace HQ::consts {
-    constexpr std::string_view font_path { "assets/pixelmix.ttf" }, pfx_text { "root@Console ~ %" };
+    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
+
+    constexpr hal::pixel_t desired { static_cast<hal::pixel_t>(consts::renderer_height * 0.045) };
 
     constexpr hal::pixel_t padding_left { 20 }, padding_right { 20 };
 
@@ -20,20 +22,19 @@ namespace HQ::consts {
 
     constexpr hal::coord_point offset { 10, 10 };
 
-    constexpr hal::font::render_type text_render_type { hal::font::render_type::solid };
+    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
     constexpr bool clear_on_close { false };
 }
 
 namespace {
-    hal::font find_font(hal::ttf::context& ttf, std::string_view path) {
-        constexpr hal::font::pt_t incr { 2 };
-        constexpr hal::pixel_t    desired { static_cast<hal::pixel_t>(consts::renderer_height * 0.04) };
+    hal::font find_font(hal::ttf::context& ttf, std::string_view path, hal::pixel_t desired_height) {
+        constexpr hal::font::pt_t incr { 1 };
 
         hal::font       f;
         hal::font::pt_t curr { 0 };
 
-        while ((f = ttf.load(hal::access(path), curr += incr)).size_text("A").y < desired)
+        while ((f = ttf.load(hal::access(path), curr += incr)).size_text("A").y < desired_height)
             ;
 
         return f;
@@ -61,7 +62,11 @@ shuffle_bag::shuffle_bag()
         "[redacted]",
         "[is anyone there?]",
         "[licensed under the WTFPL]",
-        "[openest source]"
+        "[openest source]",
+        "[watch?v=lo5cG0FhWro]",
+        "[no man page here, sorry]",
+        "[womp womp]",
+        "[40.7736N, 29.7564W]"
     }
     , m_index { num_texts } {
 }
@@ -77,7 +82,7 @@ const char* shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : m_font { find_font(ttf, consts::font_path) }
+    : m_font { find_font(ttf, consts::font_path, consts::desired) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_repaint { false } {
@@ -115,7 +120,7 @@ void console::show(hal::renderer& rnd) {
 
     m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
 
-    m_field.show();
+    m_field.active = true;
 }
 
 void console::hide() {
@@ -126,21 +131,11 @@ void console::hide() {
         m_field.text.clear();
     }
 
-    m_field.hide();
+    m_field.active = false;
 }
 
 bool console::active() {
-    return m_field.has_focus();
-}
-
-bool console::toggle(hal::renderer& rnd) {
-    if (m_field.toggle()) {
-        show(rnd);
-        return true;
-    } else {
-        hide();
-        return false;
-    }
+    return m_field.active;
 }
 
 void console::repaint(hal::renderer& rnd) {

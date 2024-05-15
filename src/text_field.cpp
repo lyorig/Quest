@@ -5,20 +5,7 @@ using namespace HQ;
 constexpr text_field::diff_t tab_spaces { 4 };
 
 text_field::text_field()
-    : m_focus { false } {
-}
-
-void text_field::show() {
-    m_focus = true;
-}
-
-void text_field::hide() {
-    m_focus = false;
-}
-
-bool text_field::toggle() {
-    m_focus = !m_focus;
-    return has_focus();
+    : active { false } {
 }
 
 std::size_t text_field::process(std::string_view inp) {
@@ -77,8 +64,4 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
     }
 
     return 0; // Nothing changed.
-}
-
-bool text_field::has_focus() const {
-    return m_focus;
 }
