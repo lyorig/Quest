@@ -42,7 +42,7 @@ void game::main_loop() {
     hal::f64   delta;
     hal::timer timer;
 
-    while (m_running) {
+    while (true) {
         delta = timer();
         timer.reset();
 
@@ -52,8 +52,7 @@ void game::main_loop() {
 
                 // Handle universal events here.
             case quit_requested:
-                m_running = false;
-                break;
+                return;
 
             case key_pressed:
                 if (m_console.active()) {
@@ -71,6 +70,10 @@ void game::main_loop() {
                 case consts::console_toggle_bind:
                     m_console.show(m_renderer);
                     m_video.events.text_input_start();
+                    break;
+
+                case esc:
+                    quit();
                     break;
 
                 default:
@@ -103,5 +106,6 @@ void game::main_loop() {
 }
 
 void game::quit() {
-    m_running = false;
+    m_event.event_type(hal::event::type::quit_requested);
+    m_event.push();
 }

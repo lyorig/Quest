@@ -39,8 +39,5 @@ namespace HQ {
 
         // Reference to the current state.
         std::unique_ptr<state::base> m_state;
-
-        // Whether the game is not quit yet.
-        bool m_running { true };
     };
 }
