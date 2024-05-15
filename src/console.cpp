@@ -5,13 +5,12 @@
 #include <halcyon/utility/locks.hpp>
 
 #include <quest/constants.hpp>
+#include <quest/helpers.hpp>
 
 using namespace HQ;
 
 namespace HQ::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
-
-    constexpr hal::pixel_t desired { static_cast<hal::pixel_t>(consts::renderer_height * 0.045) };
 
     constexpr hal::pixel_t padding_left { 20 }, padding_right { 20 };
 
@@ -25,20 +24,6 @@ namespace HQ::consts {
     constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
     constexpr bool clear_on_close { false };
-}
-
-namespace {
-    hal::font find_font(hal::ttf::context& ttf, std::string_view path, hal::pixel_t desired_height) {
-        constexpr hal::font::pt_t incr { 1 };
-
-        hal::font       f;
-        hal::font::pt_t curr { 0 };
-
-        while ((f = ttf.load(hal::access(path), curr += incr)).size_text("A").y < desired_height)
-            ;
-
-        return f;
-    }
 }
 
 shuffle_bag::shuffle_bag()
@@ -73,7 +58,7 @@ shuffle_bag::shuffle_bag()
 
 const char* shuffle_bag::next() {
     if (m_index == num_texts) { // Need to refresh.
-        HAL_PRINT("Shuffling console splash texts...");
+        HAL_PRINT("<Console> Shuffling placeholder text...");
         std::shuffle(std::begin(m_arr), std::end(m_arr), std::mt19937_64 { std::random_device {}() });
         m_index = 0;
     }
@@ -82,7 +67,7 @@ const char* shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : m_font { find_font(ttf, consts::font_path, consts::desired) }
+    : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_repaint { false } {
@@ -142,7 +127,7 @@ void console::repaint(hal::renderer& rnd) {
     hal::surface text;
 
     if (m_field.text.empty()) {
-        text = m_font.render(m_splash.next())
+        text = m_font.render(m_placeholders.next())
                    .fg(consts::ph_color)(consts::text_render_type);
     } else {
         text = m_font.render(m_field.text + '|')

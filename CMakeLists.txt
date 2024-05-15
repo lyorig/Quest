@@ -8,6 +8,7 @@ set(QUEST_SOURCES
 state/main_menu.cpp
 console.cpp
 game.cpp
+helpers.cpp
 main.cpp
 sprite.cpp
 text_field.cpp

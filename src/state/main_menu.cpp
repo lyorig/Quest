@@ -1,6 +1,7 @@
 #include <quest/state/main_menu.hpp>
 
 #include <quest/constants.hpp>
+#include <quest/helpers.hpp>
 
 using namespace HQ::state;
 
@@ -8,7 +9,7 @@ main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_theme { rnd.color() }
     , m_currentTheme { 0 } {
 
-    const hal::font font { ttf.load(hal::access("assets/Ubuntu Mono.ttf"), 128) };
+    const hal::font font { find_sized_font(ttf, "assets/Ubuntu Mono.ttf", rnd.size().y / 5) };
 
     const hal::surface surf { font.render("Main Menu").fg(0x808080)(hal::font::render_type::blended) };
 

@@ -41,7 +41,7 @@ namespace HQ {
     private:
         void repaint(hal::renderer& rnd);
 
-        shuffle_bag m_splash;
+        shuffle_bag m_placeholders;
 
         hal::font m_font;
 

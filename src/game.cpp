@@ -8,7 +8,9 @@
 using namespace HQ;
 
 namespace HQ::consts {
-    constexpr std::string_view   window_name { "HalQuest" };
+    constexpr std::string_view window_name { "HalQuest" };
+    constexpr hal::pixel_point window_size { 1280, 720 };
+
     constexpr hal::keyboard::key console_toggle_bind { hal::keyboard::key::F1 };
 }
 
@@ -28,20 +30,16 @@ bool args::operator[](std::string_view what) const {
 
 game::game(args a)
     : m_video { m_context }
+    , m_window { m_video.make_window(consts::window_name, consts::window_size) }
     , m_event { m_video.events } {
+    if (a["-fs"]) {
+        m_window.size(m_video.displays[m_window.display_index()].size());
+        m_window.fullscreen(true);
+    }
+
     using enum hal::renderer::flags;
 
-    const hal::pixel_point     size { hal::scale::height(consts::renderer_height)(m_video.displays[0].size()) };
-    const hal::renderer::flags cond_vsync { a["-v"] ? vsync : none };
-
-    if (a["-fs"]) {
-        m_window   = m_video.make_window(consts::window_name, hal::tag::fullscreen);
-        m_renderer = m_window.make_renderer({ accelerated, cond_vsync });
-        m_renderer.size(size);
-    } else {
-        m_window   = m_video.make_window(consts::window_name, size);
-        m_renderer = m_window.make_renderer({ accelerated, cond_vsync });
-    }
+    m_renderer = m_window.make_renderer({ accelerated, a["-v"] ? vsync : none });
 
     m_renderer.blend(hal::blend_mode::blend);
 
