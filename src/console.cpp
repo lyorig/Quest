@@ -75,6 +75,10 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
 }
 
 void console::draw(hal::renderer& rnd) {
+    {
+        hal::lock::color lock{ rnd, { hal::palette::black, 128 } };
+        rnd.fill();
+    }
     if (m_repaint) {
         m_repaint = false;
         repaint(rnd);
@@ -82,7 +86,6 @@ void console::draw(hal::renderer& rnd) {
 
     auto pos = consts::offset;
 
-    rnd.draw(m_bg).to(hal::tag::fill)();
     rnd.draw(m_pfx).to(pos)();
 
     pos.x += m_texBegin;
@@ -99,14 +102,10 @@ void console::process(std::string_view inp) {
     m_repaint = true;
 }
 
-void console::show(hal::renderer& rnd, const hal::image::context& ctx) {
+void console::show(hal::renderer& rnd) {
     m_repaint = true;
 
     m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
-
-    hal::surface surf { ctx.load("assets/hampter.jpg", hal::image::load_format::jpg) };
-    surf.alpha_mod(96);
-    m_bg = rnd.make_texture(surf);
 
     m_active = true;
 }
@@ -114,7 +113,6 @@ void console::show(hal::renderer& rnd, const hal::image::context& ctx) {
 void console::hide() {
     m_pfx.reset();
     m_tex.reset();
-    m_bg.reset();
 
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();

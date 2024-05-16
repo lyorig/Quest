@@ -32,7 +32,7 @@ namespace HQ {
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);
 
-        void show(hal::renderer& rnd, const hal::image::context& ctx);
+        void show(hal::renderer& rnd);
         void hide();
 
         // Is the console active?
@@ -47,7 +47,7 @@ namespace HQ {
 
         text_field m_field;
 
-        hal::texture m_pfx, m_tex, m_bg;
+        hal::texture m_pfx, m_tex;
         hal::pixel_t m_texBegin, m_wrap;
 
         bool m_active, m_repaint;

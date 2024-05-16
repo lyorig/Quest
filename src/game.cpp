@@ -69,7 +69,7 @@ void game::main_loop() {
                     using enum hal::keyboard::key;
 
                 case consts::console_toggle_bind:
-                    m_console.show(m_renderer, m_img);
+                    m_console.show(m_renderer);
                     m_video.events.text_input_start();
                     break;
 
