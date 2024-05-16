@@ -104,7 +104,7 @@ void console::show(hal::renderer& rnd, const hal::image::context& ctx) {
 
     m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
 
-    hal::surface surf { ctx.load(hal::access("assets/hampter.jpg"), hal::image::load_format::jpg) };
+    hal::surface surf { ctx.load("assets/hampter.jpg", hal::image::load_format::jpg) };
     surf.alpha_mod(96);
     m_bg = rnd.make_texture(surf);
 
