@@ -4,8 +4,12 @@ using namespace HQ;
 
 constexpr text_field::diff_t tab_spaces { 4 };
 
+text_field::text_field()
+    : cursor { 0 } { }
+
 std::size_t text_field::process(std::string_view inp) {
-    text.append(inp);
+    text.insert(cursor, inp);
+    cursor += inp.size();
     return inp.size();
 }
 
@@ -15,34 +19,49 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
         using mod = hal::keyboard::mod;
 
     case key::backspace:
-        if (!text.empty()) {
-            if (m[mod::ctrl]) { // delete entire word
-                std::size_t off;
+        if (text.empty())
+            break;
 
-                if (text.back() == ' ') {
-                    off = text.find_last_not_of(' ') + 1;
-                } else {
-                    off = text.find_last_of(' ');
-                    if (off == std::string::npos)
-                        off = 0;
-                }
+        if (m[mod::ctrl]) { // delete entire word
+            std::size_t off;
 
-                const std::size_t ret { text.size() - off };
-
-                text.erase(text.begin() + off, text.end());
-
-                return static_cast<diff_t>(ret);
-
-            } else { // delete one character
-                text.pop_back();
-                return 1;
+            if (text.back() == ' ') {
+                off = text.find_last_not_of(' ') + 1;
+            } else {
+                off = text.find_last_of(' ');
+                if (off == std::string::npos)
+                    off = 0;
             }
+
+            const std::size_t ret { text.size() - off };
+
+            text.erase(text.begin() + off, text.end());
+            cursor -= ret;
+
+            return static_cast<diff_t>(ret);
+
+        } else { // delete one character
+            text.pop_back();
+            --cursor;
+            return 1;
+        }
+
+    case key::left_arrow:
+        if (cursor != 0) {
+            --cursor;
         }
         break;
 
-    case key::tab:
-        text.append(tab_spaces, ' ');
+    case key::right_arrow:
+        if (text.empty())
+            break;
 
+        cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
+        break;
+
+    case key::tab:
+        text.insert(cursor, tab_spaces, ' ');
+        cursor += tab_spaces;
         return tab_spaces;
 
     case key::V:
@@ -50,7 +69,8 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             const auto        str = c();
             const std::size_t sz { str.size() }; // one-time size calculation
 
-            text += std::string_view { str.c_str(), sz };
+            text.insert(cursor, str.c_str(), sz);
+            cursor += sz;
 
             return static_cast<diff_t>(sz);
         }

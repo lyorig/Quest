@@ -12,14 +12,15 @@ namespace HQ {
     public:
         using diff_t = hal::i8;
 
-        text_field() = default;
+        text_field();
 
-        // Process some text. Returns the amount of chars that was added.
+        // Process some text. Returns the amount of chars that were added.
         std::size_t process(std::string_view inp);
 
         // Process a key. Returns the amount of characters added/removed.
         diff_t process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
 
         std::string text;
+        hal::u16    cursor;
     };
 }

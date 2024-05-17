@@ -48,7 +48,9 @@ namespace HQ {
         text_field m_field;
 
         hal::texture m_pfx, m_tex;
-        hal::pixel_t m_texBegin, m_wrap;
+
+        hal::coord_point m_glyphSize;
+        hal::pixel_t     m_texBegin, m_wrap;
 
         bool m_active, m_repaint;
     };

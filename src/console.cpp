@@ -68,6 +68,7 @@ const char* shuffle_bag::next() {
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
+    , m_glyphSize { static_cast<hal::coord_point>(m_font.size_text(" ")) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_active { false }
@@ -75,10 +76,9 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
 }
 
 void console::draw(hal::renderer& rnd) {
-    {
-        hal::lock::color lock{ rnd, { hal::palette::black, 128 } };
-        rnd.fill();
-    }
+    hal::lock::color lock { rnd, { hal::palette::black, 128 } };
+    rnd.fill();
+
     if (m_repaint) {
         m_repaint = false;
         repaint(rnd);
@@ -86,10 +86,19 @@ void console::draw(hal::renderer& rnd) {
 
     auto pos = consts::offset;
 
-    rnd.draw(m_pfx).to(pos)();
+    rnd.render(m_pfx).to(pos)();
 
     pos.x += m_texBegin;
-    rnd.draw(m_tex).to(pos)();
+    rnd.render(m_tex).to(pos)();
+
+    lock.set({ hal::palette::white, 128 });
+
+    const hal::coord_rect r(
+        pos.x + m_glyphSize.x * m_field.cursor, pos.y,
+        m_glyphSize.x,
+        m_glyphSize.y);
+
+    rnd.fill(r);
 }
 
 bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
@@ -132,7 +141,7 @@ void console::repaint(hal::renderer& rnd) {
         text = m_font.render(m_placeholders.next())
                    .fg(consts::ph_color)(consts::text_render_type);
     } else {
-        text = m_font.render(m_field.text + '|')
+        text = m_font.render(m_field.text)
                    .wrap(m_wrap)
                    .fg(consts::input_color)(consts::text_render_type);
     }

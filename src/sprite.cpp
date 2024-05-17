@@ -3,7 +3,6 @@
 #include <halcyon/utility/locks.hpp>
 #include <halcyon/video/renderer.hpp>
 
-
 using namespace HQ;
 
 sprite::sprite(hal::coord_point pos)
@@ -19,7 +18,7 @@ void sprite::draw(hal::renderer& rnd) const {
     hal::lock::color cl { rnd, hal::palette::green };
 
     if (texture.valid())
-        rnd.draw(texture).to(hitbox)();
+        rnd.render(texture).to(hitbox)();
 }
 
 void sprite::reset(hal::texture tex, hal::scaler scl) {
