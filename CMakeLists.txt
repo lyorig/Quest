@@ -27,10 +27,6 @@ else()
     target_compile_options(HalodaQuest PRIVATE /W4)
 endif()
 
-if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
-    target_compile_definitions(HalodaQuest PRIVATE HAL_DEBUG_ENABLED)
-endif()
-
 target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_link_libraries(HalodaQuest PRIVATE ${HALCYON_LIBRARIES})
 

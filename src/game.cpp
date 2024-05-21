@@ -19,7 +19,7 @@ args::args(int argc, char** argv)
 
 bool args::operator[](std::string_view what) const {
     for (auto arg : m_span) {
-        if (what == arg) {
+        if (arg == what) {
             return true;
         }
     }
@@ -31,7 +31,7 @@ game::game(args)
     : m_video { m_context }
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video.make_window(consts::window_name, hal::tag::fullscreen) }
-    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated, hal::renderer::flags::vsync }) }
+    , m_renderer { m_window.make_renderer({ hal::renderer::flags::accelerated }) }
     , m_console { m_renderer, m_ttf }
     , m_event { m_video.events }
     , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {
@@ -59,10 +59,11 @@ void game::main_loop() {
                 if (m_console.active()) {
                     if (m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard)) {
                         m_console.hide();
-                        m_video.events.text_input_stop();
+                        m_event.text_input_stop();
                     }
 
-                    continue; // Nobody else gets incoming key events while the console is active.
+                    // Nobody else gets incoming key events while the console is active.
+                    continue;
                 }
 
                 switch (m_event.keyboard().key()) {
@@ -70,7 +71,7 @@ void game::main_loop() {
 
                 case consts::console_toggle_bind:
                     m_console.show(m_renderer);
-                    m_video.events.text_input_start();
+                    m_event.text_input_start();
                     break;
 
                 case esc:

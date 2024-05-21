@@ -22,6 +22,9 @@ namespace HQ {
         game(args a);
 
         void main_loop();
+
+        // Post a quit event.
+        // This will be processed in the next event loop.
         void quit();
 
     private:
@@ -38,7 +41,7 @@ namespace HQ {
 
         hal::event::handler m_event;
 
-        // Reference to the current state.
+        // The current state.
         std::unique_ptr<state::base> m_state;
     };
 }

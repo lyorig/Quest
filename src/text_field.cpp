@@ -36,13 +36,16 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             const std::size_t ret { text.size() - off };
 
             text.erase(text.begin() + off, text.end());
-            cursor -= ret;
+            cursor -= cursor - off;
 
             return static_cast<diff_t>(ret);
 
         } else { // delete one character
-            text.pop_back();
-            --cursor;
+            if (cursor != 0) {
+                --cursor;
+            }
+
+            text.erase(text.begin() + cursor);
             return 1;
         }
 
@@ -53,9 +56,6 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
         break;
 
     case key::right_arrow:
-        if (text.empty())
-            break;
-
         cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
         break;
 
@@ -74,10 +74,14 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
 
             return static_cast<diff_t>(sz);
         }
+        break;
 
     default:
         break;
     }
+
+    if (cursor > text.size())
+        HAL_PRINT("<Text Field> Oops, cursor is OOB: ", cursor);
 
     return 0; // Nothing changed.
 }
