@@ -51,7 +51,12 @@ shuffle_bag::shuffle_bag()
         "[no man page here, sorry]",
         "[womp womp]",
         "[40.7736N, 29.7564W]",
-        "[you can sudo, trust me]"
+        "[you can sudo, trust me]",
+        "[docker? I barely know 'er!]",
+        "[running out of time]",
+        "[not actually random]",
+        "[see you again]",
+        "[forget me not]",
     }
     , m_index { num_texts } {
 }

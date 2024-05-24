@@ -26,9 +26,9 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             std::size_t off;
 
             if (text.back() == ' ') {
-                off = text.find_last_not_of(' ') + 1;
+                off = text.find_last_not_of(' ', cursor) + 1;
             } else {
-                off = text.find_last_of(' ');
+                off = text.find_last_of(' ', cursor);
                 if (off == std::string::npos)
                     off = 0;
             }
@@ -66,7 +66,7 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
 
     case key::V:
         if (m[mod::ctrl] && c.has_text()) {
-            const auto        str = c();
+            const auto        str = c.text();
             const std::size_t sz { str.size() }; // one-time size calculation
 
             text.insert(cursor, str.c_str(), sz);

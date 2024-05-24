@@ -9,7 +9,7 @@
 namespace HQ {
     class shuffle_bag {
     public:
-        static constexpr hal::u8 num_texts { 25 };
+        static constexpr hal::u8 num_texts { 30 };
 
         shuffle_bag();
 
