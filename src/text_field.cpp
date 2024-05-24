@@ -7,10 +7,9 @@ constexpr text_field::diff_t tab_spaces { 4 };
 text_field::text_field()
     : cursor { 0 } { }
 
-std::size_t text_field::process(std::string_view inp) {
+void text_field::process(std::string_view inp) {
     text.insert(cursor, inp);
     cursor += inp.size();
-    return inp.size();
 }
 
 text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
