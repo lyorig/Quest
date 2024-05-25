@@ -2,8 +2,6 @@
 
 using namespace HQ;
 
-constexpr text_field::diff_t tab_spaces { 4 };
-
 text_field::text_field()
     : cursor { 0 } { }
 
@@ -12,7 +10,7 @@ void text_field::process(std::string_view inp) {
     cursor += inp.size();
 }
 
-text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -22,6 +20,8 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             break;
 
         if (m[mod::ctrl]) { // delete entire word
+            if (cursor == 0) {
+            }
             std::size_t off;
 
             if (text.back() == ' ') {
@@ -37,7 +37,7 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             text.erase(text.begin() + off, text.end());
             cursor -= cursor - off;
 
-            return static_cast<diff_t>(ret);
+            return true;
 
         } else { // delete one character
             if (cursor != 0) {
@@ -59,9 +59,9 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
         break;
 
     case key::tab:
-        text.insert(cursor, tab_spaces, ' ');
-        cursor += tab_spaces;
-        return tab_spaces;
+        text.insert(cursor, 4, ' ');
+        cursor += 4;
+        return true;
 
     case key::V:
         if (m[mod::ctrl] && c.has_text()) {
@@ -71,7 +71,7 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
             text.insert(cursor, str.c_str(), sz);
             cursor += sz;
 
-            return static_cast<diff_t>(sz);
+            return true;
         }
         break;
 
@@ -82,5 +82,5 @@ text_field::diff_t text_field::process(hal::keyboard::key k, hal::keyboard::mod_
     if (cursor > text.size())
         HAL_PRINT("<Text Field> Oops, cursor is OOB: ", cursor);
 
-    return 0; // Nothing changed.
+    return false; // Nothing changed.
 }

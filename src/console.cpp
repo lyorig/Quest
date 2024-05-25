@@ -107,7 +107,7 @@ void console::draw(hal::renderer& rnd) {
 }
 
 bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
-    m_repaint = m_field.process(k, m, c) != 0;
+    m_repaint = m_field.process(k, m, c);
     return k == hal::keyboard::key::F1;
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <halcyon/events.hpp>
+#include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
 #include <quest/console.hpp>
@@ -31,15 +31,20 @@ namespace HQ {
         HAL_NO_SIZE hal::context m_context;
 
         HAL_NO_SIZE hal::system::video m_video;
+        HAL_NO_SIZE hal::system::audio m_audio;
+
         HAL_NO_SIZE hal::ttf::context m_ttf;
         HAL_NO_SIZE hal::image::context m_img;
 
         hal::window   m_window;
         hal::renderer m_renderer;
 
-        console m_console;
+        hal::audio::device m_audioDevice;
+        hal::audio::stream m_audioStream;
 
         hal::event::handler m_event;
+
+        console m_console;
 
         // The current state.
         std::unique_ptr<state::base> m_state;
