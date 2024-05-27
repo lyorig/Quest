@@ -19,23 +19,51 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
         if (text.empty())
             break;
 
-        if (m[mod::ctrl]) { // delete entire word
-            if (cursor == 0) {
+        if (m[mod::ctrl]) {
+            std::size_t begin, end;
+
+            if (cursor == 0) { // delete from beginning
+                begin = end = 0;
+
+                const char curr { text[begin] };
+
+                if (curr == ' ') { // delete spaces
+                    for (; end != text.size() && text[end] == ' '; ++end)
+                        ;
+                } else if (std::isalpha(curr)) { // delete letters
+                    for (; end != text.size() && std::isalpha(text[end]); ++end)
+                        ;
+                } else { // delete... not letters?
+                    for (; end != text.size() && !std::isalpha(text[end]) && text[end] != ' '; ++end)
+                        ;
+                }
             }
-            std::size_t off;
 
-            if (text.back() == ' ') {
-                off = text.find_last_not_of(' ', cursor) + 1;
-            } else {
-                off = text.find_last_of(' ', cursor);
-                if (off == std::string::npos)
-                    off = 0;
+            else { // delete from cursor
+                begin = cursor - 1;
+                end   = cursor;
+
+                const char curr { text[begin] };
+
+                if (curr == ' ') { // delete spaces
+                    for (; begin != 0 && text[begin] == ' '; --begin)
+                        ;
+                } else if (std::isalpha(curr)) { // delete letters
+                    for (; begin != 0 && std::isalpha(text[begin]); --begin)
+                        ;
+                } else { // delete... not letters?
+                    for (; begin != 0 && !std::isalpha(text[begin]) && text[begin] != ' '; --begin)
+                        ;
+
+                    if (begin != 0)
+                        ++begin;
+                }
             }
 
-            const std::size_t ret { text.size() - off };
+            HAL_PRINT("<Text Field> Offset ", begin);
 
-            text.erase(text.begin() + off, text.end());
-            cursor -= cursor - off;
+            text.erase(text.begin() + begin, text.begin() + end);
+            cursor -= end - begin;
 
             return true;
 
@@ -45,7 +73,7 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
             }
 
             text.erase(text.begin() + cursor);
-            return 1;
+            return true;
         }
 
     case key::left_arrow:
