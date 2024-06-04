@@ -12,16 +12,16 @@ namespace HQ {
     public:
         sprite() = default;
 
-        sprite(hal::coord_point pos);
-        sprite(hal::texture tex, hal::coord_point pos, hal::coord_point size);
+        sprite(hal::coord::point pos);
+        sprite(hal::texture tex, hal::coord::point pos, hal::coord::point size);
 
         void draw(hal::renderer& rnd) const;
 
         void reset(hal::texture tex, hal::scaler scl);
 
-        void pos(hal::coord_point where);
+        void pos(hal::coord::point where);
 
         hal::texture    texture;
-        hal::coord_rect hitbox;
+        hal::coord::rect hitbox;
     };
 }

@@ -33,7 +33,7 @@ game::game(args)
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
     , m_renderer { m_window, { hal::renderer::flags::accelerated } }
-    , m_audioDevice { m_audio.make_device()() }
+    , m_audioDevice { m_audio.build_device()() }
     , m_audioStream { m_audio, hal::audio::format::i32, 2, 44100, hal::audio::format::i32, 2, 44100 }
     , m_event { m_video.events }
     , m_console { m_renderer, m_ttf }
@@ -51,10 +51,14 @@ void game::main_loop() {
         timer.reset();
 
         while (m_event.poll()) {
-            switch (m_event.event_type()) {
+            switch (m_event.kind()) {
                 using enum hal::event::type;
 
-                // Handle universal events here.
+            // Handle universal events here.
+            case terminated:
+                HAL_PRINT("Got termination request.");
+                // Intentional fallthrough.
+
             case quit_requested:
                 return;
 
@@ -111,6 +115,6 @@ void game::main_loop() {
 }
 
 void game::quit() {
-    m_event.event_type(hal::event::type::quit_requested);
+    m_event.kind(hal::event::type::quit_requested);
     m_event.push();
 }

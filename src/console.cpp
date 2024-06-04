@@ -18,7 +18,7 @@ namespace HQ::consts {
         ph_color { 0x808080 },
         pfx_color { hal::palette::green };
 
-    constexpr hal::coord_point offset { 10, 10 };
+    constexpr hal::coord::point offset { 10, 10 };
 
     constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
@@ -73,7 +73,7 @@ const char* shuffle_bag::next() {
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
-    , m_glyphSize { static_cast<hal::coord_point>(m_font.size_text(" ")) }
+    , m_glyphSize { static_cast<hal::coord::point>(m_font.size_text(" ")) }
     , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
     , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
     , m_active { false }
@@ -98,7 +98,7 @@ void console::draw(hal::renderer& rnd) {
 
     lock.set({ hal::palette::white, 128 });
 
-    const hal::coord_rect r(
+    const hal::coord::rect r(
         pos.x + m_glyphSize.x * m_field.cursor, pos.y,
         m_glyphSize.x,
         m_glyphSize.y);

@@ -60,8 +60,6 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
                 }
             }
 
-            HAL_PRINT("<Text Field> Offset ", begin);
-
             text.erase(text.begin() + begin, text.begin() + end);
             cursor -= end - begin;
 
@@ -107,8 +105,7 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
         break;
     }
 
-    if (cursor > text.size())
-        HAL_PRINT("<Text Field> Oops, cursor is OOB: ", cursor);
+    HAL_WARN_IF(cursor > text.size(), "<Text Field> Oops, cursor is OOB: ", cursor);
 
     return false; // Nothing changed.
 }

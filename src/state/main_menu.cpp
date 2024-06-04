@@ -13,13 +13,13 @@ main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
 
     const hal::surface surf { font.render("Main Menu").fg(0x808080)(hal::font::render_type::blended) };
 
-    const auto pos = hal::coord_rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::center, surf.size());
+    const auto pos = hal::coord::rect(hal::tag::as_size, rnd.size()).anchor(hal::anchor::center, surf.size());
 
     m_widgets.push_back({ rnd.make_texture(surf), pos, surf.size() });
 }
 
 void main_menu::process(const hal::event::handler& event) {
-    switch (event.event_type()) {
+    switch (event.kind()) {
         using enum hal::event::type;
 
     case key_pressed:
@@ -38,7 +38,7 @@ void main_menu::process(const hal::event::handler& event) {
     case mouse_pressed:
         if (event.mouse_button().button() == hal::mouse::button::left) {
             for (const auto& wgt : m_widgets) {
-                if (static_cast<hal::coord_point>(event.mouse_button().pos()) | wgt.hitbox) {
+                if (static_cast<hal::coord::point>(event.mouse_button().pos()) | wgt.hitbox) {
                     switch_theme();
                     break;
                 }

@@ -49,8 +49,8 @@ namespace HQ {
 
         hal::texture m_pfx, m_tex;
 
-        hal::coord_point m_glyphSize;
-        hal::pixel_t     m_texBegin, m_wrap;
+        hal::coord::point m_glyphSize;
+        hal::pixel_t      m_texBegin, m_wrap;
 
         bool m_active, m_repaint;
     };
