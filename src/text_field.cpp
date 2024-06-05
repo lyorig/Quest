@@ -2,12 +2,24 @@
 
 using namespace HQ;
 
+namespace consts {
+    constexpr std::size_t tab_size { 4 };
+}
+
 text_field::text_field()
     : cursor { 0 } { }
 
-void text_field::process(std::string_view inp) {
+bool text_field::process(std::string_view inp) {
     text.insert(cursor, inp);
     cursor += inp.size();
+
+    for (char ch : inp) {
+        if (!std::isspace(ch)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
@@ -58,10 +70,11 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
                     if (begin != 0)
                         ++begin;
                 }
+
+                cursor -= end - begin;
             }
 
             text.erase(text.begin() + begin, text.begin() + end);
-            cursor -= end - begin;
 
             return true;
 
@@ -85,8 +98,8 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
         break;
 
     case key::tab:
-        text.insert(cursor, 4, ' ');
-        cursor += 4;
+        text.insert(cursor, consts::tab_size, ' ');
+        cursor += consts::tab_size;
         return true;
 
     case key::V:

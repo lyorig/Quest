@@ -4,6 +4,7 @@
 #include <halcyon/utility/timer.hpp>
 
 #include <quest/constants.hpp>
+#include <quest/helpers.hpp>
 
 using namespace HQ;
 
@@ -27,18 +28,17 @@ bool args::operator[](std::string_view what) const {
     return false;
 }
 
-game::game(args)
+game::game(args a)
     : m_video { m_context }
     , m_audio { m_context }
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
-    , m_renderer { m_window, { hal::renderer::flags::software } }
-    , m_audioDevice { m_audio.build_device()() }
+    , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } }
+    , m_audioDevice { m_audio.build_device().capture()() }
     , m_audioStream { m_audio, { hal::audio::format::i32, 2, 44100 }, { hal::audio::format::i32, 2, 44100 } }
     , m_event { m_video.events }
     , m_console { m_renderer, m_ttf }
     , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {
-    using enum hal::renderer::flags;
     m_renderer.blend(hal::blend_mode::blend);
 }
 
@@ -55,10 +55,6 @@ void game::main_loop() {
                 using enum hal::event::type;
 
             // Handle universal events here.
-            case terminated:
-                HAL_PRINT("Got termination request.");
-                // Intentional fallthrough.
-
             case quit_requested:
                 return;
 

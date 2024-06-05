@@ -49,8 +49,14 @@ namespace HQ {
 
         hal::texture m_pfx, m_tex;
 
-        hal::coord::point m_glyphSize;
-        hal::pixel_t      m_texBegin, m_wrap;
+        hal::coord_t m_texBegin;
+        hal::pixel_t m_wrap;
+
+        // pos = current outline pos
+        // size = glyph size (constant)
+        hal::coord::rect m_outline;
+
+        hal::u8 m_maxChars;
 
         bool m_active, m_repaint;
     };
