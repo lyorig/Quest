@@ -31,12 +31,12 @@ namespace HQ {
         }
     }
 
-    template <typename T, auto AnimFunc>
+    template <typename T, auto AnimFunc, typename Diff_Type = decltype(std::declval<T>() - std::declval<T>())>
         requires std::is_invocable_r_v<delta_t, decltype(AnimFunc), delta_t>
     class animatable {
     public:
         using value_t = T;
-        using diff_t  = decltype(T {} - T {});
+        using diff_t  = Diff_Type;
 
         animatable() = default;
 
