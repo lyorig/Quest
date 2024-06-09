@@ -81,6 +81,7 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     , m_maxChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
     , m_repaint { false } {
+    m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 }
 
 void console::draw(hal::renderer& rnd) {
@@ -92,12 +93,19 @@ void console::draw(hal::renderer& rnd) {
         repaint(rnd);
     }
 
-    auto pos = consts::text_offset;
+    rnd.render(m_pfx).to(consts::text_offset)();
 
-    rnd.render(m_pfx).to(pos)();
+    hal::coord::point where { m_texBegin, consts::text_offset.y };
+    hal::coord::rect  crd;
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_tex.size().x, m_wrap));
+    crd.size.y = m_outline.size.y;
 
-    pos.x = m_texBegin;
-    rnd.render(m_tex).to(pos)();
+    using namespace hal::literals;
+
+    for (; m_tex.size().x - crd.pos.x > 0;
+         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        rnd.render(m_tex).from(crd).to(where)();
+    }
 
     lock.set(consts::cursor_color);
 
@@ -159,7 +167,6 @@ void console::repaint(hal::renderer& rnd) {
                    .fg(consts::placeholder_color)(consts::text_render_type);
     } else {
         text = m_font.render(m_field.text)
-                   .wrap(m_wrap)
                    .fg(consts::input_color)(consts::text_render_type);
     }
 
