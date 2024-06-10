@@ -27,7 +27,7 @@ namespace HQ {
         console() = default;
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void draw(hal::renderer& rnd);
+        void draw(hal::renderer& rnd, hal::f64 elapsed);
 
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);
@@ -49,9 +49,17 @@ namespace HQ {
 
         hal::texture m_pfx, m_tex;
 
-        hal::coord::point m_glyphSize;
-        hal::pixel_t      m_texBegin, m_wrap;
+        hal::coord_t m_texBegin;
+        hal::pixel_t m_wrap;
 
-        bool m_active : 1, m_repaint : 1;
+        // pos = current outline pos
+        // size = glyph size (constant)
+        hal::coord::rect m_outline;
+
+        hal::f64 m_cursorTime;
+
+        hal::u8 m_maxChars;
+
+        bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
     };
 }

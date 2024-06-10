@@ -10,19 +10,23 @@
 using namespace HQ;
 
 namespace HQ::consts {
-    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, pfx_text { "root@Console ~ %" };
+    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
 
-    constexpr hal::pixel_t padding_left { 20 }, padding_right { 20 };
+    constexpr hal::pixel_t padding_left { 32 }, padding_right { 20 };
 
     constexpr hal::color input_color { hal::palette::white },
-        ph_color { 0x808080 },
-        pfx_color { hal::palette::green };
+        background_color { hal::palette::black, 128 },
+        cursor_color { hal::palette::white, 128 },
+        placeholder_color { 0x808080 },
+        prefix_color { hal::palette::green };
 
-    constexpr hal::coord::point offset { 10, 10 };
+    constexpr hal::coord::point text_offset { 10, 10 };
 
     constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
     constexpr bool clear_on_close { false };
+
+    constexpr hal::f64 cursor_blink_time { 0.6 };
 }
 
 shuffle_bag::shuffle_bag()
@@ -36,7 +40,7 @@ shuffle_bag::shuffle_bag()
         "[not POSIX compliant]",
         "[made with Halcyon]",
         "[start typing, please]",
-        "[may 5th, 2022]",
+        "[non-euclidean interface]",
         "[commands not included]",
         "[who needs documentation]",
         "[your turn]",
@@ -73,15 +77,18 @@ const char* shuffle_bag::next() {
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
-    , m_glyphSize { static_cast<hal::coord::point>(m_font.size_text(" ")) }
-    , m_texBegin { static_cast<hal::pixel_t>(consts::offset.x + m_font.size_text(consts::pfx_text).x + consts::padding_left) }
-    , m_wrap { rnd.size().x - m_texBegin - consts::padding_right }
+    , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + consts::padding_left }
+    , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - consts::padding_right) }
+    , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
+    , m_maxChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
-    , m_repaint { false } {
+    , m_repaint { false }
+    , m_cursorVis { true } {
+    m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 }
 
-void console::draw(hal::renderer& rnd) {
-    hal::lock::color lock { rnd, { hal::palette::black, 128 } };
+void console::draw(hal::renderer& rnd, hal::f64 elapsed) {
+    hal::lock::color lock { rnd, consts::background_color };
     rnd.fill();
 
     if (m_repaint) {
@@ -89,39 +96,71 @@ void console::draw(hal::renderer& rnd) {
         repaint(rnd);
     }
 
-    auto pos = consts::offset;
+    rnd.render(m_pfx).to(consts::text_offset)();
 
-    rnd.render(m_pfx).to(pos)();
+    hal::coord::point where { m_texBegin, consts::text_offset.y };
+    hal::coord::rect  crd;
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_tex.size().x, m_wrap));
+    crd.size.y = m_outline.size.y;
 
-    pos.x += m_texBegin;
-    rnd.render(m_tex).to(pos)();
+    using namespace hal::literals;
 
-    lock.set({ hal::palette::white, 128 });
+    for (; m_tex.size().x - crd.pos.x > 0;
+         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        rnd.render(m_tex).from(crd).to(where)();
+    }
 
-    const hal::coord::rect r(
-        pos.x + m_glyphSize.x * m_field.cursor, pos.y,
-        m_glyphSize.x,
-        m_glyphSize.y);
+    m_cursorTime += elapsed;
 
-    rnd.fill(r);
+    if (m_cursorTime >= consts::cursor_blink_time) {
+        m_cursorTime = std::fmod(m_cursorTime, consts::cursor_blink_time);
+        m_cursorVis  = !m_cursorVis;
+    }
+
+    if (m_cursorVis) {
+        lock.set(consts::cursor_color);
+        rnd.fill(m_outline);
+    }
 }
 
 bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
-    m_repaint = m_field.process(k, m, c);
-    return k == hal::keyboard::key::F1;
+    switch (k) {
+        using enum hal::keyboard::key;
+
+    case F1:
+        return true;
+
+    default:
+        m_repaint = m_field.process(k, m, c);
+        break;
+    };
+
+    m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
+    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
+
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
+
+    return false;
 }
 
 void console::process(std::string_view inp) {
-    m_field.process(inp); // changes are always made here
-    m_repaint = true;
+    m_repaint = m_field.process(inp);
+
+    m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
+    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
+
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
 }
 
 void console::show(hal::renderer& rnd) {
     m_repaint = true;
+    m_active  = true;
 
-    m_pfx = rnd.make_texture(m_font.render(consts::pfx_text).fg(consts::pfx_color)(consts::text_render_type));
+    m_cursorTime = 0.0;
 
-    m_active = true;
+    m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
 
 void console::hide() {
@@ -144,10 +183,9 @@ void console::repaint(hal::renderer& rnd) {
 
     if (m_field.text.empty()) {
         text = m_font.render(m_placeholders.next())
-                   .fg(consts::ph_color)(consts::text_render_type);
+                   .fg(consts::placeholder_color)(consts::text_render_type);
     } else {
         text = m_font.render(m_field.text)
-                   .wrap(m_wrap)
                    .fg(consts::input_color)(consts::text_render_type);
     }
 
