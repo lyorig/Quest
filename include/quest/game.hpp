@@ -40,7 +40,6 @@ namespace HQ {
         hal::renderer m_renderer;
 
         hal::audio::device m_audioDevice;
-        hal::audio::stream m_audioStream;
 
         hal::event::handler m_event;
 

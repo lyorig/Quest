@@ -33,8 +33,7 @@ game::game(args)
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
     , m_renderer { m_window, { hal::renderer::flags::accelerated } }
-    , m_audioDevice { m_audio.build_device()() }
-    , m_audioStream { m_audio, hal::audio::format::i32, 2, 44100, hal::audio::format::i32, 2, 44100 }
+    , m_audioDevice { m_audio.build_device().spec({ 31, hal::audio::format::i32, 2, 4096 })() }
     , m_event { m_video.events }
     , m_console { m_renderer, m_ttf }
     , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {

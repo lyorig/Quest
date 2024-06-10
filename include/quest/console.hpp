@@ -52,6 +52,6 @@ namespace HQ {
         hal::coord::point m_glyphSize;
         hal::pixel_t      m_texBegin, m_wrap;
 
-        bool m_active, m_repaint;
+        bool m_active : 1, m_repaint : 1;
     };
 }
