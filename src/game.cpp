@@ -104,7 +104,7 @@ void game::main_loop() {
         m_state->draw(m_renderer);
 
         if (m_console.active())
-            m_console.draw(m_renderer);
+            m_console.draw(m_renderer, delta);
 
         m_renderer.present();
     }

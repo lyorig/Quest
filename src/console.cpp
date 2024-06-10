@@ -25,6 +25,8 @@ namespace HQ::consts {
     constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
     constexpr bool clear_on_close { false };
+
+    constexpr hal::f64 cursor_blink_time { 0.6 };
 }
 
 shuffle_bag::shuffle_bag()
@@ -38,7 +40,7 @@ shuffle_bag::shuffle_bag()
         "[not POSIX compliant]",
         "[made with Halcyon]",
         "[start typing, please]",
-        "[may 5th, 2022]",
+        "[non-euclidean interface]",
         "[commands not included]",
         "[who needs documentation]",
         "[your turn]",
@@ -80,11 +82,12 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
     , m_maxChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
-    , m_repaint { false } {
+    , m_repaint { false }
+    , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 }
 
-void console::draw(hal::renderer& rnd) {
+void console::draw(hal::renderer& rnd, hal::f64 elapsed) {
     hal::lock::color lock { rnd, consts::background_color };
     rnd.fill();
 
@@ -107,9 +110,17 @@ void console::draw(hal::renderer& rnd) {
         rnd.render(m_tex).from(crd).to(where)();
     }
 
-    lock.set(consts::cursor_color);
+    m_cursorTime += elapsed;
 
-    rnd.fill(m_outline);
+    if (m_cursorTime >= consts::cursor_blink_time) {
+        m_cursorTime = std::fmod(m_cursorTime, consts::cursor_blink_time);
+        m_cursorVis  = !m_cursorVis;
+    }
+
+    if (m_cursorVis) {
+        lock.set(consts::cursor_color);
+        rnd.fill(m_outline);
+    }
 }
 
 bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
@@ -127,6 +138,9 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
     m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
     m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
 
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
+
     return false;
 }
 
@@ -135,11 +149,16 @@ void console::process(std::string_view inp) {
 
     m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
     m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
+
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
 }
 
 void console::show(hal::renderer& rnd) {
     m_repaint = true;
     m_active  = true;
+
+    m_cursorTime = 0.0;
 
     m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
