@@ -39,8 +39,6 @@ namespace HQ {
         hal::window   m_window;
         hal::renderer m_renderer;
 
-        hal::audio::device m_audioDevice;
-
         hal::event::handler m_event;
 
         console m_console;

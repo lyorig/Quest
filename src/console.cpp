@@ -139,15 +139,31 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
 
     default: {
         const field::op op { m_field.process(k, m, c) };
-        m_repaint = op == field::op::text_added || op == field::op::text_removed;
+
+        if (m_field.text.size() > m_maxChars) {
+            m_field.trim(m_maxChars);
+        }
+
+        switch (op) {
+            using enum field::op;
+
+        case nothing:
+            break;
+
+        case text_added:
+        case text_removed:
+            m_repaint = true;
+            // Intentional fallthrough.
+
+        case cursor_moved:
+            set_cursor();
+            break;
+
+        default:
+            break;
+        }
     } break;
     };
-
-    if (m_field.text.size() > m_maxChars) {
-        m_field.trim(m_maxChars);
-    }
-
-    set_cursor();
 
     return false;
 }
