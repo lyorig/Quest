@@ -11,7 +11,7 @@ game.cpp
 helpers.cpp
 main.cpp
 sprite.cpp
-text_field.cpp
+field.cpp
 )
 
 list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)

@@ -16,8 +16,7 @@ namespace HQ::state {
         main_menu(hal::renderer& rnd, hal::ttf::context& ttf);
 
         void  process(const hal::event::handler& event) override;
-        base* update(hal::f64 elapsed) override;
-        void  draw(hal::renderer& rnd) const override;
+        base* update(hal::f64 elapsed, hal::renderer& rnd) override;
 
     private:
         void switch_theme();

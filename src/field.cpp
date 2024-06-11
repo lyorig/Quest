@@ -1,4 +1,4 @@
-#include <quest/text_field.hpp>
+#include <quest/field.hpp>
 
 using namespace HQ;
 
@@ -6,10 +6,10 @@ namespace consts {
     constexpr std::size_t tab_size { 4 };
 }
 
-text_field::text_field()
+field::field()
     : cursor { 0 } { }
 
-bool text_field::process(std::string_view inp) {
+bool field::process(std::string_view inp) {
     text.insert(cursor, inp);
     cursor += inp.size();
 
@@ -22,7 +22,7 @@ bool text_field::process(std::string_view inp) {
     return false;
 }
 
-bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+field::op field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -76,7 +76,7 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
 
             text.erase(text.begin() + begin, text.begin() + end);
 
-            return true;
+            return op::text_removed;
 
         } else { // delete one character
             if (cursor != 0) {
@@ -84,23 +84,27 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
             }
 
             text.erase(text.begin() + cursor);
-            return true;
+
+            return op::text_removed;
         }
 
     case key::left_arrow:
         if (cursor != 0) {
             --cursor;
         }
-        break;
+
+        return op::cursor_moved;
 
     case key::right_arrow:
         cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
-        break;
+
+        return op::cursor_moved;
 
     case key::tab:
         text.insert(cursor, consts::tab_size, ' ');
         cursor += consts::tab_size;
-        return true;
+
+        return op::text_added;
 
     case key::V:
         if (m[mod::ctrl] && c.has_text()) {
@@ -110,8 +114,9 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
             text.insert(cursor, str.c_str(), sz);
             cursor += sz;
 
-            return true;
+            return op::text_added;
         }
+
         break;
 
     default:
@@ -120,5 +125,13 @@ bool text_field::process(hal::keyboard::key k, hal::keyboard::mod_state m, const
 
     HAL_WARN_IF(cursor > text.size(), "<Text Field> Oops, cursor is OOB: ", cursor);
 
-    return false; // Nothing changed.
+    return op::nothing; // Nothing changed.
+}
+
+void field::trim(std::size_t off) {
+    if (cursor > off) {
+        cursor -= cursor - off;
+    }
+
+    text.erase(off);
 }

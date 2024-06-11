@@ -51,18 +51,16 @@ void main_menu::process(const hal::event::handler& event) {
     }
 }
 
-base* main_menu::update(delta_t elapsed) {
+base* main_menu::update(delta_t elapsed, hal::renderer& rnd) {
     m_theme.update(elapsed);
 
-    return nullptr;
-}
-
-void main_menu::draw(hal::renderer& rnd) const {
     rnd.color(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
         wgt.draw(rnd);
     }
+
+    return nullptr;
 }
 
 void main_menu::switch_theme() {

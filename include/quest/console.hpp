@@ -3,13 +3,13 @@
 #include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/text_field.hpp>
+#include <quest/field.hpp>
 #include <quest/types.hpp>
 
 namespace HQ {
     class shuffle_bag {
     public:
-        static constexpr hal::u8 num_texts { 30 };
+        static constexpr hal::u8 num_texts { 32 };
 
         shuffle_bag();
 
@@ -27,7 +27,7 @@ namespace HQ {
         console() = default;
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void draw(hal::renderer& rnd, hal::f64 elapsed);
+        void update(hal::renderer& rnd, hal::f64 elapsed);
 
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);
@@ -40,12 +40,13 @@ namespace HQ {
 
     private:
         void repaint(hal::renderer& rnd);
+        void set_cursor();
 
         shuffle_bag m_placeholders;
 
         hal::font m_font;
 
-        text_field m_field;
+        field m_field;
 
         hal::texture m_pfx, m_tex;
 
@@ -58,7 +59,8 @@ namespace HQ {
 
         hal::f64 m_cursorTime;
 
-        hal::u8 m_maxChars;
+        hal::u16 m_maxChars;
+        hal::u8  m_lineChars;
 
         bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
     };

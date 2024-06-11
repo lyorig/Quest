@@ -35,7 +35,6 @@ game::game(args a)
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
     , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } }
     , m_audioDevice { m_audio.build_device().capture()() }
-    , m_audioStream { m_audio, { hal::audio::format::i32, 2, 44100 }, { hal::audio::format::i32, 2, 44100 } }
     , m_event { m_video.events }
     , m_console { m_renderer, m_ttf }
     , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {
@@ -98,13 +97,11 @@ void game::main_loop() {
             m_state->process(m_event);
         }
 
-        if (state::base* ptr = m_state->update(delta); ptr != nullptr)
+        if (state::base* ptr = m_state->update(delta, m_renderer); ptr != nullptr)
             m_state.reset(ptr);
 
-        m_state->draw(m_renderer);
-
         if (m_console.active())
-            m_console.draw(m_renderer, delta);
+            m_console.update(m_renderer, delta);
 
         m_renderer.present();
     }

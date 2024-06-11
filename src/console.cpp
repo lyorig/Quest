@@ -27,6 +27,8 @@ namespace HQ::consts {
     constexpr bool clear_on_close { false };
 
     constexpr hal::f64 cursor_blink_time { 0.6 };
+
+    constexpr std::size_t desired_max_chars { 128 };
 }
 
 shuffle_bag::shuffle_bag()
@@ -46,7 +48,7 @@ shuffle_bag::shuffle_bag()
         "[your turn]",
         "[segfaulting since 2021]",
         "[quoth the raven, nevermore]",
-        "[sudo pacman -S neofetch]",
+        "[sudo pacman -S lyofetch]",
         "[redacted]",
         "[is anyone there?]",
         "[licensed under the WTFPL]",
@@ -55,12 +57,14 @@ shuffle_bag::shuffle_bag()
         "[no man page here, sorry]",
         "[womp womp]",
         "[40.7736N, 29.7564W]",
-        "[you can sudo, trust me]",
+        "[sudo deez nuts]",
         "[docker? I barely know 'er!]",
         "[running out of time]",
         "[not actually random]",
         "[see you again]",
         "[forget me not]",
+        "[this is not the end]",
+        "[one big CVE]"
     }
     , m_index { num_texts } {
 }
@@ -80,14 +84,17 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + consts::padding_left }
     , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - consts::padding_right) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
+    , m_maxChars { static_cast<hal::u16>(std::min(static_cast<int>(rnd.info().max_texture_size().x / m_outline.size.x), static_cast<int>(consts::desired_max_chars))) }
+    , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
     , m_repaint { false }
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
+
+    HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-void console::draw(hal::renderer& rnd, hal::f64 elapsed) {
+void console::update(hal::renderer& rnd, hal::f64 elapsed) {
     hal::lock::color lock { rnd, consts::background_color };
     rnd.fill();
 
@@ -113,8 +120,8 @@ void console::draw(hal::renderer& rnd, hal::f64 elapsed) {
     m_cursorTime += elapsed;
 
     if (m_cursorTime >= consts::cursor_blink_time) {
-        m_cursorTime = std::fmod(m_cursorTime, consts::cursor_blink_time);
-        m_cursorVis  = !m_cursorVis;
+        m_cursorTime -= consts::cursor_blink_time;
+        m_cursorVis = !m_cursorVis;
     }
 
     if (m_cursorVis) {
@@ -130,16 +137,17 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
     case F1:
         return true;
 
-    default:
-        m_repaint = m_field.process(k, m, c);
-        break;
+    default: {
+        const field::op op { m_field.process(k, m, c) };
+        m_repaint = op == field::op::text_added || op == field::op::text_removed;
+    } break;
     };
 
-    m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
-    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
+    if (m_field.text.size() > m_maxChars) {
+        m_field.trim(m_maxChars);
+    }
 
-    m_cursorTime = 0.0;
-    m_cursorVis  = true;
+    set_cursor();
 
     return false;
 }
@@ -147,11 +155,11 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
 void console::process(std::string_view inp) {
     m_repaint = m_field.process(inp);
 
-    m_outline.pos.x = m_texBegin + (m_field.cursor % m_maxChars) * m_outline.size.x;
-    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.text.size() / m_maxChars);
+    if (m_field.text.size() > m_maxChars) {
+        m_field.trim(m_maxChars);
+    }
 
-    m_cursorTime = 0.0;
-    m_cursorVis  = true;
+    set_cursor();
 }
 
 void console::show(hal::renderer& rnd) {
@@ -159,6 +167,7 @@ void console::show(hal::renderer& rnd) {
     m_active  = true;
 
     m_cursorTime = 0.0;
+    m_cursorVis  = true;
 
     m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
@@ -187,7 +196,18 @@ void console::repaint(hal::renderer& rnd) {
     } else {
         text = m_font.render(m_field.text)
                    .fg(consts::input_color)(consts::text_render_type);
+
+        if (text.size().x > rnd.info().max_texture_size().x) {
+        }
     }
 
     m_tex = rnd.make_texture(text);
+}
+
+void console::set_cursor() {
+    m_outline.pos.x = m_texBegin + (m_field.cursor % m_lineChars) * m_outline.size.x;
+    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.cursor / m_lineChars);
+
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
 }
