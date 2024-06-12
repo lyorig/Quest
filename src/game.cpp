@@ -10,8 +10,6 @@ using namespace HQ;
 
 namespace HQ::consts {
     constexpr std::string_view window_name { "HalQuest" };
-
-    constexpr hal::keyboard::key console_toggle_bind { hal::keyboard::key::F1 };
 }
 
 args::args(int argc, char** argv)
@@ -70,7 +68,7 @@ void game::main_loop() {
                 switch (m_event.keyboard().key()) {
                     using enum hal::keyboard::key;
 
-                case consts::console_toggle_bind:
+                case F1:
                     m_console.show(m_renderer);
                     m_event.text_input_start();
                     break;

@@ -224,6 +224,6 @@ void console::set_cursor() {
     m_outline.pos.x = m_texBegin + (m_field.cursor % m_lineChars) * m_outline.size.x;
     m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.cursor / m_lineChars);
 
-    m_cursorTime = 0.0;
+    m_cursorTime = consts::cursor_blink_time / 2.0;
     m_cursorVis  = true;
 }
