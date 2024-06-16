@@ -73,10 +73,6 @@ void game::main_loop() {
                     m_event.text_input_start();
                     break;
 
-                case esc:
-                    quit();
-                    break;
-
                 default:
                     break;
                 }

@@ -50,6 +50,7 @@ namespace HQ {
 
         hal::texture m_pfx, m_tex;
 
+        hal::coord_t m_padding;
         hal::coord_t m_texBegin;
         hal::pixel_t m_wrap;
 

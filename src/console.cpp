@@ -12,7 +12,7 @@ using namespace HQ;
 namespace HQ::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
 
-    constexpr hal::pixel_t padding_left { 32 }, padding_right { 20 };
+    constexpr hal::coord_t padding_pc { 0.015 };
 
     constexpr hal::color input_color { hal::palette::white },
         background_color { hal::palette::black, 128 },
@@ -81,10 +81,11 @@ const char* shuffle_bag::next() {
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
-    , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + consts::padding_left }
-    , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - consts::padding_right) }
+    , m_padding { rnd.size().x * consts::padding_pc }
+    , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
+    , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u16>(std::min(static_cast<int>(rnd.info().max_texture_size().x / m_outline.size.x), static_cast<int>(consts::desired_max_chars))) }
+    , m_maxChars { static_cast<hal::u16>(std::min<int>(rnd.info().max_texture_size().x / m_outline.size.x, consts::desired_max_chars)) }
     , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
     , m_repaint { false }
@@ -113,7 +114,7 @@ void console::update(hal::renderer& rnd, hal::f64 elapsed) {
     using namespace hal::literals;
 
     for (; m_tex.size().x - crd.pos.x > 0;
-         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, m_wrap)) {
         rnd.render(m_tex).from(crd).to(where)();
     }
 
