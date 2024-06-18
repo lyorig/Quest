@@ -95,7 +95,7 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-void console::update(hal::renderer& rnd, hal::f64 elapsed) {
+void console::update(hal::renderer& rnd, delta_t elapsed) {
     hal::lock::color lock { rnd, consts::background_color };
     rnd.fill();
 

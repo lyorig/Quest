@@ -12,7 +12,7 @@ namespace HQ::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
 
-args::args(int argc, char** argv)
+args::args(int argc, const char** argv)
     : m_span { argv, static_cast<std::size_t>(argc) } {
 }
 
@@ -32,9 +32,7 @@ game::game(args a)
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
     , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } }
-    , m_event { m_video.events }
-    , m_console { m_renderer, m_ttf }
-    , m_state { std::make_unique<state::main_menu>(m_renderer, m_ttf) } {
+    , m_console { m_renderer, m_ttf } {
     m_renderer.blend(hal::blend_mode::blend);
 }
 
@@ -46,7 +44,7 @@ void game::main_loop() {
         delta = timer();
         timer.reset();
 
-        while (m_event.poll()) {
+        while (m_video.events.poll(m_event)) {
             switch (m_event.kind()) {
                 using enum hal::event::type;
 
@@ -58,7 +56,7 @@ void game::main_loop() {
                 if (m_console.active()) {
                     if (m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard)) {
                         m_console.hide();
-                        m_event.text_input_stop();
+                        m_video.events.text_input_stop();
                     }
 
                     // Nobody else gets incoming key events while the console is active.
@@ -70,7 +68,7 @@ void game::main_loop() {
 
                 case F1:
                     m_console.show(m_renderer);
-                    m_event.text_input_start();
+                    m_video.events.text_input_start();
                     break;
 
                 default:
@@ -87,14 +85,14 @@ void game::main_loop() {
                 break;
             }
 
-            m_state->process(m_event);
+            m_sceneMgr.process(m_event);
         }
 
-        if (state::base* ptr = m_state->update(delta, m_renderer); ptr != nullptr)
-            m_state.reset(ptr);
+        m_sceneMgr.update(delta, m_renderer);
 
-        if (m_console.active())
+        if (m_console.active()) {
             m_console.update(m_renderer, delta);
+        }
 
         m_renderer.present();
     }
@@ -102,5 +100,5 @@ void game::main_loop() {
 
 void game::quit() {
     m_event.kind(hal::event::type::quit_requested);
-    m_event.push();
+    m_video.events.push(m_event);
 }

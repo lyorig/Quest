@@ -5,8 +5,9 @@
 
 using namespace HQ;
 
-sprite::sprite(hal::coord::point pos)
-    : hitbox { pos } {
+sprite::sprite(hal::texture tex, hal::coord::point pos)
+    : texture { std::move(tex) }
+    , hitbox { pos, texture.size() } {
 }
 
 sprite::sprite(hal::texture tex, hal::coord::point pos, hal::coord::point size)

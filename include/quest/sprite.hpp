@@ -12,7 +12,7 @@ namespace HQ {
     public:
         sprite() = default;
 
-        sprite(hal::coord::point pos);
+        sprite(hal::texture tex, hal::coord::point pos);
         sprite(hal::texture tex, hal::coord::point pos, hal::coord::point size);
 
         void draw(hal::renderer& rnd) const;
@@ -21,7 +21,7 @@ namespace HQ {
 
         void pos(hal::coord::point where);
 
-        hal::texture    texture;
+        hal::texture     texture;
         hal::coord::rect hitbox;
     };
 }

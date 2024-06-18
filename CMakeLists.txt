@@ -5,11 +5,12 @@ project(HalodaQuest)
 include(halcyon/config.cmake)
 
 set(QUEST_SOURCES
-state/main_menu.cpp
+scenes/main_menu.cpp
 console.cpp
 game.cpp
 helpers.cpp
 main.cpp
+scene_manager.cpp
 sprite.cpp
 field.cpp
 )

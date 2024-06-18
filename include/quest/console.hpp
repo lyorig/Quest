@@ -27,7 +27,7 @@ namespace HQ {
         console() = default;
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void update(hal::renderer& rnd, hal::f64 elapsed);
+        void update(hal::renderer& rnd, delta_t elapsed);
 
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);

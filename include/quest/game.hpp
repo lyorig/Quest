@@ -4,17 +4,19 @@
 #include <halcyon/video.hpp>
 
 #include <quest/console.hpp>
-#include <quest/state/main_menu.hpp>
+#include <quest/scene_manager.hpp>
+#include <quest/scenes/main_menu.hpp>
+#include <quest/stack_poly.hpp>
 
 namespace HQ {
     class args {
     public:
-        args(int argc, char** argv);
+        args(int argc, const char** argv);
 
         bool operator[](std::string_view what) const;
 
     private:
-        std::span<char*> m_span;
+        std::span<const char*> m_span;
     };
 
     class game {
@@ -43,7 +45,6 @@ namespace HQ {
 
         console m_console;
 
-        // The current state.
-        std::unique_ptr<state::base> m_state;
+        scene_manager m_sceneMgr;
     };
 }
