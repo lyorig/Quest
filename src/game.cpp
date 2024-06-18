@@ -31,8 +31,7 @@ game::game(args a)
     , m_audio { m_context }
     , m_img { hal::image::init_format::jpg }
     , m_window { m_video, consts::window_name, hal::tag::fullscreen }
-    , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } }
-    , m_console { m_renderer, m_ttf } {
+    , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } } {
     m_renderer.blend(hal::blend_mode::blend);
 }
 
@@ -40,59 +39,15 @@ void game::main_loop() {
     hal::f64   delta;
     hal::timer timer;
 
-    while (true) {
+    while (m_running) {
         delta = timer();
         timer.reset();
 
         while (m_video.events.poll(m_event)) {
-            switch (m_event.kind()) {
-                using enum hal::event::type;
-
-            // Handle universal events here.
-            case quit_requested:
-                return;
-
-            case key_pressed:
-                if (m_console.active()) {
-                    if (m_console.process(m_event.keyboard().key(), m_video.events.keyboard.mod(), m_video.clipboard)) {
-                        m_console.hide();
-                        m_video.events.text_input_stop();
-                    }
-
-                    // Nobody else gets incoming key events while the console is active.
-                    continue;
-                }
-
-                switch (m_event.keyboard().key()) {
-                    using enum hal::keyboard::key;
-
-                case F1:
-                    m_console.show(m_renderer);
-                    m_video.events.text_input_start();
-                    break;
-
-                default:
-                    break;
-                }
-
-                break;
-
-            case text_input:
-                m_console.process(m_event.text_input().text());
-                break;
-
-            default:
-                break;
-            }
-
             m_sceneMgr.process(m_event);
         }
 
         m_sceneMgr.update(delta, m_renderer);
-
-        if (m_console.active()) {
-            m_console.update(m_renderer, delta);
-        }
 
         m_renderer.present();
     }

@@ -1,9 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <vector>
 
-#include <halcyon/debug.hpp>
 #include <halcyon/utility/concepts.hpp>
 
 // rfem.hpp:

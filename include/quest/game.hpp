@@ -3,10 +3,9 @@
 #include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/console.hpp>
 #include <quest/scene_manager.hpp>
+#include <quest/scenes/console.hpp>
 #include <quest/scenes/main_menu.hpp>
-#include <quest/stack_poly.hpp>
 
 namespace HQ {
     class args {
@@ -43,8 +42,8 @@ namespace HQ {
 
         hal::event::handler m_event;
 
-        console m_console;
-
         scene_manager m_sceneMgr;
+
+        bool m_running;
     };
 }

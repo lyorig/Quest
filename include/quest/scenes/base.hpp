@@ -14,20 +14,18 @@ namespace HQ::scene {
         main_menu
     };
 
+    enum class action : hal::u8 {
+        none,
+        kill,
+        prioritize,
+        activate,
+        deactivate
+    };
+
     enum class flags {
         transparent,
         force_event_processing
     };
-
-    template <typename To, typename Arithmetic>
-    constexpr To make_bitmask(std::initializer_list<Arithmetic> il) {
-        To ret { 0 };
-        for (auto val : il) {
-            ret |= (1 << static_cast<std::size_t>(val));
-        }
-
-        return ret;
-    }
 
     class base {
     public:

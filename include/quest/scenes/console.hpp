@@ -6,6 +6,8 @@
 #include <quest/field.hpp>
 #include <quest/types.hpp>
 
+#include <quest/scenes/base.hpp>
+
 namespace HQ {
     class shuffle_bag {
     public:
@@ -22,12 +24,13 @@ namespace HQ {
     };
 
     // A console. Designed for use with mono fonts.
-    class console {
+    class console final : scene::base {
     public:
-        console() = default;
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void update(hal::renderer& rnd, delta_t elapsed);
+        scene::type update(delta_t elapsed, hal::renderer& rnd) override;
+
+        void process(const hal::event::handler& eh) override;
 
         bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
         void process(std::string_view inp);

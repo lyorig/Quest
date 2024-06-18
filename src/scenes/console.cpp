@@ -1,4 +1,4 @@
-#include <quest/console.hpp>
+#include <quest/scenes/console.hpp>
 
 #include <random>
 
@@ -80,7 +80,8 @@ const char* shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
+    : base { scene::flags::transparent, scene::flags::force_event_processing }
+    , m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
     , m_padding { rnd.size().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - m_padding) }
@@ -95,7 +96,7 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-void console::update(hal::renderer& rnd, delta_t elapsed) {
+scene::type console::update(delta_t elapsed, hal::renderer& rnd) {
     hal::lock::color lock { rnd, consts::background_color };
     rnd.fill();
 
@@ -129,6 +130,8 @@ void console::update(hal::renderer& rnd, delta_t elapsed) {
         lock.set(consts::cursor_color);
         rnd.fill(m_outline);
     }
+
+    return scene::type::none;
 }
 
 bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
