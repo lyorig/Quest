@@ -4,8 +4,6 @@
 #include <halcyon/video.hpp>
 
 #include <quest/scene_manager.hpp>
-#include <quest/scenes/console.hpp>
-#include <quest/scenes/main_menu.hpp>
 
 namespace HQ {
     class args {
@@ -48,13 +46,9 @@ namespace HQ {
         scene_manager m_scenes;
         event_vector  m_polled;
 
-    public:
         delta_t m_delta;
         bool    m_running;
 
-    private:
         void collect_events();
-
-    public:
     };
 }

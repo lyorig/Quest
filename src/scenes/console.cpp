@@ -120,7 +120,7 @@ scene::type console::update(game& g) {
         g.renderer.render(m_tex).from(crd).to(where)();
     }
 
-    m_cursorTime += g.m_delta;
+    m_cursorTime += g.delta();
 
     if (m_cursorTime >= consts::cursor_blink_time) {
         m_cursorTime -= consts::cursor_blink_time;

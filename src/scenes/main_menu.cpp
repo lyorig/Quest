@@ -66,7 +66,7 @@ type main_menu::update(game& g) {
             break;
         }
 
-    m_theme.update(g.m_delta);
+    m_theme.update(g.delta());
 
     g.renderer.color(m_theme.value());
 
