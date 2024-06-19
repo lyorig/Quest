@@ -81,7 +81,7 @@ const char* console::shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : base { scene::flags::block_further_processing }
+    : base { flags::block_further_processing }
     , m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
     , m_padding { rnd.size().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
@@ -103,7 +103,9 @@ action console::process(const game::event_vector& polled, const hal::proxy::vide
             using enum hal::event::type;
 
         case key_pressed:
-            return process(evt.keyboard().key(), vid) ? action::switch_state : action::none;
+            if (process(evt.keyboard().key(), vid)) {
+                return action::switch_state;
+            };
             break;
 
         case text_input:
@@ -225,6 +227,8 @@ void console::process(std::string_view inp) {
     if (m_field.text.size() > m_maxChars) {
         m_field.trim(m_maxChars);
     }
+
+    m_repaint = true;
 
     set_cursor();
 }

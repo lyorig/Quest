@@ -34,7 +34,8 @@ game::game(args a)
     , audio { m_context }
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, hal::tag::fullscreen }
-    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } } {
+    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["-xv"]) } }
+    , m_running { true } {
     renderer.blend(hal::blend_mode::blend);
 
     m_scenes.active.push_back(std::make_unique<scene::main_menu>(renderer, ttf));
