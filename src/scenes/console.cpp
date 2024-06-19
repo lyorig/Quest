@@ -8,7 +8,7 @@
 #include <quest/game.hpp>
 #include <quest/helpers.hpp>
 
-using namespace HQ;
+using namespace HQ::scene;
 
 namespace HQ::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
@@ -32,7 +32,7 @@ namespace HQ::consts {
     constexpr std::size_t desired_max_chars { 128 };
 }
 
-shuffle_bag::shuffle_bag()
+console::shuffle_bag::shuffle_bag()
     : m_arr {
         "[enter command here]",
         "[be not afraid]",
@@ -70,7 +70,7 @@ shuffle_bag::shuffle_bag()
     , m_index { num_texts } {
 }
 
-const char* shuffle_bag::next() {
+const char* console::shuffle_bag::next() {
     if (m_index == num_texts) { // Need to refresh.
         HAL_PRINT("<Console> Shuffling placeholder text...");
         std::shuffle(std::begin(m_arr), std::end(m_arr), std::mt19937_64 { std::random_device {}() });
@@ -81,7 +81,7 @@ const char* shuffle_bag::next() {
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
-    : base { scene::flags::transparent, scene::flags::force_event_processing }
+    : base { scene::flags::block_further_processing }
     , m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
     , m_padding { rnd.size().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
@@ -97,16 +97,46 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-scene::type console::update(game& g) {
-    hal::lock::color lock { g.renderer, consts::background_color };
-    g.renderer.fill();
+action console::process(const game::event_vector& polled, const hal::proxy::video& vid) {
+    for (const auto& evt : polled) {
+        switch (evt.kind()) {
+            using enum hal::event::type;
+
+        case key_pressed:
+            return process(evt.keyboard().key(), vid) ? action::switch_state : action::none;
+            break;
+
+        case text_input:
+            process(evt.text_input().text());
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return action::none;
+}
+
+void console::update(delta_t elapsed) {
+    m_cursorTime += elapsed;
+
+    if (m_cursorTime >= consts::cursor_blink_time) {
+        m_cursorTime -= consts::cursor_blink_time;
+        m_cursorVis = !m_cursorVis;
+    }
+}
+
+void console::draw(hal::renderer& rnd) {
+    hal::lock::color lock { rnd, consts::background_color };
+    rnd.fill();
 
     if (m_repaint) {
         m_repaint = false;
-        repaint(g.renderer);
+        repaint(rnd);
     }
 
-    g.renderer.render(m_pfx).to(consts::text_offset)();
+    rnd.render(m_pfx).to(consts::text_offset)();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
     hal::coord::rect  crd;
@@ -117,25 +147,41 @@ scene::type console::update(game& g) {
 
     for (; m_tex.size().x - crd.pos.x > 0;
          where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        g.renderer.render(m_tex).from(crd).to(where)();
-    }
-
-    m_cursorTime += g.delta();
-
-    if (m_cursorTime >= consts::cursor_blink_time) {
-        m_cursorTime -= consts::cursor_blink_time;
-        m_cursorVis = !m_cursorVis;
+        rnd.render(m_tex).from(crd).to(where)();
     }
 
     if (m_cursorVis) {
         lock.set(consts::cursor_color);
-        g.renderer.fill(m_outline);
+        rnd.fill(m_outline);
     }
-
-    return scene::type::none;
 }
 
-bool console::process(hal::keyboard::key k, game& g) {
+void console::activate(hal::renderer& rnd) {
+    m_repaint = true;
+    m_active  = true;
+
+    m_cursorTime = 0.0;
+    m_cursorVis  = true;
+
+    m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
+}
+
+void console::deactivate() {
+    m_pfx.reset();
+    m_tex.reset();
+
+    if constexpr (consts::clear_on_close) {
+        m_field.text.clear();
+    }
+
+    m_active = false;
+}
+
+std::string_view console::name() const {
+    return "Console";
+}
+
+bool console::process(hal::keyboard::key k, const hal::proxy::video& vid) {
     switch (k) {
         using enum hal::keyboard::key;
 
@@ -143,7 +189,7 @@ bool console::process(hal::keyboard::key k, game& g) {
         return true;
 
     default: {
-        const field::op op { m_field.process(k, g.video) };
+        const field::op op { m_field.process(k, vid) };
 
         if (m_field.text.size() > m_maxChars) {
             m_field.trim(m_maxChars);
@@ -181,27 +227,6 @@ void console::process(std::string_view inp) {
     }
 
     set_cursor();
-}
-
-void console::show(hal::renderer& rnd) {
-    m_repaint = true;
-    m_active  = true;
-
-    m_cursorTime = 0.0;
-    m_cursorVis  = true;
-
-    m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
-}
-
-void console::hide() {
-    m_pfx.reset();
-    m_tex.reset();
-
-    if constexpr (consts::clear_on_close) {
-        m_field.text.clear();
-    }
-
-    m_active = false;
 }
 
 bool console::active() {

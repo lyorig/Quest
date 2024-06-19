@@ -9,61 +9,72 @@
 #include <quest/scenes/base.hpp>
 
 namespace HQ {
-    class shuffle_bag {
-    public:
-        static constexpr hal::u8 num_texts { 32 };
+    namespace scene {
+        // A console. Designed for use with mono fonts.
+        class console final : public base {
+        public:
+            class shuffle_bag {
+            public:
+                static constexpr hal::u8 num_texts { 32 };
 
-        shuffle_bag();
+                shuffle_bag();
 
-        const char* next();
+                const char* next();
 
-    private:
-        const char* m_arr[num_texts];
+            private:
+                const char* m_arr[num_texts];
 
-        hal::u8 m_index;
-    };
+                hal::u8 m_index;
+            };
 
-    // A console. Designed for use with mono fonts.
-    class console final : scene::base {
-    public:
-        console(hal::renderer& rnd, hal::ttf::context& ttf);
+            console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        scene::type update(game& g) override;
+            action process(const std::vector<hal::event::handler>& vector, const hal::proxy::video& vid) override;
 
-        bool process(hal::keyboard::key k, game& g);
-        void process(std::string_view inp);
+            void update(delta_t elapsed) override;
+            void draw(hal::renderer& rnd) override;
 
-        void show(hal::renderer& rnd);
-        void hide();
+            void activate(hal::renderer& rnd) override;
+            void deactivate() override;
 
-        // Is the console active?
-        bool active();
+            virtual std::string_view name() const override;
 
-    private:
-        void repaint(hal::renderer& rnd);
-        void set_cursor();
+            // Process a keystroke.
+            // Returns whether the console should be closed.
+            bool process(hal::keyboard::key k, const hal::proxy::video& vid);
 
-        shuffle_bag m_placeholders;
+            // Process entered text.
+            void process(std::string_view inp);
 
-        hal::font m_font;
+            // Is the console active?
+            bool active();
 
-        field m_field;
+        private:
+            void repaint(hal::renderer& rnd);
+            void set_cursor();
 
-        hal::texture m_pfx, m_tex;
+            shuffle_bag m_placeholders;
 
-        hal::coord_t m_padding;
-        hal::coord_t m_texBegin;
-        hal::pixel_t m_wrap;
+            hal::font m_font;
 
-        // pos = current outline pos
-        // size = glyph size (constant)
-        hal::coord::rect m_outline;
+            field m_field;
 
-        hal::f64 m_cursorTime;
+            hal::texture m_pfx, m_tex;
 
-        hal::u16 m_maxChars;
-        hal::u8  m_lineChars;
+            hal::coord_t m_padding;
+            hal::coord_t m_texBegin;
+            hal::pixel_t m_wrap;
 
-        bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
-    };
+            // pos = current outline pos
+            // size = glyph size (constant)
+            hal::coord::rect m_outline;
+
+            hal::f64 m_cursorTime;
+
+            hal::u16 m_maxChars;
+            hal::u8  m_lineChars;
+
+            bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
+        };
+    }
 }

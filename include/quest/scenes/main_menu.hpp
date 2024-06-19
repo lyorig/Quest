@@ -15,7 +15,15 @@ namespace HQ::scene {
     public:
         main_menu(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        type update(game& g) override;
+        action process(const std::vector<hal::event::handler>& vector, const hal::proxy::video& vid) override;
+
+        void update(delta_t elapsed) override;
+        void draw(hal::renderer& rnd) override;
+
+        void activate(hal::renderer& rnd) override;
+        void deactivate() override;
+
+        virtual std::string_view name() const override;
 
     private:
         void set_widget(std::size_t index, const hal::font& fnt, std::string_view text);

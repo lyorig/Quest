@@ -6,6 +6,9 @@
 #include <quest/constants.hpp>
 #include <quest/helpers.hpp>
 
+#include <quest/scenes/console.hpp>
+#include <quest/scenes/main_menu.hpp>
+
 using namespace HQ;
 
 namespace HQ::consts {
@@ -33,6 +36,9 @@ game::game(args a)
     , window { video, consts::window_name, hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } } {
     renderer.blend(hal::blend_mode::blend);
+
+    m_scenes.active.push_back(std::make_unique<scene::main_menu>(renderer, ttf));
+    m_scenes.parked.push_back(std::make_unique<scene::console>(renderer, ttf));
 }
 
 void game::main_loop() {
@@ -59,8 +65,19 @@ void game::collect_events() {
 
     hal::event::handler h;
 
+    // Process global events here...
     while (video.events.poll(h)) {
-        m_polled.push_back(h);
+        switch (h.kind()) {
+            using enum hal::event::type;
+
+        case quit_requested:
+            quit();
+            break;
+
+        default:
+            m_polled.push_back(h);
+            break;
+        }
     }
 }
 

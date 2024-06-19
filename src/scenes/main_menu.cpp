@@ -33,8 +33,8 @@ main_menu::main_menu(hal::renderer& rnd, hal::ttf::context& ttf)
     }
 }
 
-type main_menu::update(game& g) {
-    for (const auto& e : g.polled())
+action main_menu::process(const std::vector<hal::event::handler>& polled, const hal::proxy::video&) {
+    for (const auto& e : polled)
         switch (e.kind()) {
             using enum hal::event::type;
 
@@ -66,15 +66,29 @@ type main_menu::update(game& g) {
             break;
         }
 
-    m_theme.update(g.delta());
+    return action::none;
+}
 
-    g.renderer.color(m_theme.value());
+void main_menu::update(delta_t elapsed) {
+    m_theme.update(elapsed);
+}
+
+void main_menu::draw(hal::renderer& rnd) {
+    rnd.color(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
-        wgt.draw(g.renderer);
+        wgt.draw(rnd);
     }
+}
 
-    return type::none;
+void main_menu::activate(hal::renderer&) {
+}
+
+void main_menu::deactivate() {
+}
+
+std::string_view main_menu::name() const {
+    return "Main menu";
 }
 
 void main_menu::switch_theme() {
