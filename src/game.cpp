@@ -27,33 +27,47 @@ bool args::operator[](std::string_view what) const {
 }
 
 game::game(args a)
-    : m_video { m_context }
-    , m_audio { m_context }
-    , m_img { hal::image::init_format::jpg }
-    , m_window { m_video, consts::window_name, hal::tag::fullscreen }
-    , m_renderer { m_window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } } {
-    m_renderer.blend(hal::blend_mode::blend);
+    : video { m_context }
+    , audio { m_context }
+    , img { hal::image::init_format::jpg }
+    , window { video, consts::window_name, hal::tag::fullscreen }
+    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, a["-v"]) } } {
+    renderer.blend(hal::blend_mode::blend);
 }
 
 void game::main_loop() {
-    hal::f64   delta;
     hal::timer timer;
 
     while (m_running) {
-        delta = timer();
+        m_delta = timer();
         timer.reset();
 
-        while (m_video.events.poll(m_event)) {
-            m_sceneMgr.process(m_event);
-        }
+        collect_events();
 
-        m_sceneMgr.update(delta, m_renderer);
+        m_scenes.update(*this);
 
-        m_renderer.present();
+        renderer.present();
     }
 }
 
 void game::quit() {
-    m_event.kind(hal::event::type::quit_requested);
-    m_video.events.push(m_event);
+    m_running = false;
+}
+
+void game::collect_events() {
+    m_polled.clear();
+
+    hal::event::handler h;
+
+    while (video.events.poll(h)) {
+        m_polled.push_back(h);
+    }
+}
+
+const game::event_vector& game::polled() const {
+    return m_polled;
+}
+
+delta_t game::delta() const {
+    return m_delta;
 }

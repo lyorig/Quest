@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
@@ -15,8 +15,7 @@ namespace HQ::scene {
     public:
         main_menu(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        void process(const hal::event::handler& event) override;
-        type update(delta_t elapsed, hal::renderer& rnd) override;
+        type update(game& g) override;
 
     private:
         void set_widget(std::size_t index, const hal::font& fnt, std::string_view text);

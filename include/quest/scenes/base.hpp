@@ -8,36 +8,39 @@
 // state/base.hpp:
 // Base state class.
 
-namespace HQ::scene {
-    enum class type : hal::u8 {
-        none,
-        main_menu
-    };
+namespace HQ {
+    class game;
 
-    enum class action : hal::u8 {
-        none,
-        kill,
-        prioritize,
-        activate,
-        deactivate
-    };
+    namespace scene {
+        enum class type : hal::u8 {
+            none,
+            main_menu
+        };
 
-    enum class flags {
-        transparent,
-        force_event_processing
-    };
+        enum class action : hal::u8 {
+            none,
+            kill,
+            prioritize,
+            activate,
+            deactivate
+        };
 
-    class base {
-    public:
-        constexpr base(std::initializer_list<flags> f)
-            : flags { f } {
-        }
+        enum class flags {
+            transparent,
+            force_event_processing
+        };
 
-        virtual void process(const hal::event::handler& evt)     = 0;
-        virtual type update(delta_t elapsed, hal::renderer& rnd) = 0;
+        class base {
+        public:
+            constexpr base(std::initializer_list<flags> f)
+                : flags { f } {
+            }
 
-        virtual ~base() = default;
+            virtual type update(game& g) = 0;
 
-        hal::enum_bitset<flags, hal::u8> flags;
-    };
+            virtual ~base() = default;
+
+            hal::enum_bitset<flags, hal::u8> flags;
+        };
+    }
 }

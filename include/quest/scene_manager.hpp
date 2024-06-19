@@ -6,6 +6,8 @@
 #include <quest/stack_poly.hpp>
 
 namespace HQ {
+    class game;
+
     // A LIFO scene manager.
     class scene_manager {
     public:
@@ -20,8 +22,7 @@ namespace HQ {
 
         void pop_back();
 
-        void process(const hal::event::handler& event);
-        void update(delta_t time, hal::renderer& rnd);
+        void update(game& g);
 
     private:
         std::vector<base_up> m_stack;

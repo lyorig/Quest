@@ -28,11 +28,9 @@ namespace HQ {
     public:
         console(hal::renderer& rnd, hal::ttf::context& ttf);
 
-        scene::type update(delta_t elapsed, hal::renderer& rnd) override;
+        scene::type update(game& g) override;
 
-        void process(const hal::event::handler& eh) override;
-
-        bool process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c);
+        bool process(hal::keyboard::key k, game& g);
         void process(std::string_view inp);
 
         void show(hal::renderer& rnd);

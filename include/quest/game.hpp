@@ -20,30 +20,41 @@ namespace HQ {
 
     class game {
     public:
+        using event_vector = std::vector<hal::event::handler>;
+
         game(args a);
 
         void main_loop();
-
-        // Post a quit event.
-        // This will be processed in the next event loop.
         void quit();
+
+        const event_vector& polled() const;
+
+        delta_t delta() const;
 
     private:
         HAL_NO_SIZE hal::context m_context;
 
-        HAL_NO_SIZE hal::system::video m_video;
-        HAL_NO_SIZE hal::system::audio m_audio;
+    public:
+        HAL_NO_SIZE hal::system::video video;
+        HAL_NO_SIZE hal::system::audio audio;
 
-        HAL_NO_SIZE hal::ttf::context m_ttf;
-        HAL_NO_SIZE hal::image::context m_img;
+        HAL_NO_SIZE hal::ttf::context ttf;
+        HAL_NO_SIZE hal::image::context img;
 
-        hal::window   m_window;
-        hal::renderer m_renderer;
+        hal::window   window;
+        hal::renderer renderer;
 
-        hal::event::handler m_event;
+    private:
+        scene_manager m_scenes;
+        event_vector  m_polled;
 
-        scene_manager m_sceneMgr;
+    public:
+        delta_t m_delta;
+        bool    m_running;
 
-        bool m_running;
+    private:
+        void collect_events();
+
+    public:
     };
 }

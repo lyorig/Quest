@@ -5,6 +5,7 @@
 #include <halcyon/utility/locks.hpp>
 
 #include <quest/constants.hpp>
+#include <quest/game.hpp>
 #include <quest/helpers.hpp>
 
 using namespace HQ;
@@ -12,7 +13,7 @@ using namespace HQ;
 namespace HQ::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
 
-    constexpr hal::coord_t padding_pc { 0.015 };
+    constexpr hal::coord_t padding_pc { 0.015_crd };
 
     constexpr hal::color input_color { hal::palette::white },
         background_color { hal::palette::black, 128 },
@@ -86,7 +87,7 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u16>(std::min<int>(rnd.info().max_texture_size().x / m_outline.size.x, consts::desired_max_chars)) }
+    , m_maxChars { static_cast<hal::u16>(std::min(rnd.info().max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
     , m_repaint { false }
@@ -96,16 +97,16 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-scene::type console::update(delta_t elapsed, hal::renderer& rnd) {
-    hal::lock::color lock { rnd, consts::background_color };
-    rnd.fill();
+scene::type console::update(game& g) {
+    hal::lock::color lock { g.renderer, consts::background_color };
+    g.renderer.fill();
 
     if (m_repaint) {
         m_repaint = false;
-        repaint(rnd);
+        repaint(g.renderer);
     }
 
-    rnd.render(m_pfx).to(consts::text_offset)();
+    g.renderer.render(m_pfx).to(consts::text_offset)();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
     hal::coord::rect  crd;
@@ -115,11 +116,11 @@ scene::type console::update(delta_t elapsed, hal::renderer& rnd) {
     using namespace hal::literals;
 
     for (; m_tex.size().x - crd.pos.x > 0;
-         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, m_wrap)) {
-        rnd.render(m_tex).from(crd).to(where)();
+         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        g.renderer.render(m_tex).from(crd).to(where)();
     }
 
-    m_cursorTime += elapsed;
+    m_cursorTime += g.m_delta;
 
     if (m_cursorTime >= consts::cursor_blink_time) {
         m_cursorTime -= consts::cursor_blink_time;
@@ -128,13 +129,13 @@ scene::type console::update(delta_t elapsed, hal::renderer& rnd) {
 
     if (m_cursorVis) {
         lock.set(consts::cursor_color);
-        rnd.fill(m_outline);
+        g.renderer.fill(m_outline);
     }
 
     return scene::type::none;
 }
 
-bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const hal::proxy::clipboard& c) {
+bool console::process(hal::keyboard::key k, game& g) {
     switch (k) {
         using enum hal::keyboard::key;
 
@@ -142,7 +143,7 @@ bool console::process(hal::keyboard::key k, hal::keyboard::mod_state m, const ha
         return true;
 
     default: {
-        const field::op op { m_field.process(k, m, c) };
+        const field::op op { m_field.process(k, g.video) };
 
         if (m_field.text.size() > m_maxChars) {
             m_field.trim(m_maxChars);
