@@ -25,12 +25,11 @@ namespace HQ {
                 hal::u8 m_arr[num_texts], m_index;
             };
 
-            console(hal::renderer& rnd, hal::ttf::context& ttf);
+            console(game& g);
 
-            action process(const std::vector<hal::event::handler>& vector, const hal::proxy::video& vid) override;
-
-            void update(delta_t elapsed) override;
-            void draw(hal::renderer& rnd) override;
+            action process(game& g) override;
+            void   update(game& g) override;
+            void   draw(hal::renderer& rnd) override;
 
             void activate(game& g) override;
             void deactivate() override;

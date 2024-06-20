@@ -21,7 +21,10 @@ namespace HQ {
 
         void update(game& g);
 
+        // Add an active scene with priority.
         void add_active(base_up&& scn);
+
+        // Add a parked (inactive) scene.
         void add_parked(base_up&& scn);
 
     private:
@@ -32,6 +35,7 @@ namespace HQ {
 
         scene_vector::iterator find_last_with_flag(scene::flags f);
 
+        // Update cached iterators.
         void update_cached();
     };
 }

@@ -38,9 +38,9 @@ game::game(args a)
     , m_running { true } {
     renderer.blend(hal::blend_mode::blend);
 
-    m_scenes.add_active(std::make_unique<scene::main_menu>(renderer, ttf));
+    m_scenes.add_active(std::make_unique<scene::main_menu>(*this));
 
-    auto up = std::make_unique<scene::console>(renderer, ttf);
+    auto up = std::make_unique<scene::console>(*this);
 
     if (a["--console"]) {
         up->activate(*this);
@@ -74,11 +74,9 @@ void game::quit() {
 void game::collect_events() {
     m_polled.clear();
 
-    hal::event::handler h;
-
     // Process global events here...
-    while (video.events.poll(h)) {
-        switch (h.kind()) {
+    while (video.events.poll(m_eventHandler)) {
+        switch (m_eventHandler.kind()) {
             using enum hal::event::type;
 
         case quit_requested:
@@ -86,7 +84,7 @@ void game::collect_events() {
             break;
 
         default:
-            m_polled.push_back(h);
+            m_polled.push_back(m_eventHandler);
             break;
         }
     }

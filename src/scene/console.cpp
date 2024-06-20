@@ -82,14 +82,14 @@ const char* console::shuffle_bag::next() {
     return consts::placeholders[m_arr[m_index++]];
 }
 
-console::console(hal::renderer& rnd, hal::ttf::context& ttf)
+console::console(game& g)
     : base { flags::block_further_processing }
-    , m_font { find_sized_font(ttf, consts::font_path, static_cast<hal::pixel_t>(rnd.size().y * 0.045)) }
-    , m_padding { rnd.size().x * consts::padding_pc }
+    , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size().y * 0.045)) }
+    , m_padding { g.renderer.size().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
-    , m_wrap { static_cast<hal::pixel_t>(rnd.size().x - m_texBegin - m_padding) }
+    , m_wrap { static_cast<hal::pixel_t>(g.renderer.size().x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u16>(std::min(rnd.info().max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
+    , m_maxChars { static_cast<hal::u16>(std::min(g.renderer.info().max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_active { false }
     , m_repaint { false }
@@ -99,13 +99,13 @@ console::console(hal::renderer& rnd, hal::ttf::context& ttf)
     HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
 }
 
-action console::process(const game::event_vector& polled, const hal::proxy::video& vid) {
-    for (const auto& evt : polled) {
+action console::process(game& g) {
+    for (const auto& evt : g.polled()) {
         switch (evt.kind()) {
             using enum hal::event::type;
 
         case key_pressed:
-            if (process(evt.keyboard().key(), vid)) {
+            if (process(evt.keyboard().key(), g.video)) {
                 return action::switch_state;
             };
             break;
@@ -122,8 +122,8 @@ action console::process(const game::event_vector& polled, const hal::proxy::vide
     return action::nothing;
 }
 
-void console::update(delta_t elapsed) {
-    m_cursorTime += elapsed;
+void console::update(game& g) {
+    m_cursorTime += g.delta();
 
     if (m_cursorTime >= consts::cursor_blink_time) {
         m_cursorTime -= consts::cursor_blink_time;

@@ -14,7 +14,7 @@ void scene_manager::update(game& g) {
     // Parked scenes can still listen for events to determine whether they want to be pulled up.
     // The "block_further_processing" flag is not relevant here.
     for (auto it = begin; it != end;) {
-        switch ((*it)->process(g.polled(), g.video)) {
+        switch ((*it)->process(g)) {
             using enum scene::action;
 
         case switch_state: // The scene requests to be made active / "unparked".
@@ -44,7 +44,7 @@ void scene_manager::update(game& g) {
     begin = m_active.begin(), end = m_active.end() - num_activated;
 
     for (auto it = m_cachedLastProcess; it != end;) {
-        switch ((*it)->process(g.polled(), g.video)) {
+        switch ((*it)->process(g)) {
             using enum scene::action;
 
         case switch_state: // The state requests to be made inactive / "parked".
@@ -70,7 +70,7 @@ void scene_manager::update(game& g) {
 
     // Update everything.
     for (auto it = begin; it != end; ++it) {
-        (*it)->update(g.delta());
+        (*it)->update(g);
     }
 
     // Draw everything.

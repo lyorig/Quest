@@ -30,6 +30,8 @@ namespace HQ {
         delta_t delta() const;
 
     private:
+        hal::event::handler m_eventHandler;
+
         HAL_NO_SIZE hal::context m_context;
 
     public:
@@ -46,7 +48,7 @@ namespace HQ {
         scene_manager m_scenes;
         event_vector  m_polled;
 
-        delta_t m_delta;
+        delta_t m_delta; // Intentionally uninitialized.
         bool    m_running;
 
         void collect_events();

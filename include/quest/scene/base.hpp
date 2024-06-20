@@ -29,10 +29,9 @@ namespace HQ {
                 : flags { f } {
             }
 
-            virtual action process(const std::vector<hal::event::handler>& vector, const hal::proxy::video& vid) = 0;
-
-            virtual void update(delta_t elapsed)  = 0;
-            virtual void draw(hal::renderer& rnd) = 0;
+            virtual action process(game& g)         = 0;
+            virtual void   update(game& g)          = 0;
+            virtual void   draw(hal::renderer& rnd) = 0;
 
             virtual void activate(game& g) = 0;
             virtual void deactivate()      = 0;
