@@ -13,17 +13,16 @@ void scene_manager::update(game& g) {
 
     // Parked scenes can still listen for events to determine whether they want to be pulled up.
     // The "block_further_processing" flag is not relevant here.
-    for (auto it = m_parked.begin(); it != m_parked.end();) {
+    for (auto it = begin; it != end;) {
         switch ((*it)->process(g.polled(), g.video)) {
             using enum scene::action;
 
         case switch_state: // The scene requests to be made active / "unparked".
-            HAL_PRINT("<SceneMgr> Activating ", (*it)->name());
             (*it)->activate(g);
             add_active(std::move(*it));
             it = m_parked.erase(it);
 
-            begin = m_parked.begin(), end = m_parked.end();
+            --end;
             ++num_activated;
 
             break;
@@ -40,31 +39,26 @@ void scene_manager::update(game& g) {
 
     begin = m_active.begin(), end = m_active.end() - num_activated;
 
-    for (auto it = begin; it != end;) {
-        const bool block { (*it)->flags[scene::flags::block_further_processing] };
-
+    for (auto it = m_cachedLastProcess; it != end;) {
         switch ((*it)->process(g.polled(), g.video)) {
             using enum scene::action;
 
         case switch_state: // The state requests to be made inactive / "parked".
-            HAL_PRINT("<SceneMgr> Parking ", (*it)->name());
             (*it)->deactivate();
-            m_parked.push_back(std::move(*it));
+            add_parked(std::move(*it));
+
             it = m_active.erase(it);
 
             // Reset iterators.
-            begin = m_active.begin(), end = m_active.end() - num_activated;
-            m_cachedLastOpaque = find_last_opaque();
+            --end;
+            update_cached();
+
             break;
 
         default:
             ++it;
             break;
         };
-
-        if (block) {
-            break;
-        }
     }
 
     // Update everything.
@@ -86,17 +80,26 @@ void scene_manager::update(game& g) {
 
 void scene_manager::add_active(base_up&& scn) {
     m_active.push_back(std::move(scn));
-    m_cachedLastOpaque = find_last_opaque();
+    update_cached();
 }
 
 void scene_manager::add_parked(base_up&& scn) {
     m_parked.push_back(std::move(scn));
 }
 
-scene_manager::scene_vector::iterator scene_manager::find_last_opaque() {
-    if (auto draw_from = std::find_if(m_active.rbegin(), m_active.rend(), [](const auto& ptr) { return ptr->flags[scene::flags::opaque]; }); draw_from == m_active.rend()) {
-        return m_active.begin(); // not found, draw everything
-    } else {
-        return std::next(draw_from).base(); // found, draw from here
+scene_manager::scene_vector::iterator scene_manager::find_last_with_flag(scene::flags f) {
+    auto it = m_active.end() - 1;
+
+    for (; it != m_active.begin(); --it) {
+        if ((*it)->flags[f]) {
+            break;
+        }
     }
+
+    return it;
+}
+
+void scene_manager::update_cached() {
+    m_cachedLastOpaque  = find_last_with_flag(scene::flags::opaque);
+    m_cachedLastProcess = find_last_with_flag(scene::flags::block_further_processing);
 }

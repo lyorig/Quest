@@ -89,7 +89,7 @@ namespace HQ {
         }
 
         constexpr void erase(iterator first, iterator last) {
-            const auto dist = std::distance(first, last);
+            const auto dist = last - first;
 
             std::shift_left(first, end(), dist);
             m_size -= dist;

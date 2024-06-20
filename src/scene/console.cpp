@@ -27,7 +27,7 @@ namespace HQ::consts {
 
     constexpr bool clear_on_close { false };
 
-    constexpr hal::f64 cursor_blink_time { 0.6 };
+    constexpr delta_t cursor_blink_time { 0.5 };
 
     constexpr std::size_t desired_max_chars { 128 };
 }

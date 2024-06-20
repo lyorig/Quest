@@ -23,8 +23,10 @@ namespace HQ {
         scene_vector m_active, m_parked;
 
         // Where to start drawing from.
-        scene_vector::iterator m_cachedLastOpaque;
+        scene_vector::iterator m_cachedLastOpaque, m_cachedLastProcess;
 
-        scene_vector::iterator find_last_opaque();
+        scene_vector::iterator find_last_with_flag(scene::flags f);
+
+        void update_cached();
     };
 }
