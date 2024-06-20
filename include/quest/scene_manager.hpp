@@ -1,7 +1,12 @@
 #pragma once
 
-#include <quest/scene/base.hpp>
 #include <quest/static_vector.hpp>
+
+#include <quest/scene/console.hpp>
+#include <quest/scene/main_menu.hpp>
+
+// scene_manager.hpp:
+// A scene manager which aims to use as little space as possible. Here's hoping.
 
 namespace HQ {
     class game;

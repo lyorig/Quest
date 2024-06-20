@@ -34,12 +34,22 @@ game::game(args a)
     , audio { m_context }
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, hal::tag::fullscreen }
-    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["-xv"]) } }
+    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["--no-vsync"]) } }
     , m_running { true } {
     renderer.blend(hal::blend_mode::blend);
 
     m_scenes.add_active(std::make_unique<scene::main_menu>(renderer, ttf));
-    m_scenes.add_parked(std::make_unique<scene::console>(renderer, ttf));
+
+    auto up = std::make_unique<scene::console>(renderer, ttf);
+
+    if (a["--console"]) {
+        up->activate(*this);
+        m_scenes.add_active(std::move(up));
+    }
+
+    else {
+        m_scenes.add_parked(std::move(up));
+    }
 }
 
 void game::main_loop() {

@@ -20,6 +20,10 @@ void scene_manager::update(game& g) {
         case switch_state: // The scene requests to be made active / "unparked".
             (*it)->activate(g);
             add_active(std::move(*it));
+
+            // ↓↓ Intentional fallthrough! ↓↓
+
+        case kill: // The scene wantes to be removed.
             it = m_parked.erase(it);
 
             --end;
@@ -47,6 +51,9 @@ void scene_manager::update(game& g) {
             (*it)->deactivate();
             add_parked(std::move(*it));
 
+            // ↓↓ Intentional fallthrough! ↓↓
+
+        case kill: // The scene wantes to be removed.
             it = m_active.erase(it);
 
             // Reset iterators.

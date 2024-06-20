@@ -5,6 +5,9 @@
 
 #include <halcyon/utility/concepts.hpp>
 
+// A stack polymorphism type.
+// Cannot hold an invalid object.
+
 namespace HQ {
     template <hal::meta::bare Base, hal::meta::bare... Ts>
         requires(std::is_base_of_v<Base, Ts> && ...)
@@ -17,17 +20,13 @@ namespace HQ {
         }
 
         ~stack_poly() {
-            reset();
+            std::destroy_at(reinterpret_cast<Base*>(m_data.data()));
         }
 
         template <hal::meta::one_of<Ts...> T, typename... Args>
             requires std::constructible_from<T, Args...>
         void emplace(Args&&... args) {
             std::construct_at(reinterpret_cast<T*>(m_data.data()), std::forward<Args>(args)...);
-        }
-
-        void reset() {
-            std::destroy_at(reinterpret_cast<Base*>(m_data.data()));
         }
 
         Base* get() {

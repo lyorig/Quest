@@ -15,16 +15,14 @@ namespace HQ {
         public:
             class shuffle_bag {
             public:
-                static constexpr hal::u8 num_texts { 32 };
+                static constexpr hal::u8 num_texts { 31 };
 
                 shuffle_bag();
 
                 const char* next();
 
             private:
-                const char* m_arr[num_texts];
-
-                hal::u8 m_index;
+                hal::u8 m_arr[num_texts], m_index;
             };
 
             console(hal::renderer& rnd, hal::ttf::context& ttf);
@@ -53,26 +51,26 @@ namespace HQ {
             void repaint(hal::renderer& rnd);
             void set_cursor();
 
-            shuffle_bag m_placeholders;
+            field m_field; // 48
 
-            hal::font m_font;
+            shuffle_bag m_placeholders; // 32
 
-            field m_field;
+            hal::font m_font; // 8
 
-            hal::texture m_pfx, m_tex;
+            hal::texture m_pfx, m_tex; // 8, 8
 
-            hal::coord_t m_padding;
-            hal::coord_t m_texBegin;
-            hal::pixel_t m_wrap;
+            hal::coord_t m_padding;  // 4
+            hal::coord_t m_texBegin; // 4
+            hal::pixel_t m_wrap;     // 4
 
             // pos = current outline pos
             // size = glyph size (constant)
-            hal::coord::rect m_outline;
+            hal::coord::rect m_outline; // 16
 
-            hal::f64 m_cursorTime;
+            hal::f64 m_cursorTime; // 8
 
-            hal::u16 m_maxChars;
-            hal::u8  m_lineChars;
+            hal::u16 m_maxChars;  // 2
+            hal::u8  m_lineChars; // 1
 
             bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
         };

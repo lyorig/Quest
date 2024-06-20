@@ -1,5 +1,6 @@
 #include <quest/scene/console.hpp>
 
+#include <numeric>
 #include <random>
 
 #include <halcyon/utility/locks.hpp>
@@ -13,27 +14,7 @@ using namespace HQ::scene;
 namespace HQ::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
 
-    constexpr hal::coord_t padding_pc { 0.015_crd };
-
-    constexpr hal::color input_color { hal::palette::white },
-        background_color { hal::palette::black, 128 },
-        cursor_color { hal::palette::white, 128 },
-        placeholder_color { 0x808080 },
-        prefix_color { hal::palette::green };
-
-    constexpr hal::coord::point text_offset { 10, 10 };
-
-    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
-
-    constexpr bool clear_on_close { false };
-
-    constexpr delta_t cursor_blink_time { 0.5 };
-
-    constexpr std::size_t desired_max_chars { 128 };
-}
-
-console::shuffle_bag::shuffle_bag()
-    : m_arr {
+    constexpr const char* placeholders[] {
         "[enter command here]",
         "[be not afraid]",
         "[food for thought]",
@@ -64,20 +45,41 @@ console::shuffle_bag::shuffle_bag()
         "[not actually random]",
         "[see you again]",
         "[forget me not]",
-        "[this is not the end]",
         "[one big CVE]"
-    }
-    , m_index { num_texts } {
+    };
+
+    constexpr hal::coord_t padding_pc { 0.015_crd };
+
+    constexpr hal::color input_color { hal::palette::white },
+        background_color { hal::palette::black, 128 },
+        cursor_color { hal::palette::white, 128 },
+        placeholder_color { 0x808080 },
+        prefix_color { hal::palette::green };
+
+    constexpr hal::coord::point text_offset { 10, 10 };
+
+    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
+
+    constexpr bool clear_on_close { false };
+
+    constexpr delta_t cursor_blink_time { 0.5 };
+
+    constexpr std::size_t desired_max_chars { 128 };
+}
+
+console::shuffle_bag::shuffle_bag()
+    : m_index { num_texts } {
+    std::iota(std::begin(m_arr), std::end(m_arr), static_cast<hal::u8>(0));
 }
 
 const char* console::shuffle_bag::next() {
     if (m_index == num_texts) { // Need to refresh.
-        HAL_PRINT("<Console> Shuffling placeholder text...");
+        HAL_PRINT("<Console> Shuffling placeholder indices...");
         std::shuffle(std::begin(m_arr), std::end(m_arr), std::mt19937_64 { std::random_device {}() });
         m_index = 0;
     }
 
-    return m_arr[m_index++];
+    return consts::placeholders[m_arr[m_index++]];
 }
 
 console::console(hal::renderer& rnd, hal::ttf::context& ttf)
@@ -117,7 +119,7 @@ action console::process(const game::event_vector& polled, const hal::proxy::vide
         }
     }
 
-    return action::none;
+    return action::nothing;
 }
 
 void console::update(delta_t elapsed) {

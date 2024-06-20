@@ -66,7 +66,7 @@ action main_menu::process(const std::vector<hal::event::handler>& polled, const 
             break;
         }
 
-    return action::none;
+    return action::nothing;
 }
 
 void main_menu::update(delta_t elapsed) {

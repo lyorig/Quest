@@ -13,8 +13,9 @@ namespace HQ {
 
     namespace scene {
         enum class action : hal::u8 {
-            none,        // Do nothing.
-            switch_state // (De)activate this state.
+            switch_state, // Switch this scene's active/parked state.
+            kill,         // Kill (remove) this scene entirely.
+            nothing       // Do nothing.
         };
 
         enum class flags {
