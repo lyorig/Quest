@@ -1,4 +1,4 @@
-#include <quest/scenes/main_menu.hpp>
+#include <quest/scene/main_menu.hpp>
 
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
@@ -81,7 +81,7 @@ void main_menu::draw(hal::renderer& rnd) {
     }
 }
 
-void main_menu::activate(hal::renderer&) {
+void main_menu::activate(game&) {
 }
 
 void main_menu::deactivate() {

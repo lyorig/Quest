@@ -6,8 +6,8 @@
 #include <quest/constants.hpp>
 #include <quest/helpers.hpp>
 
-#include <quest/scenes/console.hpp>
-#include <quest/scenes/main_menu.hpp>
+#include <quest/scene/console.hpp>
+#include <quest/scene/main_menu.hpp>
 
 using namespace HQ;
 
@@ -38,8 +38,8 @@ game::game(args a)
     , m_running { true } {
     renderer.blend(hal::blend_mode::blend);
 
-    m_scenes.active.push_back(std::make_unique<scene::main_menu>(renderer, ttf));
-    m_scenes.parked.push_back(std::make_unique<scene::console>(renderer, ttf));
+    m_scenes.add_active(std::make_unique<scene::main_menu>(renderer, ttf));
+    m_scenes.add_parked(std::make_unique<scene::console>(renderer, ttf));
 }
 
 void game::main_loop() {

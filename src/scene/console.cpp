@@ -1,4 +1,4 @@
-#include <quest/scenes/console.hpp>
+#include <quest/scene/console.hpp>
 
 #include <random>
 
@@ -158,14 +158,14 @@ void console::draw(hal::renderer& rnd) {
     }
 }
 
-void console::activate(hal::renderer& rnd) {
+void console::activate(game& g) {
     m_repaint = true;
     m_active  = true;
 
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_pfx = rnd.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
+    m_pfx = g.renderer.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
 
 void console::deactivate() {

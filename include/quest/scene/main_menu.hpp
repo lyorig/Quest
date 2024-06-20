@@ -5,7 +5,7 @@
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
 
-#include <quest/scenes/base.hpp>
+#include <quest/scene/base.hpp>
 
 // state/rest.hpp:
 // The rest of the state types.
@@ -20,7 +20,7 @@ namespace HQ::scene {
         void update(delta_t elapsed) override;
         void draw(hal::renderer& rnd) override;
 
-        void activate(hal::renderer& rnd) override;
+        void activate(game& g) override;
         void deactivate() override;
 
         virtual std::string_view name() const override;

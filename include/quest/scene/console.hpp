@@ -6,7 +6,7 @@
 #include <quest/field.hpp>
 #include <quest/types.hpp>
 
-#include <quest/scenes/base.hpp>
+#include <quest/scene/base.hpp>
 
 namespace HQ {
     namespace scene {
@@ -34,7 +34,7 @@ namespace HQ {
             void update(delta_t elapsed) override;
             void draw(hal::renderer& rnd) override;
 
-            void activate(hal::renderer& rnd) override;
+            void activate(game& g) override;
             void deactivate() override;
 
             virtual std::string_view name() const override;

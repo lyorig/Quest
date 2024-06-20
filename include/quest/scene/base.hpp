@@ -33,8 +33,8 @@ namespace HQ {
             virtual void update(delta_t elapsed)  = 0;
             virtual void draw(hal::renderer& rnd) = 0;
 
-            virtual void activate(hal::renderer& rnd) = 0;
-            virtual void deactivate()                 = 0;
+            virtual void activate(game& g) = 0;
+            virtual void deactivate()      = 0;
 
             virtual std::string_view name() const = 0;
 
