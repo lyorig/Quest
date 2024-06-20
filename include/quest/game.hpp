@@ -18,7 +18,7 @@ namespace HQ {
 
     class game {
     public:
-        using event_vector = std::vector<hal::event::handler>;
+        using event_vector = std::vector<hal::event::holder>;
 
         game(args a);
 
@@ -30,7 +30,7 @@ namespace HQ {
         delta_t delta() const;
 
     private:
-        hal::event::handler m_eventHandler;
+        hal::event::holder m_eventHandler;
 
         HAL_NO_SIZE hal::context m_context;
 
