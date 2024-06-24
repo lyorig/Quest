@@ -28,8 +28,8 @@ void manager::update(game& g) {
         }
 
         // Check status flags:
-        if (obj.flags[flags::remove_me]) { // Park me!
-            
+        if (obj.flags[flags::remove_me]) {
+            it = m_scenes.erase(it);
         }
     }
 }

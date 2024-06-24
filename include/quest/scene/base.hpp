@@ -19,20 +19,26 @@ namespace hq {
             nothing // Do nothing.
         };
 
-        enum class flags {
+        using flags_t = std::uintptr_t;
+
+        consteval flags_t make_flag(std::size_t index) {
+            return static_cast<flags_t>(1) << index;
+        }
+
+        enum class flags : flags_t {
             // Disabling flags:
-            no_process,
-            no_update,
-            no_draw,
+            no_process = make_flag(0),
+            no_update  = make_flag(1),
+            no_draw    = make_flag(2),
 
             // Blocker flags:
-            stop_process,
-            stop_draw,
+            stop_process = make_flag(3),
+            stop_draw    = make_flag(4),
 
             // Status flags:
-            remove_me,
+            remove_me = make_flag(5),
 
-            max, // Only used for static asserts.
+            max = make_flag(6), // Only used for static asserts.
 
             // Combiner flags:
             all_disabling = no_process | no_update | no_draw,
@@ -42,9 +48,6 @@ namespace hq {
 
         class base {
         public:
-            // Alignment is gonna screw us over anyway, so might as well make these as big as possible.
-            using flags_t = std::uintptr_t;
-
             // Paranoia.
             static_assert(std::to_underlying(flags::max) <= sizeof(flags_t) * CHAR_BIT);
 
@@ -71,7 +74,7 @@ namespace hq {
                 }
             }
 
-            hal::enum_bitset<flags, flags_t> flags;
+            hal::enum_bitmask<flags, flags_t> flags;
         };
     }
 }
