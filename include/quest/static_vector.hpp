@@ -9,7 +9,7 @@
 // static_vector.hpp:
 // A lobotomy-inducing vector with a fixed capacity.
 
-namespace HQ {
+namespace hq {
     template <typename T, std::size_t N, typename Size_Type = std::size_t>
     class static_vector {
     public:

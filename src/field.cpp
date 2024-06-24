@@ -1,6 +1,6 @@
 #include <quest/field.hpp>
 
-using namespace HQ;
+using namespace hq;
 
 namespace consts {
     constexpr std::size_t tab_size { 4 };

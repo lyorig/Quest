@@ -7,7 +7,7 @@
 // field:
 // A text field manipulated via keystrokes.
 
-namespace HQ {
+namespace hq {
     class field {
     public:
         enum class op {

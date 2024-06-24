@@ -2,6 +2,6 @@
 
 #include <halcyon/types/numeric.hpp>
 
-namespace HQ {
+namespace hq {
     using delta_t = hal::f64;
 }

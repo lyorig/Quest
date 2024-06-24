@@ -6,7 +6,7 @@
 #include <quest/game.hpp>
 #include <quest/helpers.hpp>
 
-using namespace HQ::scene;
+using namespace hq::scene;
 
 namespace lc { // Local constants.
     using namespace hal::literals;

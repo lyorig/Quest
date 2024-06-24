@@ -7,10 +7,10 @@ include(halcyon/config.cmake)
 set(QUEST_SOURCES
 scene/console.cpp
 scene/main_menu.cpp
+scene/manager.cpp
 game.cpp
 helpers.cpp
 main.cpp
-scene_manager.cpp
 sprite.cpp
 field.cpp
 )

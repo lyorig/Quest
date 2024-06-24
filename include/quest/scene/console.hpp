@@ -8,7 +8,7 @@
 
 #include <quest/scene/base.hpp>
 
-namespace HQ {
+namespace hq {
     namespace scene {
         // A console. Designed for use with mono fonts.
         class console final : public base {
@@ -22,7 +22,9 @@ namespace HQ {
                 const char* next();
 
             private:
-                hal::u8 m_arr[num_texts], m_index;
+                const char* m_texts[num_texts];
+
+                hal::u8 m_index;
             };
 
             console(game& g);
@@ -50,26 +52,26 @@ namespace HQ {
             void repaint(hal::renderer& rnd);
             void set_cursor();
 
-            field m_field; // 48
+            field m_field;
 
-            shuffle_bag m_placeholders; // 32
+            shuffle_bag m_placeholders;
 
-            hal::font m_font; // 8
+            hal::font m_font;
 
-            hal::texture m_pfx, m_tex; // 8, 8
+            hal::static_texture m_pfx, m_tex;
 
-            hal::coord_t m_padding;  // 4
-            hal::coord_t m_texBegin; // 4
-            hal::pixel_t m_wrap;     // 4
+            hal::coord_t m_padding;
+            hal::coord_t m_texBegin;
+            hal::pixel_t m_wrap;
 
             // pos = current outline pos
             // size = glyph size (constant)
-            hal::coord::rect m_outline; // 16
+            hal::coord::rect m_outline;
 
-            hal::f64 m_cursorTime; // 8
+            hal::f64 m_cursorTime;
 
-            hal::u16 m_maxChars;  // 2
-            hal::u8  m_lineChars; // 1
+            hal::u16 m_maxChars;
+            hal::u8  m_lineChars;
 
             bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
         };

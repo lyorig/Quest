@@ -9,9 +9,9 @@
 #include <quest/scene/console.hpp>
 #include <quest/scene/main_menu.hpp>
 
-using namespace HQ;
+using namespace hq;
 
-namespace HQ::consts {
+namespace hq::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
 
@@ -38,18 +38,15 @@ game::game(args a)
     , m_running { true } {
     renderer.blend(hal::blend_mode::blend);
 
-    m_scenes.add_active(std::make_unique<scene::main_menu>(*this));
+    scenes.add(std::make_unique<scene::main_menu>(*this));
 
-    auto up = std::make_unique<scene::console>(*this);
+    auto cons = std::make_unique<scene::console>(*this);
 
-    if (a["--console"]) {
-        up->activate(*this);
-        m_scenes.add_active(std::move(up));
+    if (!a["--console"]) {
+        cons->deactivate();
     }
 
-    else {
-        m_scenes.add_parked(std::move(up));
-    }
+    scenes.add(std::move(cons));
 }
 
 void game::main_loop() {
@@ -61,7 +58,7 @@ void game::main_loop() {
 
         collect_events();
 
-        m_scenes.update(*this);
+        scenes.update(*this);
 
         renderer.present();
     }

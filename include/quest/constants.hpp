@@ -2,7 +2,7 @@
 
 #include <halcyon/video/types.hpp>
 
-namespace HQ::consts {
+namespace hq::consts {
     using namespace hal::literals;
 
     constexpr hal::pixel_t renderer_height { 768_px };

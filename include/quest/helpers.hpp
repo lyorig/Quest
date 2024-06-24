@@ -1,6 +1,6 @@
 #include <halcyon/ttf.hpp>
 
-namespace HQ {
+namespace hq {
     // Find a font whose height of rendered text is the closest possible to the one requested.
     hal::font find_sized_font(hal::ttf::context& ttf, std::string_view path, hal::pixel_t desired_height);
 

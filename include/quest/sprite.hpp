@@ -7,21 +7,21 @@
 
 #include <halcyon/internal/scaler.hpp>
 
-namespace HQ {
+namespace hq {
     class sprite {
     public:
         sprite() = default;
 
-        sprite(hal::texture tex, hal::coord::point pos);
-        sprite(hal::texture tex, hal::coord::point pos, hal::coord::point size);
+        sprite(hal::static_texture tex, hal::coord::point pos);
+        sprite(hal::static_texture tex, hal::coord::point pos, hal::coord::point size);
 
         void draw(hal::renderer& rnd) const;
 
-        void reset(hal::texture tex, hal::scaler scl);
+        void reset(hal::static_texture tex, hal::scaler scl);
 
         void pos(hal::coord::point where);
 
-        hal::texture     texture;
-        hal::coord::rect hitbox;
+        hal::static_texture texture;
+        hal::coord::rect    hitbox;
     };
 }

@@ -7,7 +7,7 @@
 // rfem.hpp:
 // The Really Fast Entity Manager.
 
-namespace HQ {
+namespace hq {
     template <hal::meta::bare T>
     class rfem_leaf {
     protected:

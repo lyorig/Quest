@@ -3,9 +3,9 @@
 #include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
-#include <quest/scene_manager.hpp>
+#include <quest/scene/manager.hpp>
 
-namespace HQ {
+namespace hq {
     class args {
     public:
         args(int argc, const char** argv);
@@ -44,9 +44,10 @@ namespace HQ {
         hal::window   window;
         hal::renderer renderer;
 
+        scene::manager scenes;
+
     private:
-        scene_manager m_scenes;
-        event_vector  m_polled;
+        event_vector m_polled;
 
         delta_t m_delta; // Intentionally uninitialized.
         bool    m_running;

@@ -8,23 +8,46 @@
 // state/base.hpp:
 // Base state class.
 
-namespace HQ {
+namespace hq {
     class game;
 
     namespace scene {
         enum class action : hal::u8 {
+            kill,         // Remove this scene entirely.
             switch_state, // Switch this scene's active/parked state.
-            kill,         // Kill (remove) this scene entirely.
-            nothing       // Do nothing.
+
+            nothing // Do nothing.
         };
 
         enum class flags {
-            opaque,                  // Drawing should stop here.
-            block_further_processing // Event processing should stop here.
+            // Disabling flags:
+            no_process,
+            no_update,
+            no_draw,
+
+            // Blocker flags:
+            stop_process,
+            stop_draw,
+
+            // Status flags:
+            remove_me,
+
+            max, // Only used for static asserts.
+
+            // Combiner flags:
+            all_disabling = no_process | no_update | no_draw,
+            all_blocker   = stop_draw | stop_process,
+            all_status    = remove_me
         };
 
         class base {
         public:
+            // Alignment is gonna screw us over anyway, so might as well make these as big as possible.
+            using flags_t = std::uintptr_t;
+
+            // Paranoia.
+            static_assert(std::to_underlying(flags::max) <= sizeof(flags_t) * CHAR_BIT);
+
             constexpr base(std::initializer_list<flags> f)
                 : flags { f } {
             }
@@ -40,7 +63,15 @@ namespace HQ {
 
             virtual ~base() = default;
 
-            hal::enum_bitset<flags, hal::u8> flags;
+            constexpr void switch_state() {
+                if (flags[flags::all_disabling]) { // disabled
+                    flags -= flags::all_disabling;
+                } else { // enabled
+                    flags += flags::all_disabling;
+                }
+            }
+
+            hal::enum_bitset<flags, flags_t> flags;
         };
     }
 }

@@ -10,7 +10,7 @@
 // state/rest.hpp:
 // The rest of the state types.
 
-namespace HQ::scene {
+namespace hq::scene {
     class main_menu final : public base {
     public:
         main_menu(game& g);

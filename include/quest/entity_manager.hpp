@@ -3,7 +3,7 @@
 #include <halcyon/utility/concepts.hpp>
 #include <vector>
 
-namespace HQ {
+namespace hq {
     template <hal::meta::bare T>
     class rfem_leaf {
     public:

@@ -3,14 +3,14 @@
 #include <halcyon/utility/locks.hpp>
 #include <halcyon/video/renderer.hpp>
 
-using namespace HQ;
+using namespace hq;
 
-sprite::sprite(hal::texture tex, hal::coord::point pos)
+sprite::sprite(hal::static_texture tex, hal::coord::point pos)
     : texture { std::move(tex) }
     , hitbox { pos, texture.size() } {
 }
 
-sprite::sprite(hal::texture tex, hal::coord::point pos, hal::coord::point size)
+sprite::sprite(hal::static_texture tex, hal::coord::point pos, hal::coord::point size)
     : texture { std::move(tex) }
     , hitbox { pos, size } {
 }
@@ -22,7 +22,7 @@ void sprite::draw(hal::renderer& rnd) const {
         rnd.render(texture).to(hitbox)();
 }
 
-void sprite::reset(hal::texture tex, hal::scaler scl) {
+void sprite::reset(hal::static_texture tex, hal::scaler scl) {
     texture     = std::move(tex);
     hitbox.size = scl(texture.size());
 }

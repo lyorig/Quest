@@ -8,7 +8,7 @@
 // A stack polymorphism type.
 // Cannot hold an invalid object.
 
-namespace HQ {
+namespace hq {
     template <hal::meta::bare Base, hal::meta::bare... Ts>
         requires(std::is_base_of_v<Base, Ts> && ...)
     class stack_poly {

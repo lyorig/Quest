@@ -4,7 +4,7 @@
 
 #include <quest/types.hpp>
 
-namespace HQ {
+namespace hq {
     namespace easing {
         constexpr delta_t linear(delta_t t) { return t; }
 
