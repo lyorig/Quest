@@ -8,7 +8,7 @@
 namespace hq {
     class args {
     public:
-        args(int argc, const char** argv);
+        args(int argc, char** argv);
 
         bool operator[](std::string_view what) const;
 
@@ -23,7 +23,6 @@ namespace hq {
         game(args a);
 
         void main_loop();
-        void quit();
 
         const event_vector& polled() const;
 
@@ -50,8 +49,13 @@ namespace hq {
         event_vector m_polled;
 
         delta_t m_delta; // Intentionally uninitialized.
-        bool    m_running;
 
+    public:
+        delta_t timescale;
+
+        bool running;
+
+    private:
         void collect_events();
     };
 }

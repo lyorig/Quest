@@ -71,7 +71,7 @@ action main_menu::process(game& g) {
         case mouse_pressed:
             if (e.mouse_button().button() == hal::mouse::button::left) {
                 if (static_cast<hal::coord::point>(e.mouse_button().pos()) | m_widgets.back().hitbox) {
-                    g.quit();
+                    g.running = false;
                     break;
                 }
             }

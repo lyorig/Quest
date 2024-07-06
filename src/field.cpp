@@ -13,7 +13,7 @@ bool field::process(std::string_view inp) {
     text.insert(cursor, inp);
     cursor += inp.size();
 
-    for (char ch : inp) {
+    for (const char ch : inp) {
         if (!std::isspace(ch)) {
             return true;
         }

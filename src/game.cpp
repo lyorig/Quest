@@ -15,8 +15,8 @@ namespace hq::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
 
-args::args(int argc, const char** argv)
-    : m_span { argv, static_cast<std::size_t>(argc) } {
+args::args(int argc, char** argv)
+    : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
 
 bool args::operator[](std::string_view what) const {
@@ -35,24 +35,18 @@ game::game(args a)
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["--no-vsync"]) } }
-    , m_running { true } {
+    , timescale { 1.0 }
+    , running { true } {
     renderer.blend(hal::blend_mode::blend);
 
     scenes.add(std::make_unique<scene::main_menu>(*this));
-
-    auto cons = std::make_unique<scene::console>(*this);
-
-    if (!a["--console"]) {
-        cons->deactivate();
-    }
-
-    scenes.add(std::move(cons));
+    scenes.add(std::make_unique<scene::console>(*this));
 }
 
 void game::main_loop() {
     hal::timer timer;
 
-    while (m_running) {
+    while (running) {
         m_delta = timer();
         timer.reset();
 
@@ -64,10 +58,6 @@ void game::main_loop() {
     }
 }
 
-void game::quit() {
-    m_running = false;
-}
-
 void game::collect_events() {
     m_polled.clear();
 
@@ -77,7 +67,7 @@ void game::collect_events() {
             using enum hal::event::type;
 
         case quit_requested:
-            quit();
+            running = false;
             break;
 
         default:
@@ -92,5 +82,5 @@ const game::event_vector& game::polled() const {
 }
 
 delta_t game::delta() const {
-    return m_delta;
+    return m_delta * timescale;
 }
