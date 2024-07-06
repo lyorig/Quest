@@ -36,4 +36,5 @@ void manager::update(game& g) {
 
 void manager::add(base_up&& scn) {
     m_scenes.push_back(std::move(scn));
+    std::vector<int> n;
 }

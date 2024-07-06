@@ -38,8 +38,6 @@ namespace hq {
             // Status flags:
             remove_me = make_flag(5),
 
-            max = make_flag(6), // Only used for static asserts.
-
             // Combiner flags:
             all_disabling = no_process | no_update | no_draw,
             all_blocker   = stop_draw | stop_process,
@@ -48,9 +46,6 @@ namespace hq {
 
         class base {
         public:
-            // Paranoia.
-            static_assert(std::to_underlying(flags::max) <= sizeof(flags_t) * CHAR_BIT);
-
             constexpr base(std::initializer_list<flags> f)
                 : flags { f } {
             }

@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION 3.22.0)
 
 project(HalodaQuest)
 
-include(halcyon/config.cmake)
+set(HAL_BUILD_TESTS TRUE)
+set(HAL_BUILD_EXAMPLES TRUE)
+
+add_subdirectory(halcyon)
+
+message("Include dirs = ${HALCYON_INCLUDE_DIRS}")
 
 set(QUEST_SOURCES
 scene/console.cpp
@@ -18,7 +23,6 @@ field.cpp
 list(TRANSFORM QUEST_SOURCES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 add_executable(HalodaQuest
-${HALCYON_SOURCES}
 ${QUEST_SOURCES}
 )
 
@@ -28,9 +32,10 @@ else()
     target_compile_options(HalodaQuest PRIVATE /W4)
 endif()
 
-target_include_directories(HalodaQuest PRIVATE ${HALCYON_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-target_link_libraries(HalodaQuest PRIVATE ${HALCYON_LIBRARIES})
+target_include_directories(HalodaQuest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+target_link_libraries(HalodaQuest PRIVATE Halcyon)
 
 set_target_properties(HalodaQuest PROPERTIES
+CXX_STANDARD 23
 RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
 )

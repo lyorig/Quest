@@ -54,13 +54,22 @@ namespace hq {
             emplace_back(std::move(obj));
         }
 
+        constexpr void insert(iterator pos, T&& obj) {
+            emplace(pos, std::move(obj));
+        }
+
         template <typename... Args>
             requires std::is_constructible_v<T, Args...>
         constexpr void emplace_back(Args&&... args) {
+            emplace(end(), std::forward<Args>(args)...);
+        }
+
+        template <typename... Args>
+        constexpr void emplace(iterator pos, Args&&... args) {
             assert(size() < capacity());
-            const Size_Type old { m_size };
             ++m_size;
-            std::construct_at(begin() + old, std::forward<Args>(args)...);
+            std::shift_right(pos, end(), 1);
+            std::construct_at(pos, std::forward<Args>(args)...);
         }
 
         constexpr void resize(Size_Type sz) {
