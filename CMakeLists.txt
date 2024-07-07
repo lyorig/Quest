@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.22.0)
 
 project(HalodaQuest VERSION 0.1 LANGUAGES CXX)
 
-set(Halcyon_BUILD_TESTS TRUE)
-set(Halcyon_BUILD_EXAMPLES TRUE)
-
+# set(BUILD_SHARED_LIBS ON)
 add_subdirectory(halcyon)
 
 set(QUEST_SOURCES
@@ -35,5 +33,5 @@ target_link_libraries(HalodaQuest PRIVATE Halcyon::Halcyon)
 
 set_target_properties(HalodaQuest PROPERTIES
     CXX_STANDARD 23
-    RUNTIME_OUTPUT_DIRECTORY bin/
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
 )
