@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.22.0)
 
 project(HalodaQuest VERSION 0.1 LANGUAGES CXX)
 
+set(Halcyon_BUILD_TESTS ON)
 # set(BUILD_SHARED_LIBS ON)
+
 add_subdirectory(halcyon)
 
 set(QUEST_SOURCES
