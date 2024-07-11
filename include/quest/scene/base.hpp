@@ -60,16 +60,6 @@ namespace hq {
 
             virtual ~base() = default;
 
-            constexpr void switch_state(game& g) {
-                if (flags[flags::all_enabling]) { // enabled
-                    flags -= flags::all_enabling;
-                    deactivate();
-                } else { // disabled
-                    flags += flags::all_enabling;
-                    activate(g);
-                }
-            }
-
             hal::enum_bitmask<flags, flags_t> flags;
         };
     }

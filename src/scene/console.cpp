@@ -103,7 +103,13 @@ action console::process(game& g) {
 
         case key_pressed:
             if (process(evt.keyboard().key(), g.video)) {
-                switch_state(g);
+              if (flags[flags::all_enabling]) {
+                flags -= flags::all_enabling;
+                deactivate();
+              } else {
+                flags += flags::all_enabling;
+                activate(g);
+              }
             };
             break;
 

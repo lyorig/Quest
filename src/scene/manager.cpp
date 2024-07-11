@@ -6,8 +6,8 @@ using namespace hq::scene;
 
 // Process -> update -> draw.
 void manager::update(game& g) {
-    for (auto it = m_scenes.rbegin(); it != m_scenes.rend(); ++it) {
-        scene::base& obj { **it };
+    for (auto& scn : m_scenes) {
+        scene::base& obj { *scn };
 
         // Disable status flags beforehand.
         obj.flags -= flags::all_status;
