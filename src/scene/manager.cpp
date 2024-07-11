@@ -12,8 +12,10 @@ void manager::update(game& g) {
         // Disable status flags beforehand.
         obj.flags -= flags::all_status;
 
-        // Process: (this happens for every scene)
-        obj.process(g);
+        // Process:
+        if (obj.flags[flags::process]) {
+            obj.process(g);
+        }
 
         // Update:
         if (obj.flags[flags::update]) {
