@@ -39,14 +39,8 @@ game::game(args a)
     , running { true } {
     renderer.blend(hal::blend_mode::blend);
 
-    auto menu = std::make_unique<scene::main_menu>(*this);
-    auto cons = std::make_unique<scene::main_menu>(*this);
-
-    menu->flags += scene::flags::all_disabling;
-    cons->flags += scene::flags::all_disabling;
-
-    scenes.add(std::move(menu));
-    scenes.add(std::move(cons));
+    scenes.add(std::make_unique<scene::main_menu>(*this));
+    scenes.add(std::make_unique<scene::console>(*this));
 }
 
 void game::main_loop() {

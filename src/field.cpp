@@ -123,9 +123,9 @@ field::op field::process(hal::keyboard::key k, const hal::proxy::video& vid) {
         break;
     }
 
-    HAL_WARN_IF(cursor > text.size(), "<Text Field> Oops, cursor is OOB: ", cursor);
+    HAL_WARN_IF(cursor > text.size(), "<Text Field> Cursor is OOB @ ", cursor);
 
-    return op::nothing; // Nothing changed.
+    return op::nothing;
 }
 
 void field::trim(std::size_t off) {

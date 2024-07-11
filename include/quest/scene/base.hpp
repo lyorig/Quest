@@ -14,7 +14,7 @@ namespace hq {
     namespace scene {
         enum class action : hal::u8 {
             kill,         // Remove this scene entirely.
-            switch_state, // Switch this scene's active/parked state.
+            switch_state, // Switch this scene's active state.
 
             nothing // Do nothing.
         };
@@ -26,10 +26,9 @@ namespace hq {
         }
 
         enum class flags : flags_t {
-            // Disabling flags:
-            no_process = make_flag(0),
-            no_update  = make_flag(1),
-            no_draw    = make_flag(2),
+            // Enabling flags:
+            update = make_flag(1),
+            draw   = make_flag(2),
 
             // Blocker flags:
             stop_process = make_flag(3),
@@ -39,9 +38,9 @@ namespace hq {
             remove_me = make_flag(5),
 
             // Combiner flags:
-            all_disabling = no_process | no_update | no_draw,
-            all_blocker   = stop_draw | stop_process,
-            all_status    = remove_me
+            all_enabling = update | draw,
+            all_blocker  = stop_draw | stop_process,
+            all_status   = remove_me
         };
 
         class base {
@@ -61,11 +60,13 @@ namespace hq {
 
             virtual ~base() = default;
 
-            constexpr void switch_state() {
-                if (flags[flags::all_disabling]) { // disabled
-                    flags -= flags::all_disabling;
-                } else { // enabled
-                    flags += flags::all_disabling;
+            constexpr void switch_state(game& g) {
+                if (flags[flags::all_enabling]) { // enabled
+                    flags -= flags::all_enabling;
+                    deactivate();
+                } else { // disabled
+                    flags += flags::all_enabling;
+                    activate(g);
                 }
             }
 

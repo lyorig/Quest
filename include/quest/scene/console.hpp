@@ -39,7 +39,7 @@ namespace hq {
             virtual std::string_view name() const override;
 
             // Process a keystroke.
-            // Returns whether the console should be closed.
+            // Returns whether the console's state should be switched.
             bool process(hal::keyboard::key k, const hal::proxy::video& vid);
 
             // Process entered text.

@@ -12,8 +12,8 @@ namespace hq {
     public:
         sprite() = default;
 
-        sprite(hal::static_texture tex, hal::coord::point pos);
-        sprite(hal::static_texture tex, hal::coord::point pos, hal::coord::point size);
+        sprite(hal::static_texture&& tex, hal::coord::point pos);
+        sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::point size);
 
         void draw(hal::renderer& rnd) const;
 

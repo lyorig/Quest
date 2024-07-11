@@ -103,7 +103,7 @@ action console::process(game& g) {
 
         case key_pressed:
             if (process(evt.keyboard().key(), g.video)) {
-                switch_state();
+                switch_state(g);
             };
             break;
 
@@ -198,9 +198,6 @@ bool console::process(hal::keyboard::key k, const hal::proxy::video& vid) {
 
         switch (op) {
             using enum field::op;
-
-        case nothing:
-            break;
 
         case text_added:
         case text_removed:

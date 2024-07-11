@@ -5,12 +5,12 @@
 
 using namespace hq;
 
-sprite::sprite(hal::static_texture tex, hal::coord::point pos)
+sprite::sprite(hal::static_texture&& tex, hal::coord::point pos)
     : texture { std::move(tex) }
     , hitbox { pos, texture.size() } {
 }
 
-sprite::sprite(hal::static_texture tex, hal::coord::point pos, hal::coord::point size)
+sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::point size)
     : texture { std::move(tex) }
     , hitbox { pos, size } {
 }
