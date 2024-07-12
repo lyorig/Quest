@@ -3,37 +3,52 @@
 #include <quest/game.hpp>
 
 using namespace hq::scene;
-
 // Process -> update -> draw.
 void manager::update(game& g) {
-    for (auto& scn : m_scenes) {
-        scene::base& obj { *scn };
+    for (auto it = m_scenes.begin(); it != m_scenes.end(); ++it) {
+        scene::base& obj { **it };
 
-        // Disable status flags beforehand.
-        obj.flags -= flags::all_status;
+        const flag_bitmask flags_before { obj.flags };
 
         // Process:
-        if (obj.flags[flags::process]) {
-            obj.process(g);
+        if (obj.flags[flags::process] && it >= m_cachedProcess) {
+            obj.update(g);
         }
 
         // Update:
-        if (obj.flags[flags::update]) {
+        if (obj.flags[flags::update] && it >= m_cachedUpdate) {
             obj.update(g);
         }
 
         // Draw:
-        if (obj.flags[flags::draw]) {
+        if (obj.flags[flags::draw] && it >= m_cachedDraw) {
             obj.draw(g.renderer);
         }
 
-        // Check status flags:
-        // if (obj.flags[flags::remove_me]) {
-        //     it = m_scenes.erase(it);
-        // }
+        // Visibility changed. Reset cached iterators!
+        if (obj.flags != flags_before) {
+            reset_cached();
+        }
     }
 }
 
 void manager::add(base_up&& scn) {
     m_scenes.push_back(std::move(scn));
+    reset_cached();
+}
+
+manager::const_iterator manager::find_last_with_flags(flag_bitmask m) const {
+    const_iterator it { m_scenes.end() - 1 };
+    for (; it != m_scenes.begin(); --it) {
+        if ((*it)->flags[m]) {
+            break;
+        }
+    }
+    return it;
+}
+
+void manager::reset_cached() {
+    m_cachedProcess = find_last_with_flags(flags::stop_process);
+    m_cachedUpdate  = find_last_with_flags(flags::stop_update);
+    m_cachedDraw    = find_last_with_flags(flags::stop_draw);
 }

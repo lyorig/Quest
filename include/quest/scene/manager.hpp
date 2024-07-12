@@ -7,7 +7,6 @@
 
 // scene_manager.hpp:
 // A scene manager which aims to use as little space as possible. Here's hoping.
-// It uses the PUD (Process, Update, Draw) model.
 
 namespace hq {
     class game;
@@ -16,9 +15,10 @@ namespace hq {
         // A LIFO scene manager.
         class manager {
         public:
-            using base_up      = std::unique_ptr<scene::base>;
-            using scene_vector = static_vector<base_up, 2>;
-            using iterator     = scene_vector::iterator;
+            using base_up        = std::unique_ptr<scene::base>;
+            using scene_vector   = static_vector<base_up, 2>;
+            using iterator       = scene_vector::iterator;
+            using const_iterator = scene_vector::const_iterator;
 
             manager() = default;
 
@@ -29,9 +29,14 @@ namespace hq {
             void add(base_up&& scn);
 
         private:
-            void move(iterator from, iterator to);
-
             scene_vector m_scenes;
+
+            const_iterator m_cachedProcess, m_cachedUpdate, m_cachedDraw;
+
+            // Not const because static_vector is const correct or whatever.
+            const_iterator find_last_with_flags(flag_bitmask m) const;
+
+            void reset_cached();
         };
     }
 }

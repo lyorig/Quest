@@ -13,8 +13,7 @@ namespace hq {
 
     namespace scene {
         enum class action : hal::u8 {
-            kill, // Remove this scene entirely.
-
+            kill,   // Remove this scene entirely.
             nothing // Do nothing.
         };
 
@@ -27,20 +26,17 @@ namespace hq {
         enum class flags : flags_t {
             // Enabling flags:
             process = make_flag(0),
-            update = make_flag(1),
-            draw   = make_flag(2),
+            update  = make_flag(1),
+            draw    = make_flag(2),
 
             // Blocker flags:
             stop_process = make_flag(3),
-            stop_draw    = make_flag(4),
-
-            // Status flags:
-            remove_me = make_flag(5),
+            stop_update  = make_flag(4),
+            stop_draw    = make_flag(5),
 
             // Combiner flags:
             all_enabling = process | update | draw,
             all_blocker  = stop_draw | stop_process,
-            all_status   = remove_me
         };
 
         using flag_bitmask = hal::enum_bitmask<flags>;
