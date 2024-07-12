@@ -32,7 +32,7 @@ main_menu::main_menu(game& g)
     hal::coord_t       accum { offset.y };
 
     for (std::size_t i { 0 }; i < std::size(texts); ++i) {
-        m_widgets[i] = { g.renderer.make_texture(font.render(texts[i])(hal::font::render_type::blended)), { offset.x, accum } };
+        m_widgets[i] = { g.renderer.make_static_texture(font.render(texts[i])(hal::font::render_type::blended)), { offset.x, accum } };
         accum += sz;
     }
 }

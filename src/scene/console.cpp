@@ -172,7 +172,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_pfx = g.renderer.make_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
+    m_pfx = g.renderer.make_static_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
 
 void console::deactivate() {
@@ -255,7 +255,7 @@ void console::repaint(hal::renderer& rnd) {
         }
     }
 
-    m_tex = rnd.make_texture(text);
+    m_tex = rnd.make_static_texture(text);
 }
 
 void console::set_cursor() {
