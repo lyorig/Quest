@@ -18,7 +18,7 @@ namespace lc { // Local constants.
 }
 
 main_menu::main_menu(game& g)
-    : base { flags::all_enabling }
+    : base { flags::all_enable }
     , m_theme { g.renderer.color() }
     , m_outline { { .x = lc::invalid_outline } }
     , m_currentTheme { static_cast<hal::u8>(std::size(lc::colors) - 1) } {
@@ -37,7 +37,7 @@ main_menu::main_menu(game& g)
     }
 }
 
-action main_menu::process(game& g) {
+void main_menu::process(game& g) {
     for (const auto& e : g.polled())
         switch (e.kind()) {
             using enum hal::event::type;
@@ -80,8 +80,6 @@ action main_menu::process(game& g) {
         default:
             break;
         }
-
-    return action::nothing;
 }
 
 void main_menu::update(game& g) {
@@ -95,7 +93,7 @@ void main_menu::draw(hal::renderer& rnd) {
         wgt.draw(rnd);
 
         if (m_outline.pos.x != lc::invalid_outline) {
-            hal::lock::color cl { rnd, { 0x00FFFF, 32 } };
+            hal::lock::color<hal::renderer> cl { rnd, { 0x00FFFF, 32 } };
 
             rnd.fill(m_outline);
         }

@@ -16,7 +16,7 @@ sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::poi
 }
 
 void sprite::draw(hal::renderer& rnd) const {
-    hal::lock::color cl { rnd, hal::palette::green };
+    hal::lock::color<hal::renderer> cl { rnd, hal::palette::green };
 
     if (texture.valid())
         rnd.render(texture).to(hitbox)();

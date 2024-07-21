@@ -25,18 +25,22 @@ namespace hq {
 
         enum class flags : flags_t {
             // Enabling flags:
-            process = make_flag(0),
-            update  = make_flag(1),
-            draw    = make_flag(2),
+            enable_process = make_flag(0),
+            enable_update  = make_flag(1),
+            enable_draw    = make_flag(2),
 
             // Blocker flags:
-            stop_process = make_flag(3),
-            stop_update  = make_flag(4),
-            stop_draw    = make_flag(5),
+            block_process = make_flag(7),
+            block_update  = make_flag(8),
+            block_draw    = make_flag(9),
+
+            // Status flags:
+            status_state = make_flag(15),
 
             // Combiner flags:
-            all_enabling = process | update | draw,
-            all_blocker  = stop_draw | stop_process,
+            all_enable = enable_process | enable_update | enable_draw,
+            all_block  = block_draw | block_process,
+            all_status = status_state
         };
 
         using flag_bitmask = hal::enum_bitmask<flags>;
@@ -47,9 +51,9 @@ namespace hq {
                 : flags { f } {
             }
 
-            virtual action process(game& g)         = 0;
-            virtual void   update(game& g)          = 0;
-            virtual void   draw(hal::renderer& rnd) = 0;
+            virtual void process(game& g)         = 0;
+            virtual void update(game& g)          = 0;
+            virtual void draw(hal::renderer& rnd) = 0;
 
             virtual void activate(game& g) = 0;
             virtual void deactivate()      = 0;

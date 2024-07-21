@@ -29,9 +29,9 @@ namespace hq {
 
             console(game& g);
 
-            action process(game& g) override;
-            void   update(game& g) override;
-            void   draw(hal::renderer& rnd) override;
+            void process(game& g) override;
+            void update(game& g) override;
+            void draw(hal::renderer& rnd) override;
 
             void activate(game& g) override;
             void deactivate() override;

@@ -1,0 +1,13 @@
+[0.000s] [init]  Halcyon context initialized [platform: Mac OS X]
+[0.083s] [init]  Video subsystem initialized
+[0.125s] [init]  Audio subsystem initialized
+[0.125s] [init]  TTF context initialized
+[0.125s] [init]  Initialized image context [flags: 0x1]
+[0.163s] [init]  Created window "HalQuest" [ID: 1]
+[0.166s] [info]  Created renderer for "HalQuest" 
+[0.185s] [info]  <Console> Initialized. Max 128 chars.
+[5.177s] [info]  Destroyed image context
+[5.177s] [info]  TTF context destroyed
+[5.177s] [info]  Audio subsystem destroyed
+[5.177s] [info]  Video subsystem destroyed
+[5.177s] [info]  Halcyon context destroyed [last error: [no SDL error]]
