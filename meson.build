@@ -4,6 +4,7 @@ sources = files(
   'src/scene/console.cpp',
   'src/scene/main_menu.cpp',
   'src/scene/manager.cpp',
+  'src/atlas.cpp',
   'src/game.cpp',
   'src/helpers.cpp',
   'src/main.cpp',

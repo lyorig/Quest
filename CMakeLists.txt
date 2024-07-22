@@ -11,6 +11,7 @@ set(QUEST_SOURCES
     scene/console.cpp
     scene/main_menu.cpp
     scene/manager.cpp
+	atlas.cpp
     game.cpp
     helpers.cpp
     main.cpp
@@ -20,7 +21,7 @@ set(QUEST_SOURCES
 
 list(TRANSFORM QUEST_SOURCES PREPEND src/)
 
-add_executable(HalodaQuest
+add_executable(HalodaQuest WIN32
     ${QUEST_SOURCES}
 )
 
