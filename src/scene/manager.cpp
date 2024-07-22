@@ -8,40 +8,20 @@ using namespace hq::scene;
 void manager::update(game& g) {
     for (auto it = m_scenes.begin(); it != m_scenes.end(); ++it) {
         scene::base& obj { **it };
-        obj.flags -= flags::all_status;
-
-        const flag_bitmask flags_before { obj.flags };
 
         // Process:
-        if (obj.flags[flags::enable_process] && it >= m_cachedProcess) {
+        if (obj.flags[flags::enable_process]) {
             obj.update(g);
         }
 
         // Update:
-        if (obj.flags[flags::enable_update] && it >= m_cachedUpdate) {
+        if (obj.flags[flags::enable_update]) {
             obj.update(g);
         }
 
         // Draw:
-        if (obj.flags[flags::enable_draw] && it >= m_cachedDraw) {
+        if (obj.flags[flags::enable_draw]) {
             obj.draw(g.renderer);
-        }
-
-        // Visibility changed. Reset cached iterators!
-        if (auto f = obj.flags; f[flags::status_state]) {
-            f ^= flags_before;
-
-            if (f[flags::enable_process]) {
-                m_cachedProcess = find_last_with_flags(flags::enable_process);
-            }
-
-            if (f[flags::enable_update]) {
-                m_cachedUpdate = find_last_with_flags(flags::enable_update);
-            }
-
-            if (f[flags::enable_draw]) {
-                m_cachedDraw = find_last_with_flags(flags::enable_draw);
-            }
         }
     }
 }

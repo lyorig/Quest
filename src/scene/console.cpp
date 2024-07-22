@@ -112,8 +112,6 @@ void console::process(game& g) {
                     flags += enbl;
                     activate(g);
                 }
-
-                flags += flags::status_state;
             };
             break;
 

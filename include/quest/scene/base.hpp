@@ -34,13 +34,9 @@ namespace hq {
             block_update  = make_flag(8),
             block_draw    = make_flag(9),
 
-            // Status flags:
-            status_state = make_flag(15),
-
             // Combiner flags:
             all_enable = enable_process | enable_update | enable_draw,
-            all_block  = block_draw | block_process,
-            all_status = status_state
+            all_block  = block_process | block_update | block_draw
         };
 
         using flag_bitmask = hal::enum_bitmask<flags>;
