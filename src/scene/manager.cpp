@@ -11,7 +11,7 @@ void manager::update(game& g) {
 
         // Process:
         if (obj.flags[flags::enable_process]) {
-            obj.update(g);
+            obj.process(g);
         }
 
         // Update:
