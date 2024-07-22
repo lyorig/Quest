@@ -93,7 +93,7 @@ console::console(game& g)
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 
-    HAL_PRINT("<Console> Initialized. Max ", m_maxChars, " chars.");
+    HAL_PRINT("<Console> Max ", m_maxChars, " chars");
 }
 
 void console::process(game& g) {

@@ -35,6 +35,7 @@ game::game(args a)
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["--no-vsync"]) } }
+    , atlas { renderer, { 128, 128 } }
     , timescale { 1.0 }
     , running { true } {
     renderer.blend(hal::blend_mode::blend);

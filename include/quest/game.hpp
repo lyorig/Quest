@@ -3,6 +3,7 @@
 #include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
+#include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
 
 namespace hq {
@@ -44,6 +45,7 @@ namespace hq {
         hal::renderer renderer;
 
         scene::manager scenes;
+        atlas          atlas;
 
     private:
         event_vector m_polled;
