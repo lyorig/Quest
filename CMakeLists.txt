@@ -5,7 +5,7 @@ project(HalodaQuest VERSION 0.1 LANGUAGES CXX)
 set(Halcyon_BUILD_TESTS ON)
 # set(BUILD_SHARED_LIBS ON)
 
-add_subdirectory(halcyon)
+add_subdirectory(subprojects/halcyon)
 
 set(QUEST_SOURCES
     scene/console.cpp
