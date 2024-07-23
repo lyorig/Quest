@@ -3,7 +3,6 @@
 #include <quest/game.hpp>
 
 #include <charconv>
-#include <cstring>
 #include <filesystem>
 
 #include <halcyon/utility/strutil.hpp>
@@ -86,7 +85,7 @@ void game::take_screenshot() const {
 #define HQ_SCREENSHOT_EXT ".png"
 
     constexpr std::size_t
-        digits { std::numeric_limits<std::size_t>::digits10 },
+        digits { std::numeric_limits<decltype(digits)>::digits10 },
         pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) };
 
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };

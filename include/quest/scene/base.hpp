@@ -12,18 +12,13 @@ namespace hq {
     class game;
 
     namespace scene {
-        enum class action : hal::u8 {
-            kill,   // Remove this scene entirely.
-            nothing // Do nothing.
-        };
+        using flag_t = std::uintptr_t;
 
-        using flags_t = std::uintptr_t;
-
-        consteval flags_t make_flag(std::size_t index) {
-            return static_cast<flags_t>(1) << index;
+        consteval flag_t make_flag(std::size_t index) {
+            return static_cast<flag_t>(1) << index;
         }
 
-        enum class flags : flags_t {
+        enum class flag : flag_t {
             // Enabling flags:
             enable_process = make_flag(0),
             enable_update  = make_flag(1),
@@ -39,11 +34,11 @@ namespace hq {
             all_block  = block_process | block_update | block_draw
         };
 
-        using flag_bitmask = hal::enum_bitmask<flags>;
+        using flag_bitmask = hal::enum_bitmask<flag>;
 
         class base {
         public:
-            constexpr base(std::initializer_list<flags> f)
+            constexpr base(std::initializer_list<flag> f)
                 : flags { f } {
             }
 

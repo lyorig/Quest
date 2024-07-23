@@ -18,7 +18,7 @@ namespace lc { // Local constants.
 }
 
 main_menu::main_menu(game& g)
-    : base { flags::all_enable }
+    : base { flag::all_enable }
     , m_theme { g.renderer.color() }
     , m_outline { { .x = lc::invalid_outline } }
     , m_currentTheme { static_cast<hal::u8>(std::size(lc::colors) - 1) } {

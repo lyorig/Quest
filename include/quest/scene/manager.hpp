@@ -20,7 +20,7 @@ namespace hq {
             using iterator       = scene_vector::iterator;
             using const_iterator = scene_vector::const_iterator;
 
-            manager() = default;
+            manager();
 
             // Update the scene manager.
             void update(game& g);
@@ -35,8 +35,6 @@ namespace hq {
 
             // Not const because static_vector is const correct or whatever.
             const_iterator find_last_with_flags(flag_bitmask m) const;
-
-            void reset_cached();
         };
     }
 }
