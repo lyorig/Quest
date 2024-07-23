@@ -21,12 +21,6 @@ namespace hq::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
 
-namespace {
-    consteval std::size_t len(const char* str) {
-        return std::char_traits<char>::length(str);
-    }
-}
-
 args::args(int argc, char** argv)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
@@ -51,7 +45,7 @@ game::game(args a)
     , timescale { 1.0 }
     , running { true }
     , screenshot { false } {
-    renderer.blend(hal::blend_mode::blend);
+    renderer.blend(hal::blend_mode::alpha);
 
     scenes.add(std::make_unique<scene::main_menu>(*this));
     scenes.add(std::make_unique<scene::console>(*this));
@@ -93,7 +87,7 @@ void game::take_screenshot() const {
 
     constexpr std::size_t
         digits { std::numeric_limits<std::size_t>::digits10 },
-        pfxlen { len(HQ_SCREENSHOT_PFX) }, extlen { len(HQ_SCREENSHOT_EXT) };
+        pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) };
 
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
