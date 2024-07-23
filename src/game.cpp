@@ -19,6 +19,12 @@ namespace hq::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
 
+namespace {
+    consteval std::size_t len(const char* str) {
+        return std::char_traits<char>::length(str);
+    }
+}
+
 args::args(int argc, char** argv)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
@@ -81,12 +87,13 @@ void game::take_screenshot() const {
     hal::surface s { renderer.read_pixels(atlas.fmt) };
 
 #define HQ_SCREENSHOT_PFX "screenshot-"
+#define HQ_SCREENSHOT_EXT ".png"
 
     constexpr std::size_t
         digits { std::numeric_limits<std::size_t>::digits10 },
-        pfxlen { std::char_traits<char>::length(HQ_SCREENSHOT_PFX) };
+        pfxlen { len(HQ_SCREENSHOT_PFX) }, extlen { len(HQ_SCREENSHOT_EXT) };
 
-    char filename[pfxlen + digits + 1] { HQ_SCREENSHOT_PFX };
+    char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
     const std::filesystem::path directory { "screenshots" };
 
@@ -97,11 +104,12 @@ void game::take_screenshot() const {
     std::size_t i { 0 };
 
     do {
-        std::to_chars(filename + pfxlen, std::end(filename) - 1, i++);
+        std::strcpy(std::to_chars(filename + pfxlen, std::end(filename) - 1, i++).ptr, HQ_SCREENSHOT_EXT);
     } while (std::filesystem::exists(directory / filename));
 
     img.save(s, hal::image::save_format::png, directory / filename);
 
+#undef HQ_SCREENSHOT_EXT
 #undef HQ_SCREENSHOT_PFX
 }
 
