@@ -80,7 +80,7 @@ const char* console::shuffle_bag::next() {
 }
 
 console::console(game& g)
-    : base { flag::enable_process, flag::block_process }
+    : base { flag::enable_process }
     , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size().y * 0.045)) }
     , m_padding { g.renderer.size().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
@@ -103,7 +103,7 @@ void console::process(game& g) {
 
         case key_pressed:
             if (process(evt.keyboard().key(), g.video)) {
-                constexpr flag_bitmask enbl { flag::enable_update, flag::enable_draw };
+                constexpr flag_bitmask enbl { flag::enable_update, flag::enable_draw, flag::block_process };
 
                 if (flags[enbl]) {
                     flags -= enbl;
