@@ -53,10 +53,10 @@ namespace hq {
         delta_t m_delta; // Intentionally uninitialized.
 
     public:
-        delta_t timescale;
+        delta_t timescale; // Multiplies the delta time that is given to scenes.
 
-        bool running;
-        bool screenshot;
+        bool running;    // Is the game running?
+        bool screenshot; // Is a screenshot queued for this frame?
 
     private:
         void take_screenshot() const;
