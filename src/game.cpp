@@ -1,5 +1,8 @@
-#include "halcyon/image.hpp"
+#include <charconv>
 #include <quest/game.hpp>
+
+#include <cstring>
+#include <filesystem>
 
 #include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
@@ -39,7 +42,7 @@ game::game(args a)
     , atlas { renderer, { 128, 128 } }
     , timescale { 1.0 }
     , running { true }
-    , m_screenshotPending { false } {
+    , screenshot { false } {
     renderer.blend(hal::blend_mode::blend);
 
     scenes.add(std::make_unique<scene::main_menu>(*this));
@@ -57,13 +60,49 @@ void game::main_loop() {
 
         scenes.update(*this);
 
-        if (m_screenshotPending) {
-            img.save(renderer.read_pixels(atlas.fmt), hal::image::save_format::png, "screenshot.png");
-            m_screenshotPending = false;
+        if (screenshot) {
+            take_screenshot();
+            screenshot = false;
         }
 
         renderer.present();
     }
+}
+
+const game::event_vector& game::polled() const {
+    return m_polled;
+}
+
+delta_t game::delta() const {
+    return m_delta * timescale;
+}
+
+void game::take_screenshot() const {
+    hal::surface s { renderer.read_pixels(atlas.fmt) };
+
+#define HQ_SCREENSHOT_PFX "screenshot-"
+
+    constexpr std::size_t
+        digits { std::numeric_limits<std::size_t>::digits10 },
+        pfxlen { std::char_traits<char>::length(HQ_SCREENSHOT_PFX) };
+
+    char filename[pfxlen + digits + 1] { HQ_SCREENSHOT_PFX };
+
+    const std::filesystem::path directory { "screenshots" };
+
+    if (!std::filesystem::is_directory(directory)) {
+        std::filesystem::create_directory(directory);
+    }
+
+    std::size_t i { 0 };
+
+    do {
+        std::to_chars(filename + pfxlen, std::end(filename) - 1, i++);
+    } while (std::filesystem::exists(directory / filename));
+
+    img.save(s, hal::image::save_format::png, directory / filename);
+
+#undef HQ_SCREENSHOT_PFX
 }
 
 void game::collect_events() {
@@ -83,7 +122,7 @@ void game::collect_events() {
                 using enum hal::keyboard::button;
 
             case F12:
-                m_screenshotPending = true;
+                screenshot = true;
                 break;
 
             default:
@@ -96,12 +135,4 @@ void game::collect_events() {
             break;
         }
     }
-}
-
-const game::event_vector& game::polled() const {
-    return m_polled;
-}
-
-delta_t game::delta() const {
-    return m_delta * timescale;
 }

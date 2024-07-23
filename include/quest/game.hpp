@@ -56,10 +56,10 @@ namespace hq {
         delta_t timescale;
 
         bool running;
+        bool screenshot;
 
     private:
-        bool m_screenshotPending;
-
+        void take_screenshot() const;
         void collect_events();
     };
 }
