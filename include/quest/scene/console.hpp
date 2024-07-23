@@ -31,7 +31,7 @@ namespace hq {
 
             void process(game& g) override;
             void update(game& g) override;
-            void draw(hal::renderer& rnd) override;
+            void draw(game& g) override;
 
             void activate(game& g) override;
             void deactivate() override;

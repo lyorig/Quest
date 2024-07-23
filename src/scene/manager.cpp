@@ -21,7 +21,7 @@ void manager::update(game& g) {
 
         // Draw:
         if (obj.flags[flags::enable_draw]) {
-            obj.draw(g.renderer);
+            obj.draw(g);
         }
     }
 }

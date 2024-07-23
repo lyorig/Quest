@@ -86,7 +86,9 @@ void main_menu::update(game& g) {
     m_theme.update(g.delta());
 }
 
-void main_menu::draw(hal::renderer& rnd) {
+void main_menu::draw(game& g) {
+    hal::renderer& rnd { g.renderer };
+
     rnd.color(m_theme.value());
 
     for (const auto& wgt : m_widgets) {

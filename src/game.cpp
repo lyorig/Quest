@@ -1,3 +1,4 @@
+#include "halcyon/image.hpp"
 #include <quest/game.hpp>
 
 #include <halcyon/utility/strutil.hpp>
@@ -34,10 +35,11 @@ game::game(args a)
     , audio { m_context }
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, hal::tag::fullscreen }
-    , renderer { window, { hal::renderer::flags::accelerated, cond_enum(hal::renderer::flags::vsync, !a["--no-vsync"]) } }
+    , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , atlas { renderer, { 128, 128 } }
     , timescale { 1.0 }
-    , running { true } {
+    , running { true }
+    , m_screenshotPending { false } {
     renderer.blend(hal::blend_mode::blend);
 
     scenes.add(std::make_unique<scene::main_menu>(*this));
@@ -55,6 +57,11 @@ void game::main_loop() {
 
         scenes.update(*this);
 
+        if (m_screenshotPending) {
+            img.save(renderer.read_pixels(atlas.fmt), hal::image::save_format::png, "screenshot.png");
+            m_screenshotPending = false;
+        }
+
         renderer.present();
     }
 }
@@ -69,6 +76,19 @@ void game::collect_events() {
 
         case quit_requested:
             running = false;
+            break;
+
+        case key_pressed:
+            switch (m_eventHandler.keyboard().button()) {
+                using enum hal::keyboard::button;
+
+            case F12:
+                m_screenshotPending = true;
+                break;
+
+            default:
+                m_polled.push_back(m_eventHandler);
+            }
             break;
 
         default:

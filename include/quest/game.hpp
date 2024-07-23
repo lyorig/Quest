@@ -58,6 +58,8 @@ namespace hq {
         bool running;
 
     private:
+        bool m_screenshotPending;
+
         void collect_events();
     };
 }

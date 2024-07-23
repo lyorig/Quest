@@ -134,7 +134,9 @@ void console::update(game& g) {
     }
 }
 
-void console::draw(hal::renderer& rnd) {
+void console::draw(game& g) {
+    hal::renderer& rnd { g.renderer };
+
     hal::lock::color<hal::renderer> lock { rnd, consts::background_color };
     rnd.fill();
 

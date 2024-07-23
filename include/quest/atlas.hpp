@@ -11,10 +11,9 @@ namespace hq {
 
         hal::pixel::rect add(hal::clref<hal::renderer> rnd, hal::ref<const hal::surface> surf);
 
-    private:
-        std::vector<hal::pixel::rect> m_free;
+        std::vector<hal::pixel::rect> free;
 
-        hal::pixel::format  m_fmt;
-        hal::target_texture m_tex;
+        hal::pixel::format  fmt;
+        hal::target_texture tex;
     };
 }

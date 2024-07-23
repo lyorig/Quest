@@ -47,9 +47,9 @@ namespace hq {
                 : flags { f } {
             }
 
-            virtual void process(game& g)         = 0;
-            virtual void update(game& g)          = 0;
-            virtual void draw(hal::renderer& rnd) = 0;
+            virtual void process(game& g) = 0;
+            virtual void update(game& g)  = 0;
+            virtual void draw(game& g)    = 0;
 
             virtual void activate(game& g) = 0;
             virtual void deactivate()      = 0;
