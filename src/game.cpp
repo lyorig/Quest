@@ -1,6 +1,8 @@
-#include <charconv>
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <quest/game.hpp>
 
+#include <charconv>
 #include <cstring>
 #include <filesystem>
 
@@ -97,6 +99,8 @@ void game::take_screenshot() const {
 
     const std::filesystem::path directory { "screenshots" };
 
+    std::filesystem::path current;
+
     if (!std::filesystem::is_directory(directory)) {
         std::filesystem::create_directory(directory);
     }
@@ -105,9 +109,9 @@ void game::take_screenshot() const {
 
     do {
         std::strcpy(std::to_chars(filename + pfxlen, std::end(filename) - 1, i++).ptr, HQ_SCREENSHOT_EXT);
-    } while (std::filesystem::exists(directory / filename));
+    } while (std::filesystem::exists(current = directory / filename));
 
-    img.save(s, hal::image::save_format::png, directory / filename);
+    img.save(s, hal::image::save_format::png, current);
 
 #undef HQ_SCREENSHOT_EXT
 #undef HQ_SCREENSHOT_PFX
