@@ -250,9 +250,6 @@ void console::repaint(hal::renderer& rnd) {
     } else {
         text = m_font.render(m_field.text)
                    .fg(consts::input_color)(consts::text_render_type);
-
-        if (text.size().x > rnd.info().max_texture_size().x) {
-        }
     }
 
     m_tex = rnd.make_static_texture(text);
