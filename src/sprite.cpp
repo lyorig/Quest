@@ -19,7 +19,7 @@ void sprite::draw(hal::renderer& rnd) const {
     hal::guard::color<hal::renderer> cl { rnd, hal::palette::green };
 
     if (texture.valid())
-        rnd.render(texture).to(hitbox)();
+        rnd.draw(texture).to(hitbox)();
 }
 
 void sprite::reset(hal::static_texture tex, hal::scaler scl) {

@@ -145,7 +145,7 @@ void console::draw(game& g) {
         repaint(rnd);
     }
 
-    rnd.render(m_pfx).to(consts::text_offset)();
+    rnd.draw(m_pfx).to(consts::text_offset)();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
     hal::coord::rect  crd;
@@ -156,7 +156,7 @@ void console::draw(game& g) {
 
     for (; m_tex.size().x - crd.pos.x > 0;
          where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        rnd.render(m_tex).from(crd).to(where)();
+        rnd.draw(m_tex).from(crd).to(where)();
     }
 
     if (m_cursorVis) {
