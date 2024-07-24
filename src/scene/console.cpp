@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include <halcyon/utility/locks.hpp>
+#include <halcyon/utility/guard.hpp>
 
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
@@ -137,7 +137,7 @@ void console::update(game& g) {
 void console::draw(game& g) {
     hal::renderer& rnd { g.renderer };
 
-    hal::lock::color<hal::renderer> lock { rnd, consts::background_color };
+    hal::guard::color<hal::renderer> lock { rnd, consts::background_color };
     rnd.fill();
 
     if (m_repaint) {

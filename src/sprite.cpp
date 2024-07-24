@@ -1,6 +1,6 @@
 #include <quest/sprite.hpp>
 
-#include <halcyon/utility/locks.hpp>
+#include <halcyon/utility/guard.hpp>
 #include <halcyon/video/renderer.hpp>
 
 using namespace hq;
@@ -16,7 +16,7 @@ sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::poi
 }
 
 void sprite::draw(hal::renderer& rnd) const {
-    hal::lock::color<hal::renderer> cl { rnd, hal::palette::green };
+    hal::guard::color<hal::renderer> cl { rnd, hal::palette::green };
 
     if (texture.valid())
         rnd.render(texture).to(hitbox)();

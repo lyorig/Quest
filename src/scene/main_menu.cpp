@@ -1,6 +1,6 @@
 #include <quest/scene/main_menu.hpp>
 
-#include <halcyon/utility/locks.hpp>
+#include <halcyon/utility/guard.hpp>
 
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
@@ -95,11 +95,16 @@ void main_menu::draw(game& g) {
         wgt.draw(rnd);
 
         if (m_outline.pos.x != lc::invalid_outline) {
-            hal::lock::color<hal::renderer> cl { rnd, { 0x00FFFF, 32 } };
+            hal::guard::color<hal::renderer> _ { rnd, { 0x00FFFF, 32 } };
 
             rnd.fill(m_outline);
         }
     }
+
+    hal::streaming_texture tex;
+    hal::surface           s;
+
+    hal::guard::lock<hal::surface> _ { s };
 }
 
 void main_menu::activate(game&) {
