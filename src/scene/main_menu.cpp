@@ -100,11 +100,6 @@ void main_menu::draw(game& g) {
             rnd.fill(m_outline);
         }
     }
-
-    hal::streaming_texture tex;
-    hal::surface           s;
-
-    hal::guard::lock<hal::surface> _ { s };
 }
 
 void main_menu::activate(game&) {

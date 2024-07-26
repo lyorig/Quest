@@ -79,6 +79,8 @@ delta_t game::delta() const {
 }
 
 void game::take_screenshot() const {
+    HAL_DEBUG_TIMER(tmr);
+
     hal::surface s { renderer.read_pixels(atlas.fmt) };
 
 #define HQ_SCREENSHOT_PFX "screenshot-"
@@ -105,6 +107,8 @@ void game::take_screenshot() const {
     } while (std::filesystem::exists(current = directory / filename));
 
     img.save(s, hal::image::save_format::png, current);
+
+    HAL_PRINT("<Game> Saved ", current.filename().string(), " in ", tmr);
 
 #undef HQ_SCREENSHOT_EXT
 #undef HQ_SCREENSHOT_PFX
