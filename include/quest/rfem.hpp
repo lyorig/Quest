@@ -2,13 +2,13 @@
 
 #include <vector>
 
-#include <halcyon/utility/concepts.hpp>
+#include <halcyon/utility/metaprogramming.hpp>
 
 // rfem.hpp:
 // The Really Fast Entity Manager.
 
 namespace hq {
-    template <hal::meta::bare T>
+    template <hal::meta::innermost T>
     class rfem_leaf {
     protected:
         std::vector<T> vec;
@@ -21,7 +21,7 @@ namespace hq {
         }
     };
 
-    template <hal::meta::bare... Ts>
+    template <hal::meta::innermost... Ts>
     class rfem : public rfem_leaf<Ts>... {
     public:
         rfem() = default;
