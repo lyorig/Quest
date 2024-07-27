@@ -38,7 +38,7 @@ game::game(args a)
     : video { m_context }
     , audio { m_context }
     , img { hal::image::init_format::jpg }
-    , window { video, consts::window_name, { 640, 480 } }
+    , window { video, consts::window_name, video.displays[0].size() / 2 }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , atlas { renderer, { 128, 128 } }
     , timescale { 1.0 }
