@@ -1,4 +1,4 @@
-configs="d (Debug), r (Release), rd (RelWithDebInfo), rs (MinSizeRel)"
+configs="d (Debug), r (Release), rd (RelWithDebInfo), ms (MinSizeRel)"
 
 build_type=""
 
@@ -19,7 +19,7 @@ case $1 in
 	rd)
 		build_type="RelWithDebInfo"
 		;;
-	rs)
+	ms)
 		build_type="MinSizeRel"
 		;;
 	*)
