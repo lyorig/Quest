@@ -1,19 +1,17 @@
 configs="d (Debug), r (Release), rd (RelWithDebInfo), rs (MinSizeRel)"
 
 build_type=""
-tests="OFF"
 
 if [[ "$#" -ne 1 ]]; then
 	echo "A single parameter is required: ${configs}."
 	exit 1
 fi
 
-cmd="cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DHalcyon_BUILD_EXAMPLES=ON"
+cmd="cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 
 case $1 in 
 	d)
 		build_type="Debug"
-		tests="ON"
 		;;
 	r)
 		build_type="Release"
@@ -30,6 +28,4 @@ case $1 in
 		;;
 esac
 
-echo "${build_type}" > type.txt
-
-eval "${cmd} -DCMAKE_BUILD_TYPE=${build_type} -DHalcyon_BUILD_TESTS=${tests}"
+eval "${cmd} -DCMAKE_BUILD_TYPE=${build_type}"

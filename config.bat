@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set "configs=d ^(Debug^), r ^(Release^), rd ^(RelWithDebInfo^), rs ^(MinSizeRel^)"
+set "configs=d ^(Debug^), r ^(Release^), rd ^(RelWithDebInfo^), ms ^(MinSizeRel^)"
 
 set "build_type="
 set "tests=OFF"
@@ -20,14 +20,12 @@ if "%~1"=="d" (
     set "build_type=Release"
 ) else if "%~1"=="rd" (
     set "build_type=RelWithDebInfo"
-) else if "%~1"=="rs" (
+) else if "%~1"=="ms" (
     set "build_type=MinSizeRel"
 ) else (
     echo Invalid configuration "%~1". Valid ones are %configs%.
     exit /b 1
 )
-
-echo %build_type% > type.txt
 
 %cmd% -DCMAKE_BUILD_TYPE=%build_type% -DHalcyon_BUILD_TESTS=%tests%
 

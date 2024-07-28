@@ -3,7 +3,8 @@ if ! [ -f type.txt ]; then
 	exit 1
 fi
 
-type=$(<type.txt)
+type=$(grep "CMAKE_BUILD_TYPE" build/CMakeCache.txt | cut -d= -f2)
 
 echo "Building config ${type}"
+
 cmake --build build -j --config ${type}

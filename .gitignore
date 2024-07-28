@@ -9,5 +9,3 @@ build/
 .clangd
 .DS_Store
 CMakeSettings.json
-
-type.txt
