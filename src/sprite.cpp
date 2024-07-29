@@ -15,11 +15,11 @@ sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::poi
     , hitbox { pos, size } {
 }
 
-void sprite::draw(hal::renderer& rnd) const {
+void sprite::draw(hal::ref<hal::renderer> rnd) const {
     hal::guard::color<hal::renderer> cl { rnd, hal::palette::green };
 
     if (texture.valid())
-        rnd.draw(texture).to(hitbox)();
+        rnd->draw(texture).to(hitbox)();
 }
 
 void sprite::reset(hal::static_texture tex, hal::scaler scl) {

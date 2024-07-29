@@ -15,7 +15,7 @@ namespace hq {
         sprite(hal::static_texture&& tex, hal::coord::point pos);
         sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::point size);
 
-        void draw(hal::renderer& rnd) const;
+        void draw(hal::ref<hal::renderer> rnd) const;
 
         void reset(hal::static_texture tex, hal::scaler scl);
 

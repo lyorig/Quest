@@ -1,4 +1,4 @@
-if ! [ -f type.txt ]; then
+if ! [ -f build/CMakeCache.txt ]; then
 	echo "Build type file not found. Did you forget to run cfg.sh?"
 	exit 1
 fi
