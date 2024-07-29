@@ -40,14 +40,12 @@ game::game(args a)
     , img { hal::image::init_format::jpg }
     , window { video, consts::window_name, video.displays[0].size() / 2 }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
+    , scenes { *this }
     , atlas { renderer, { 128, 128 } }
     , timescale { 1.0 }
     , running { true }
     , screenshot { false } {
     renderer.blend(hal::blend_mode::alpha);
-
-    scenes.add(std::make_unique<scene::main_menu>(*this));
-    scenes.add(std::make_unique<scene::console>(*this));
 }
 
 void game::main_loop() {

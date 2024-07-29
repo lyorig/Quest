@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 #include <quest/static_vector.hpp>
 
 #include <quest/scene/console.hpp>
@@ -21,21 +23,21 @@ namespace hq {
             using iterator       = scene_vector::iterator;
             using const_iterator = scene_vector::const_iterator;
 
-            manager();
+            manager(game& g);
 
             // Update the scene manager.
             void update(game& g);
 
-            // Add a scene.
-            void add(base_up&& scn);
-
         private:
-            scene_vector m_scenes;
+            std::tuple<main_menu, console> m_tuple;
 
-            const_iterator m_begin, m_cachedProcess, m_cachedUpdate, m_cachedDraw;
+            hal::u8 m_curr, m_cProcess, m_cUpdate, m_cDraw;
+
+            template <typename T>
+            void update_one(T& x, game& g);
 
             // Not const because static_vector is const correct or whatever.
-            const_iterator find_last_with_flag(flag m) const;
+            hal::u8 find_last_with_flag(flag m) const;
 
             void update_cached(flag f);
         };

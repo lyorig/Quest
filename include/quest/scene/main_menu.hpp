@@ -15,14 +15,14 @@ namespace hq::scene {
     public:
         main_menu(game& g);
 
-        void process(game& g) override;
-        void update(game& g) override;
-        void draw(game& g) override;
+        void process(game& g);
+        void update(game& g);
+        void draw(game& g);
 
-        void activate(game& g) override;
-        void deactivate() override;
+        void activate(game& g);
+        void deactivate();
 
-        virtual std::string_view name() const override;
+        virtual std::string_view name() const;
 
     private:
         void set_widget(std::size_t index, const hal::font& fnt, std::string_view text);

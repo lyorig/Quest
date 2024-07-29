@@ -42,16 +42,7 @@ namespace hq {
                 : flags { f } {
             }
 
-            virtual void process(game& g) = 0;
-            virtual void update(game& g)  = 0;
-            virtual void draw(game& g)    = 0;
-
-            virtual void activate(game& g) = 0;
-            virtual void deactivate()      = 0;
-
             virtual std::string_view name() const = 0;
-
-            virtual ~base() = default;
 
             flag_bitmask flags;
         };

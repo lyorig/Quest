@@ -4,94 +4,104 @@
 
 using namespace hq::scene;
 
-manager::manager()
-    : m_begin { m_scenes.begin() }
-    , m_cachedProcess { m_scenes.begin() }
-    , m_cachedUpdate { m_scenes.begin() }
-    , m_cachedDraw { m_scenes.begin() } {
+namespace {
+    template <std::size_t N, typename T, typename F>
+    void forward_tuple_iter(T& tuple, F func) {
+        func(std::get<N>(tuple));
+        if constexpr (N != std::tuple_size_v<T> - 1) {
+            forward_tuple_iter<N + 1>(tuple, func);
+        }
+    }
+
+    template <typename T, typename F>
+    void forward_tuple(T& tuple, F func) {
+        forward_tuple_iter<0>(tuple, func);
+    }
+
+    template <std::size_t N, typename T, typename F>
+    void reverse_tuple_iter(T& tuple, F func) {
+        func(std::get<N>(tuple));
+        if constexpr (N != 0) {
+            reverse_tuple_iter<N - 1>(tuple, func);
+        }
+    }
+
+    template <typename T, typename F>
+    void reverse_tuple(T& tuple, F func) {
+        reverse_tuple_iter<std::tuple_size_v<T> - 1>(tuple, func);
+    }
+}
+
+manager::manager(game& g)
+    : m_tuple { g, g }
+    , m_curr { 0 }
+    , m_cProcess { 0 }
+    , m_cUpdate { 0 }
+    , m_cDraw { 0 } {
 }
 // Process -> update -> draw.
 void manager::update(game& g) {
-    for (auto it = m_begin; it != m_scenes.end(); ++it) {
-        scene::base& obj { **it };
-
-        flag_bitmask flg { obj.flags };
-
-        // Process:
-        if (obj.flags[flag::enable_process] && it >= m_cachedProcess) {
-            obj.process(g);
-        }
-
-        // Update:
-        if (obj.flags[flag::enable_update] && it >= m_cachedUpdate) {
-            obj.update(g);
-        }
-
-        // Draw:
-        if (obj.flags[flag::enable_draw] && it >= m_cachedDraw) {
-            obj.draw(g);
-        }
-
-        flg ^= obj.flags;
-
-        // TODO: This doesn't work, like, at all. I should rethink the architecture of this whole thing.
-        for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
-            if (flg[f]) {
-                update_cached(f);
-            }
-        }
-    }
+    m_curr = 0;
+    forward_tuple(m_tuple, [&](auto&& obj) { update_one(obj, g); });
 }
 
-void manager::add(base_up&& scn) {
-    m_scenes.push_back(std::move(scn));
+template <typename T>
+void manager::update_one(T& obj, game& g) {
+    flag_bitmask flg { obj.flags };
 
-    const flag_bitmask f { m_scenes.back()->flags };
-
-    if (f[flag::block_process]) {
-        m_cachedProcess = m_scenes.end() - 1;
+    // Process:
+    if (obj.flags[flag::enable_process] && m_curr >= m_cProcess) {
+        obj.process(g);
     }
 
-    if (f[flag::block_update]) {
-        m_cachedUpdate = m_scenes.end() - 1;
+    // Update:
+    if (obj.flags[flag::enable_update] && m_curr >= m_cUpdate) {
+        obj.update(g);
     }
 
-    if (f[flag::block_draw]) {
-        m_cachedDraw = m_scenes.end() - 1;
+    // Draw:
+    if (obj.flags[flag::enable_draw] && m_curr >= m_cDraw) {
+        obj.draw(g);
     }
-}
 
-manager::const_iterator manager::find_last_with_flag(flag m) const {
-    const_iterator it { m_scenes.end() - 1 };
+    // Get flag diff
+    flg ^= obj.flags;
 
-    for (; it != m_scenes.begin(); --it) {
-        if ((*it)->flags.all(m)) {
-            break;
+    for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
+        if (flg[f]) {
+            update_cached(f);
         }
     }
 
-    return it;
+    ++m_curr;
+}
+
+hal::u8 manager::find_last_with_flag(flag m) const {
+
+    hal::u8 ret { 0 };
+
+    reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });
+
+    return ret;
 }
 
 void manager::update_cached(flag f) {
-    const_iterator iter { find_last_with_flag(f) };
+    hal::u8 iter { find_last_with_flag(f) };
 
     switch (f) {
     case flag::block_process:
-        m_cachedProcess = iter;
+        m_cProcess = iter;
         break;
 
     case flag::block_update:
-        m_cachedUpdate = iter;
+        m_cUpdate = iter;
         break;
 
     case flag::block_draw:
-        m_cachedDraw = iter;
+        m_cDraw = iter;
         break;
 
     default:
         std::unreachable();
     }
-
-    m_begin = std::min({ m_cachedProcess, m_cachedUpdate, m_cachedDraw });
 }
