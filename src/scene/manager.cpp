@@ -35,7 +35,7 @@ void manager::update(game& g) {
         flg ^= obj.flags;
 
         // TODO: This doesn't work, like, at all. I should rethink the architecture of this whole thing.
-        for (const auto f : { flag::block_process, flag::block_update, flag::block_draw }) {
+        for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
             if (flg[f]) {
                 update_cached(f);
             }
@@ -61,11 +61,11 @@ void manager::add(base_up&& scn) {
     }
 }
 
-manager::const_iterator manager::find_last_with_flags(flag_bitmask m) const {
+manager::const_iterator manager::find_last_with_flag(flag m) const {
     const_iterator it { m_scenes.end() - 1 };
 
     for (; it != m_scenes.begin(); --it) {
-        if ((*it)->flags[m]) {
+        if ((*it)->flags.all(m)) {
             break;
         }
     }
@@ -74,7 +74,7 @@ manager::const_iterator manager::find_last_with_flags(flag_bitmask m) const {
 }
 
 void manager::update_cached(flag f) {
-    const_iterator iter { find_last_with_flags(f) };
+    const_iterator iter { find_last_with_flag(f) };
 
     switch (f) {
     case flag::block_process:

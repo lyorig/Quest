@@ -105,7 +105,7 @@ void console::process(game& g) {
             if (process(evt.keyboard().key(), g.video)) {
                 constexpr flag_bitmask enbl { flag::enable_update, flag::enable_draw, flag::block_process };
 
-                if (flags[enbl]) {
+                if (flags.all(enbl)) {
                     flags -= enbl;
                     deactivate();
                 } else {

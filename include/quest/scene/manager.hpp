@@ -35,7 +35,7 @@ namespace hq {
             const_iterator m_begin, m_cachedProcess, m_cachedUpdate, m_cachedDraw;
 
             // Not const because static_vector is const correct or whatever.
-            const_iterator find_last_with_flags(flag_bitmask m) const;
+            const_iterator find_last_with_flag(flag m) const;
 
             void update_cached(flag f);
         };
