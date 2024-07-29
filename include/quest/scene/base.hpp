@@ -1,7 +1,9 @@
 #pragma once
 
-#include <halcyon/events.hpp>
-#include <halcyon/video.hpp>
+#include <initializer_list>
+#include <string_view>
+
+#include <halcyon/utility/enum_bits.hpp>
 
 #include <quest/types.hpp>
 

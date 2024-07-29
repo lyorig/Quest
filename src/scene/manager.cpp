@@ -76,15 +76,6 @@ void manager::update_one(T& obj, game& g) {
     ++m_curr;
 }
 
-hal::u8 manager::find_last_with_flag(flag m) const {
-
-    hal::u8 ret { 0 };
-
-    reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });
-
-    return ret;
-}
-
 void manager::update_cached(flag f) {
     hal::u8 iter { find_last_with_flag(f) };
 
@@ -104,4 +95,13 @@ void manager::update_cached(flag f) {
     default:
         std::unreachable();
     }
+}
+
+hal::u8 manager::find_last_with_flag(flag m) const {
+
+    hal::u8 ret { 0 };
+
+    reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });
+
+    return ret;
 }

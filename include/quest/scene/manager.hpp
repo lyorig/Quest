@@ -36,10 +36,9 @@ namespace hq {
             template <typename T>
             void update_one(T& x, game& g);
 
-            // Not const because static_vector is const correct or whatever.
-            hal::u8 find_last_with_flag(flag m) const;
-
             void update_cached(flag f);
+
+            hal::u8 find_last_with_flag(flag m) const;
         };
     }
 }

@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <halcyon/ttf.hpp>
+
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
 
