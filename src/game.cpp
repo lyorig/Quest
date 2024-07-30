@@ -16,6 +16,9 @@
 
 using namespace hq;
 
+template <typename T>
+using lims = std::numeric_limits<T>;
+
 namespace hq::consts {
     constexpr std::string_view window_name { "HalQuest" };
 }
@@ -41,11 +44,12 @@ game::game(args a)
     , window { video, consts::window_name, video.displays[0].size() / 2 }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , scenes { *this }
-    , atlas { renderer, { 128, 128 } }
+    , atlas { renderer, renderer.size() / 2 }
     , timescale { 1.0 }
     , running { true }
     , screenshot { false } {
     renderer.blend(hal::blend_mode::alpha);
+    atlas.tex.alpha_mod(96);
 }
 
 void game::main_loop() {
@@ -59,7 +63,7 @@ void game::main_loop() {
 
         scenes.update(*this);
 
-        if (screenshot) {
+        if (screenshot) [[unlikely]] {
             take_screenshot();
             screenshot = false;
         }
@@ -102,7 +106,13 @@ void game::take_screenshot() const {
 
     do {
         std::strcpy(std::to_chars(filename + pfxlen, std::end(filename) - 1, i++).ptr, HQ_SCREENSHOT_EXT);
-    } while (std::filesystem::exists(current = directory / filename));
+    } while (std::filesystem::exists(current = directory / filename)
+        && i != lims<decltype(i)>::max());
+
+    if (i == lims<decltype(i)>::max()) [[unlikely]] {
+        HAL_PRINT(hal::debug::severity::warning, "Exhausted numbering of screenshots. Aborting save.");
+        return;
+    }
 
     img.save(s, hal::image::save_format::png, current);
 

@@ -7,13 +7,24 @@
 namespace hq {
     class atlas {
     public:
-        atlas(hal::clref<hal::renderer> rnd, hal::pixel::point size);
+        enum class dim : bool {
+            x,
+            y
+        };
 
-        hal::pixel::rect add(hal::clref<hal::renderer> rnd, hal::ref<const hal::surface> surf);
+        atlas(hal::lref<hal::renderer> rnd, hal::pixel::point size);
+
+        hal::pixel::rect add(hal::lref<hal::renderer> rnd, hal::ref<const hal::surface> surf);
 
         std::vector<hal::pixel::rect> free;
 
-        hal::pixel::format  fmt;
+        // The renderer's preferred format.
+        hal::pixel::format fmt;
+
+        // The atlas itself.
         hal::target_texture tex;
+
+    private:
+        hal::target_texture make_texture(hal::lref<hal::renderer> rnd, hal::pixel::point size);
     };
 }

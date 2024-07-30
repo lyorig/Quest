@@ -186,10 +186,6 @@ void console::deactivate() {
     m_active = false;
 }
 
-std::string_view console::name() const {
-    return "Console";
-}
-
 bool console::process(hal::keyboard::key k, const hal::proxy::video& vid) {
     switch (k) {
         using enum hal::keyboard::key;

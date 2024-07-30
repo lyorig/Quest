@@ -36,8 +36,6 @@ namespace hq {
             void activate(game& g);
             void deactivate();
 
-            virtual std::string_view name() const;
-
             // Process a keystroke.
             // Returns whether the console's state should be switched.
             bool process(hal::keyboard::key k, const hal::proxy::video& vid);

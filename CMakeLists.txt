@@ -8,7 +8,7 @@ endif()
 
 # set(BUILD_SHARED_LIBS ON)
 
-add_subdirectory(subprojects/halcyon)
+add_subdirectory(halcyon)
 
 set(QUEST_SOURCES
     scene/console.cpp

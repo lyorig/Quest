@@ -44,8 +44,6 @@ namespace hq {
                 : flags { f } {
             }
 
-            virtual std::string_view name() const = 0;
-
             flag_bitmask flags;
         };
     }

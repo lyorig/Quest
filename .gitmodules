@@ -1,6 +1,3 @@
 [submodule "halcyon"]
 	path = halcyon
 	url = https://github.com/lyorig/halcyon
-[submodule "subprojects/halcyon"]
-	path = subprojects/halcyon
-	url = https://github.com/lyorig/halcyon.git
