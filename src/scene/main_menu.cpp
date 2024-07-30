@@ -103,9 +103,7 @@ void main_menu::draw(game& g) {
         wgt.draw(rnd);
 
         if (m_outline.pos.x != lc::invalid_outline) {
-            hal::guard::color<hal::renderer> _ { rnd, { 0x00FFFF, 32 } };
-
-            rnd->fill(m_outline);
+            rnd->fill(m_outline, { 0x00FFFF, 32 });
         }
     }
 
