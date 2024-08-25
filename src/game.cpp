@@ -83,7 +83,7 @@ delta_t game::delta() const {
 void game::take_screenshot() const {
     HAL_DEBUG_TIMER(tmr);
 
-    hal::surface s { renderer.read_pixels(atlas.fmt) };
+    hal::surface s { renderer.read_pixels() };
 
 #define HQ_SCREENSHOT_PFX "screenshot-"
 #define HQ_SCREENSHOT_EXT ".png"
@@ -109,6 +109,7 @@ void game::take_screenshot() const {
     } while (std::filesystem::exists(current = directory / filename)
         && i != lims<decltype(i)>::max());
 
+    // Rust users can suck it, this is true paranoia
     if (i == lims<decltype(i)>::max()) [[unlikely]] {
         HAL_PRINT(hal::debug::severity::warning, "Exhausted numbering of screenshots. Aborting save.");
         return;

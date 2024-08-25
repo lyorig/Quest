@@ -33,7 +33,7 @@ namespace hq::scene {
 
         hal::u8 m_currentTheme;
 
-        std::mt19937_64                                    m_mt;
-        std::uniform_int_distribution<hal::color::value_t> m_uid;
+        std::mt19937_64                         m_mt;
+        std::uniform_int_distribution<hal::u16> m_uid;
     };
 }

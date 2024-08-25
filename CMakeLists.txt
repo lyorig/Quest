@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.22.0)
 
-project(HalodaQuest VERSION 0.1 LANGUAGES CXX)
-
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    set(Halcyon_BUILD_TESTS ON)
-endif()
-
-# set(BUILD_SHARED_LIBS ON)
+project(Quest VERSION 0.1 LANGUAGES CXX)
 
 add_subdirectory(halcyon)
 
@@ -24,20 +18,42 @@ set(QUEST_SOURCES
 
 list(TRANSFORM QUEST_SOURCES PREPEND src/)
 
-add_executable(HalodaQuest WIN32
+add_executable(TheGame WIN32
     ${QUEST_SOURCES}
 )
 
-if(NOT MSVC)
-    target_compile_options(HalodaQuest PRIVATE -Wall -Wextra)
+# Warnings.
+if (MSVC)
+	set(WarningFlags /Wall)
 else()
-    target_compile_options(HalodaQuest PRIVATE /W4)
+	set(WarningFlags -Wall -Wpedantic)
 endif()
 
-target_include_directories(HalodaQuest PRIVATE include/)
-target_link_libraries(HalodaQuest PRIVATE Halcyon::Halcyon)
+target_compile_options(TheGame PRIVATE ${WarningFlags})
 
-set_target_properties(HalodaQuest PROPERTIES
+# Link-time optimization.
+if (CMAKE_BUILD_TYPE MATCHES Release)
+	if (MSVC)
+		set(LtoCompileFlags /GL)
+		set(LtoLinkFlags /LTCG)
+	else()
+		set(LtoCompileFlags -flto)
+		set(LtoLinkFlags -flto)
+	endif()
+
+	target_compile_options(TheGame PRIVATE ${LtoCompileFlags})
+	target_link_options(TheGame PRIVATE ${LtoLinkFlags})
+endif()
+
+target_include_directories(TheGame PRIVATE include/)
+target_link_libraries(TheGame PRIVATE Halcyon::Halcyon)
+
+set_target_properties(TheGame PROPERTIES
     CXX_STANDARD 23
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
 )
+
+add_custom_command(TARGET TheGame POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:TheGame> $<TARGET_FILE_DIR:TheGame>
+  COMMAND_EXPAND_LISTS
+  )

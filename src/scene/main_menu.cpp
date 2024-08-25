@@ -54,7 +54,8 @@ void main_menu::process(game& g) {
 
             case enter: {
                 hal::surface surf { { m_uid(m_mt), m_uid(m_mt) } };
-                surf.fill({ m_uid(m_mt), m_uid(m_mt), m_uid(m_mt) });
+                using t = hal::color::value_t;
+                surf.fill({ static_cast<t>(m_uid(m_mt)), static_cast<t>(m_uid(m_mt)), static_cast<t>(m_uid(m_mt)) });
                 g.atlas.add(g.renderer, surf);
             } break;
 
@@ -108,7 +109,7 @@ void main_menu::draw(game& g) {
     }
 
     {
-        hal::guard::color<hal::renderer> _ { rnd, hal::palette::red };
+        hal::guard::color _ { rnd, hal::palette::red };
         for (const auto rect : g.atlas.free) {
             rnd->draw(rect);
         }

@@ -53,8 +53,8 @@ hal::pixel::rect atlas::add(hal::lref<hal::renderer> rnd, hal::ref<const hal::su
     free.emplace_back(old_sz.x, 0, new_sz.x - old_sz.x, old_sz.y);
 
     {
-        hal::guard::target<hal::renderer>      _ { rnd, new_tex };
-        hal::guard::blend<hal::target_texture> __ { tex, hal::blend_mode::none };
+        hal::guard::target _ { rnd, new_tex };
+        hal::guard::blend  __ { tex, hal::blend_mode::none };
 
         rnd->draw(tex)();
     }
@@ -65,7 +65,7 @@ hal::pixel::rect atlas::add(hal::lref<hal::renderer> rnd, hal::ref<const hal::su
 }
 
 hal::target_texture atlas::make_texture(hal::lref<hal::renderer> rnd, hal::pixel::point size) {
-    hal::target_texture tex { rnd, size, fmt };
-    tex.blend(hal::blend_mode::alpha);
-    return tex;
+    hal::target_texture tx { rnd, size, fmt };
+    tx.blend(hal::blend_mode::alpha);
+    return tx;
 }
