@@ -14,7 +14,7 @@
 // The rest of the state types.
 
 namespace hq::scene {
-    class main_menu final : public base {
+    class main_menu : public base {
     public:
         main_menu(game& g);
 
@@ -36,4 +36,6 @@ namespace hq::scene {
         std::mt19937_64                         m_mt;
         std::uniform_int_distribution<hal::u16> m_uid;
     };
+
+    static_assert(interface<main_menu>);
 }

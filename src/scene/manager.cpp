@@ -33,7 +33,7 @@ namespace {
 }
 
 manager::manager(game& g)
-    : m_tuple { g, g }
+    : m_tuple {}
     , m_curr { 0 }
     , m_cProcess { 0 }
     , m_cUpdate { 0 }
@@ -98,7 +98,6 @@ void manager::update_cached(flag f) {
 }
 
 hal::u8 manager::find_last_with_flag(flag m) const {
-
     hal::u8 ret { 0 };
 
     reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });

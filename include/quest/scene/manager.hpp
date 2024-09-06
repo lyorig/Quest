@@ -5,6 +5,7 @@
 #include <quest/static_vector.hpp>
 
 #include <quest/scene/console.hpp>
+#include <quest/scene/dummy.hpp>
 #include <quest/scene/main_menu.hpp>
 
 // scene_manager.hpp:
@@ -29,7 +30,7 @@ namespace hq {
             void update(game& g);
 
         private:
-            std::tuple<main_menu, console> m_tuple;
+            std::tuple<dummy> m_tuple;
 
             hal::u8 m_curr, m_cProcess, m_cUpdate, m_cDraw;
 

@@ -73,5 +73,7 @@ namespace hq {
 
             bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
         };
+
+        static_assert(interface<console>);
     }
 }

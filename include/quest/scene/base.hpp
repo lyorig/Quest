@@ -40,11 +40,20 @@ namespace hq {
 
         class base {
         public:
+            constexpr base() = default;
+
             constexpr base(std::initializer_list<flag> f)
                 : flags { f } {
             }
 
             flag_bitmask flags;
         };
+
+        template <typename T>
+        concept interface = std::is_base_of_v<base, T> && requires(T& scn, game& g) {
+                                                              scn.process(g);
+                                                              scn.update(g);
+                                                              scn.update(g);
+                                                          };
     }
 }

@@ -49,7 +49,6 @@ game::game(args a)
     , running { true }
     , screenshot { false } {
     renderer.blend(hal::blend_mode::alpha);
-    atlas.tex.alpha_mod(96);
 }
 
 void game::main_loop() {
@@ -139,6 +138,12 @@ void game::collect_events() {
             switch (m_eventHandler.keyboard().button()) {
                 using enum hal::keyboard::button;
 
+            case enter: {
+                hal::surface s { { 200, 200 } };
+                s.fill(hal::palette::cyan);
+                atlas.add(renderer, s);
+            } break;
+
             case F12:
                 screenshot = true;
                 break;
@@ -153,4 +158,6 @@ void game::collect_events() {
             break;
         }
     }
+
+    renderer.draw(atlas.tex)();
 }
