@@ -29,14 +29,11 @@ target_compile_features(TheGame PRIVATE
 
 # Is there a strip utility?
 if (CMAKE_STRIP)
-	message("Quest: Strip found at ${CMAKE_STRIP}.")
 	add_custom_command(TARGET TheGame POST_BUILD
-		COMMAND # Yes, this is quite ugly. No, I don't think there is a better solution.
-		$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:${CMAKE_STRIP}>
-		$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:$<TARGET_FILE:TheGame>>
+		COMMAND 
+		"$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:${CMAKE_STRIP};$<TARGET_FILE:TheGame>>"
+		COMMAND_EXPAND_LISTS VERBATIM
 	)
-else()
-	message("Quest: Strip not found.")
 endif()
 
 # Warnings.
