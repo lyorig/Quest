@@ -5,5 +5,7 @@ int main(int argc, char* argv[]) {
 
     g.main_loop();
 
+    hal::cleanup();
+
     return EXIT_SUCCESS;
 }

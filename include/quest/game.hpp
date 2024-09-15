@@ -32,8 +32,6 @@ namespace hq {
     private:
         hal::event::holder m_eventHandler;
 
-        HAL_NO_SIZE hal::context m_context;
-
     public:
         HAL_NO_SIZE hal::system::video video;
         HAL_NO_SIZE hal::system::audio audio;

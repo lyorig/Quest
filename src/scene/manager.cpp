@@ -33,7 +33,7 @@ namespace {
 }
 
 manager::manager(game& g)
-    : m_tuple {}
+    : m_tuple { g, g }
     , m_curr { 0 }
     , m_cProcess { 0 }
     , m_cUpdate { 0 }
@@ -42,7 +42,7 @@ manager::manager(game& g)
 // Process -> update -> draw.
 void manager::update(game& g) {
     m_curr = 0;
-    forward_tuple(m_tuple, [&](auto&& obj) { update_one(obj, g); });
+    forward_tuple(m_tuple, [&](auto& obj) { update_one(obj, g); });
 }
 
 template <typename T>

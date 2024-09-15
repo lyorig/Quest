@@ -32,9 +32,6 @@ namespace hq::scene {
         hal::coord::rect      m_outline;
 
         hal::u8 m_currentTheme;
-
-        std::mt19937_64                         m_mt;
-        std::uniform_int_distribution<hal::u16> m_uid;
     };
 
     static_assert(interface<main_menu>);

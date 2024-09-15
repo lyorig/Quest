@@ -38,9 +38,7 @@ bool args::operator[](std::string_view what) const {
 }
 
 game::game(args a)
-    : video { m_context }
-    , audio { m_context }
-    , img { hal::image::init_format::jpg }
+    : img { hal::image::init_format::jpg }
     , window { video, consts::window_name, video.displays[0].size() / 2 }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , scenes { *this }

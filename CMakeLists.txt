@@ -56,6 +56,7 @@ endif()
 
 target_compile_options(TheGame PRIVATE
 	$<$<CONFIG:Release>:${LtoCompileFlags}>
+	$<$<NOT:$<OR:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>>:-march=native>
 )
 
 target_link_options(TheGame PRIVATE
@@ -72,6 +73,7 @@ target_link_libraries(TheGame PRIVATE
 
 set_target_properties(TheGame PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
+	$<NOT:$<CONFIG:Debug>:INTERPROCEDURAL_OPTIMIZATION TRUE>
 )
 
 install(FILES $<TARGET_RUNTIME_DLLS:TheGame> TYPE BIN)

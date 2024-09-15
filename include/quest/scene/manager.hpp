@@ -8,7 +8,7 @@
 #include <quest/scene/dummy.hpp>
 #include <quest/scene/main_menu.hpp>
 
-// scene_manager.hpp:
+// scene/manager.hpp:
 // A scene manager which aims to use as little space as possible. Here's hoping.
 
 namespace hq {
@@ -30,7 +30,7 @@ namespace hq {
             void update(game& g);
 
         private:
-            std::tuple<dummy> m_tuple;
+            std::tuple<main_menu, console> m_tuple;
 
             hal::u8 m_curr, m_cProcess, m_cUpdate, m_cDraw;
 
