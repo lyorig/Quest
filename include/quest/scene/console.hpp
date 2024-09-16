@@ -1,18 +1,17 @@
 #pragma once
 
-#include <halcyon/ttf.hpp>
-#include <halcyon/video.hpp>
-
 #include <quest/field.hpp>
+#include <quest/scene/base.hpp>
 #include <quest/types.hpp>
 
-#include <quest/scene/base.hpp>
+#include <halcyon/ttf.hpp>
+#include <halcyon/video.hpp>
 
 namespace hq {
     namespace scene {
         // A console. Designed for use with mono fonts.
         class console final : public base {
-        public:
+        private:
             class shuffle_bag {
             public:
                 static constexpr hal::u8 num_texts { 31 };
@@ -27,6 +26,7 @@ namespace hq {
                 hal::u8 m_index;
             };
 
+        public:
             console(game& g);
 
             void process(game& g);
@@ -47,7 +47,7 @@ namespace hq {
             bool active();
 
         private:
-            void repaint(hal::renderer& rnd);
+            void repaint(hal::lref<hal::renderer> rnd);
             void set_cursor();
 
             field m_field;
@@ -56,7 +56,7 @@ namespace hq {
 
             hal::font m_font;
 
-            hal::static_texture m_pfx, m_tex;
+            hal::static_texture m_prefix, m_line;
 
             hal::coord_t m_padding;
             hal::coord_t m_texBegin;
@@ -71,7 +71,7 @@ namespace hq {
             hal::u16 m_maxChars;
             hal::u8  m_lineChars;
 
-            bool m_active : 1, m_repaint : 1, m_cursorVis : 1;
+            bool m_repaint, m_cursorVis;
         };
 
         static_assert(interface<console>);

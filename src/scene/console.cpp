@@ -30,6 +30,8 @@ namespace hq::consts {
     constexpr delta_t cursor_blink_time { 0.5 };
 
     constexpr std::size_t desired_max_chars { 128 };
+
+    constexpr flag_bitmask enablers { flag::enable_draw, flag::enable_update, flag::block_process };
 }
 
 console::shuffle_bag::shuffle_bag()
@@ -88,11 +90,11 @@ console::console(game& g)
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
     , m_maxChars { static_cast<hal::u16>(std::min(g.renderer.info().max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
-    , m_active { false }
     , m_repaint { false }
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 
+    HAL_WARN_IF(!m_font.mono(), '\"', m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
     HAL_PRINT("<Console> Max ", m_maxChars, " chars");
 }
 
@@ -103,20 +105,19 @@ void console::process(game& g) {
 
         case key_pressed:
             if (process(evt.keyboard().key(), g.video)) {
-                constexpr flag_bitmask enbl { flag::enable_update, flag::enable_draw, flag::block_process };
-
-                if (flags.all(enbl)) {
-                    flags -= enbl;
+                if (flags.all(consts::enablers)) {
+                    flags -= consts::enablers;
                     deactivate();
                 } else {
-                    flags += enbl;
+                    flags += consts::enablers;
                     activate(g);
                 }
             };
             break;
 
         case text_input:
-            process(evt.text_input().text());
+            if (active())
+                process(evt.text_input().text());
             break;
 
         default:
@@ -135,55 +136,53 @@ void console::update(game& g) {
 }
 
 void console::draw(game& g) {
-    hal::renderer& rnd { g.renderer };
+    hal::lref<hal::renderer> rnd { g.renderer };
 
     hal::guard::color lock { rnd, consts::background_color };
-    rnd.fill();
+    rnd->fill();
 
     if (m_repaint) {
         m_repaint = false;
         repaint(rnd);
     }
 
-    rnd.draw(m_pfx).to(consts::text_offset)();
+    rnd->draw(m_prefix).to(consts::text_offset)();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
-    hal::coord::rect  crd;
-    crd.size.x = static_cast<hal::coord_t>(std::min(m_tex.size().x, m_wrap));
+
+    hal::coord::rect crd;
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size().x, m_wrap));
     crd.size.y = m_outline.size.y;
 
     using namespace hal::literals;
 
-    for (; m_tex.size().x - crd.pos.x > 0;
-         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_tex.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        rnd.draw(m_tex).from(crd).to(where)();
+    for (; m_line.size().x - crd.pos.x > 0;
+         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        rnd->draw(m_line).from(crd).to(where)();
     }
 
     if (m_cursorVis) {
         lock.set(consts::cursor_color);
-        rnd.fill(m_outline);
+        rnd->fill(m_outline);
     }
 }
 
 void console::activate(game& g) {
     m_repaint = true;
-    m_active  = true;
 
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_pfx = g.renderer.make_static_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
+    m_prefix = g.renderer.make_static_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
 }
 
 void console::deactivate() {
-    m_pfx.reset();
-    m_tex.reset();
+    m_prefix.reset();
+    m_line.reset();
 
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();
     }
-
-    m_active = false;
 }
 
 bool console::process(hal::keyboard::key k, const hal::proxy::video& vid) {
@@ -234,10 +233,10 @@ void console::process(std::string_view inp) {
 }
 
 bool console::active() {
-    return m_active;
+    return flags[consts::enablers];
 }
 
-void console::repaint(hal::renderer& rnd) {
+void console::repaint(hal::lref<hal::renderer> rnd) {
     hal::surface text;
 
     if (m_field.text.empty()) {
@@ -248,7 +247,7 @@ void console::repaint(hal::renderer& rnd) {
                    .fg(consts::input_color)(consts::text_render_type);
     }
 
-    m_tex = rnd.make_static_texture(text);
+    m_line = rnd->make_static_texture(text);
 }
 
 void console::set_cursor() {

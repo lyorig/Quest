@@ -36,31 +36,9 @@ if (CMAKE_STRIP)
 	)
 endif()
 
-# Warnings.
-if (MSVC)
-	set(WarningFlags /Wall)
-else()
-	set(WarningFlags -Wall -Wpedantic)
-endif()
-
-add_compile_options(${WarningFlags})
-
-# Link-time optimization.
-if (MSVC)
-	set(LtoCompileFlags /GL)
-	set(LtoLinkFlags /LTCG)
-else()
-	set(LtoCompileFlags -flto)
-	set(LtoLinkFlags -flto)
-endif()
-
 target_compile_options(TheGame PRIVATE
-	$<$<CONFIG:Release>:${LtoCompileFlags}>
-	$<$<NOT:$<OR:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>>:-march=native>
-)
-
-target_link_options(TheGame PRIVATE
-	$<$<CONFIG:Release>:${LtoLinkFlags}>
+	$<$<NOT:$<OR:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>>:-march=native> # Optimize to the max!
+	$<IF:$<CXX_COMPILER_ID:MSVC>,/Wall,-Wall -Wpedantic> # Enable warnings.
 )
 
 target_include_directories(TheGame PRIVATE
@@ -71,6 +49,7 @@ target_link_libraries(TheGame PRIVATE
 	Halcyon::Halcyon
 )
 
+# Enable LTO.
 set_target_properties(TheGame PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
 	$<NOT:$<CONFIG:Debug>:INTERPROCEDURAL_OPTIMIZATION TRUE>

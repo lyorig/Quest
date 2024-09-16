@@ -1,35 +1,27 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <halcyon/utility/timer.hpp>
+
 #include <quest/game.hpp>
+#include <quest/helpers.hpp>
 
 #include <charconv>
 #include <filesystem>
-
-#include <halcyon/utility/strutil.hpp>
-#include <halcyon/utility/timer.hpp>
-
-#include <quest/constants.hpp>
-#include <quest/helpers.hpp>
-
-#include <quest/scene/console.hpp>
-#include <quest/scene/main_menu.hpp>
 
 using namespace hq;
 
 template <typename T>
 using lims = std::numeric_limits<T>;
 
-namespace hq::consts {
-    constexpr std::string_view window_name { "HalQuest" };
-}
-
 args::args(int argc, char** argv)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
+    HAL_ASSERT(argc <= m_checked.size(), "Too many arguments (max. ", m_checked.size(), ", actual ", argc, ')');
 }
 
 bool args::operator[](std::string_view what) const {
-    for (auto arg : m_span) {
-        if (arg == what) {
+    for (std::size_t i { 0 }; m_checked.test(i) && i < m_span.size(); ++i) {
+        if (what == m_span[i]) {
+            m_checked.set(i);
             return true;
         }
     }
@@ -39,7 +31,7 @@ bool args::operator[](std::string_view what) const {
 
 game::game(args a)
     : img { hal::image::init_format::jpg }
-    , window { video, consts::window_name, video.displays[0].size() / 2 }
+    , window { video, "HalQuest", hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , scenes { *this }
     , atlas { renderer, renderer.size() / 2 }

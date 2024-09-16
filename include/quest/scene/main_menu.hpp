@@ -1,14 +1,13 @@
 #pragma once
 
-#include <array>
-
-#include <halcyon/ttf.hpp>
-
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
 
 #include <quest/scene/base.hpp>
-#include <random>
+
+#include <halcyon/ttf.hpp>
+
+#include <array>
 
 // state/rest.hpp:
 // The rest of the state types.

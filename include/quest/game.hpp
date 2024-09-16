@@ -6,6 +6,8 @@
 #include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
 
+#include <bitset>
+
 namespace hq {
     class args {
     public:
@@ -13,8 +15,13 @@ namespace hq {
 
         bool operator[](std::string_view what) const;
 
+        constexpr static std::size_t max_args() {
+            return decltype(m_checked) {}.size();
+        }
+
     private:
         std::span<const char*> m_span;
+        mutable std::bitset<2> m_checked;
     };
 
     class game {

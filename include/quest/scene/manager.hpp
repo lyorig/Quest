@@ -1,12 +1,12 @@
 #pragma once
 
-#include <tuple>
-
 #include <quest/static_vector.hpp>
 
 #include <quest/scene/console.hpp>
 #include <quest/scene/dummy.hpp>
 #include <quest/scene/main_menu.hpp>
+
+#include <tuple>
 
 // scene/manager.hpp:
 // A scene manager which aims to use as little space as possible. Here's hoping.

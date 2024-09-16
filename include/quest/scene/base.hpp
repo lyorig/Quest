@@ -1,11 +1,10 @@
 #pragma once
 
-#include <initializer_list>
-#include <string_view>
+#include <quest/types.hpp>
 
 #include <halcyon/utility/enum_bits.hpp>
 
-#include <quest/types.hpp>
+#include <initializer_list>
 
 // state/base.hpp:
 // Base state class.
@@ -51,9 +50,9 @@ namespace hq {
 
         template <typename T>
         concept interface = std::is_base_of_v<base, T> && requires(T& scn, game& g) {
-                                                              scn.process(g);
-                                                              scn.update(g);
-                                                              scn.update(g);
-                                                          };
+            scn.process(g);
+            scn.update(g);
+            scn.update(g);
+        };
     }
 }
