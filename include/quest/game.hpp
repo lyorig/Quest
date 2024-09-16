@@ -12,6 +12,7 @@ namespace hq {
     class args {
     public:
         args(int argc, char** argv);
+        args(int argc, char** argv, std::nothrow_t);
 
         bool operator[](std::string_view what) const;
 
@@ -20,8 +21,8 @@ namespace hq {
         }
 
     private:
-        std::span<const char*> m_span;
-        mutable std::bitset<2> m_checked;
+        std::span<const char*>  m_span;
+        mutable std::bitset<64> m_checked;
     };
 
     class game {

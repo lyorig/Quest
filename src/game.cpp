@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
 
 #include <quest/game.hpp>
@@ -14,8 +15,14 @@ template <typename T>
 using lims = std::numeric_limits<T>;
 
 args::args(int argc, char** argv)
+    : args { argc, argv, std::nothrow } {
+    if (argc > max_args()) {
+        throw std::length_error { hal::string_from_pack("Too many args (max. ", max_args(), ", actual ", argc, ')') };
+    }
+}
+
+args::args(int argc, char** argv, std::nothrow_t)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
-    HAL_ASSERT(argc <= m_checked.size(), "Too many arguments (max. ", m_checked.size(), ", actual ", argc, ')');
 }
 
 bool args::operator[](std::string_view what) const {
@@ -30,7 +37,9 @@ bool args::operator[](std::string_view what) const {
 }
 
 game::game(args a)
-    : img { hal::image::init_format::jpg }
+    : video { std::nothrow }
+    , audio { std::nothrow }
+    , img { hal::image::init_format::jpg }
     , window { video, "HalQuest", hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , scenes { *this }
