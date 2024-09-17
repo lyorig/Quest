@@ -37,10 +37,9 @@ bool args::operator[](std::string_view what) const {
 }
 
 game::game(args a)
-    : video { std::nothrow }
-    , audio { std::nothrow }
+    : systems { std::nothrow }
     , img { hal::image::init_format::jpg }
-    , window { video, "HalQuest", hal::tag::fullscreen }
+    , window { systems, "HalQuest", hal::tag::fullscreen }
     , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
     , scenes { *this }
     , atlas { renderer, renderer.size() / 2 }
@@ -125,7 +124,7 @@ void game::collect_events() {
     m_polled.clear();
 
     // Process global events here...
-    while (video.events.poll(m_eventHandler)) {
+    while (systems.events.poll(m_eventHandler)) {
         switch (m_eventHandler.kind()) {
             using enum hal::event::type;
 

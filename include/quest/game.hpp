@@ -41,8 +41,7 @@ namespace hq {
         hal::event::holder m_eventHandler;
 
     public:
-        HAL_NO_SIZE hal::system::video video;
-        HAL_NO_SIZE hal::system::audio audio;
+        HAL_NO_SIZE hal::system::guard<hal::proxy::video, hal::proxy::audio> systems;
 
         HAL_NO_SIZE hal::ttf::context ttf;
         HAL_NO_SIZE hal::image::context img;

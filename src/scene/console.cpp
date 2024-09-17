@@ -104,7 +104,7 @@ void console::process(game& g) {
             using enum hal::event::type;
 
         case key_pressed:
-            if (process(evt.keyboard().key(), g.video)) {
+            if (process(evt.keyboard().key(), g.systems)) {
                 if (flags.all(consts::enablers)) {
                     flags -= consts::enablers;
                     deactivate();
@@ -185,7 +185,7 @@ void console::deactivate() {
     }
 }
 
-bool console::process(hal::keyboard::key k, const hal::proxy::video& vid) {
+bool console::process(hal::keyboard::key k, hal::proxy::video vid) {
     switch (k) {
         using enum hal::keyboard::key;
 
