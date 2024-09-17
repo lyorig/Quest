@@ -22,7 +22,7 @@ bool field::process(std::string_view inp) {
     return false;
 }
 
-field::op field::process(hal::keyboard::key k, const hal::proxy::video& vid) {
+field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
