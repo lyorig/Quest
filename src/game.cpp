@@ -1,3 +1,4 @@
+#include <SDL_filesystem.h>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <halcyon/utility/strutil.hpp>
