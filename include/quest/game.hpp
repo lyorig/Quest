@@ -3,6 +3,8 @@
 #include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
+#include <halcyon/image.hpp>
+
 #include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
 

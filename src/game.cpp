@@ -1,4 +1,3 @@
-#include <SDL_filesystem.h>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <halcyon/utility/strutil.hpp>
@@ -14,6 +13,14 @@ using namespace hq;
 
 template <typename T>
 using lims = std::numeric_limits<T>;
+
+namespace {
+    hal::renderer blended_renderer(hal::lref<const hal::window> wnd, args a) {
+        hal::renderer rnd { wnd, cond_enum(hal::renderer::flag::vsync, a["--vsync"]) };
+        rnd.blend(hal::blend_mode::alpha);
+        return rnd;
+    }
+}
 
 args::args(int argc, char** argv)
     : args { argc, argv, std::nothrow } {
@@ -41,13 +48,12 @@ game::game(args a)
     : systems { std::nothrow }
     , img { hal::image::init_format::jpg }
     , window { systems, "HalQuest", hal::tag::fullscreen }
-    , renderer { window, { hal::renderer::flag::accelerated, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) } }
+    , renderer { blended_renderer(window, a) }
     , scenes { *this }
-    , atlas { renderer, renderer.size() / 2 }
+    , atlas { renderer, renderer.size().get() / 2 }
     , timescale { 1.0 }
     , running { true }
     , screenshot { false } {
-    renderer.blend(hal::blend_mode::alpha);
 }
 
 void game::main_loop() {
@@ -88,7 +94,8 @@ void game::take_screenshot() const {
 
     constexpr std::size_t
         digits { std::numeric_limits<decltype(digits)>::digits10 },
-        pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) };
+        pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) },
+        max_ss_attempts { std::numeric_limits<decltype(max_ss_attempts)>::max() };
 
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
@@ -105,10 +112,10 @@ void game::take_screenshot() const {
     do {
         std::strcpy(std::to_chars(filename + pfxlen, std::end(filename) - 1, i++).ptr, HQ_SCREENSHOT_EXT);
     } while (std::filesystem::exists(current = directory / filename)
-        && i != lims<decltype(i)>::max());
+        && i != max_ss_attempts);
 
     // Rust users can suck it, this is true paranoia
-    if (i == lims<decltype(i)>::max()) [[unlikely]] {
+    if (i == max_ss_attempts) [[unlikely]] {
         HAL_PRINT(hal::debug::severity::warning, "Exhausted numbering of screenshots. Aborting save.");
         return;
     }

@@ -5,7 +5,11 @@ namespace hq {
     hal::font find_sized_font(hal::ttf::context& ttf, std::string_view path, hal::pixel_t desired_height);
 
     template <typename T>
-        requires std::is_enum_v<T>
+    concept has_none = std::is_enum_v<T> && requires {
+        { T::none } -> std::same_as<T>;
+    };
+
+    template <has_none T>
     constexpr T cond_enum(T val, bool v) {
         return v ? val : T::none;
     }

@@ -31,7 +31,7 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
         if (text.empty())
             break;
 
-        if (vid.events.keyboard.mod().any(mod::ctrl_both)) {
+        if (vid.events.keyboard_mod().any(mod::ctrl_both)) {
             std::size_t begin, end;
 
             if (cursor == 0) { // delete from beginning
@@ -107,8 +107,8 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
         return op::text_added;
 
     case key::V:
-        if ((vid.events.keyboard.mod().any(mod::ctrl_both)) && vid.clipboard.has_text()) {
-            const auto        str = vid.clipboard.text();
+        if ((vid.events.keyboard_mod().any(mod::ctrl_both)) && vid.clipboard_has_text()) {
+            const auto        str = vid.clipboard();
             const std::size_t sz { str.size() }; // one-time size calculation
 
             text.insert(cursor, str.c_str(), sz);

@@ -3,9 +3,13 @@
 #include <halcyon/main.hpp>
 
 int main(int argc, char* argv[]) {
-    hq::game g { hq::args { argc, argv, std::nothrow } };
+    try {
+        hq::game g { hq::args { argc, argv, std::nothrow } };
 
-    g.main_loop();
+        g.main_loop();
+    } catch (hal::exception) {
+        std::puts(hal::last_error().data());
+    }
 
     return EXIT_SUCCESS;
 }

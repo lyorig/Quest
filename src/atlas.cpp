@@ -13,7 +13,7 @@ namespace {
 
 atlas::atlas(hal::lref<hal::renderer> rnd, hal::pixel::point size)
     : free { { hal::tag::as_size, size } }
-    , fmt { rnd().info().formats().front() }
+    , fmt { rnd().info().get().formats().front() }
     , tex { make_texture(rnd, size) } {
     HAL_PRINT("<Atlas> Preferred format is ", fmt);
 }
@@ -38,7 +38,7 @@ hal::pixel::rect atlas::add(hal::lref<hal::renderer> rnd, hal::ref<const hal::su
                 free.push_back(r);
 
             hal::guard::target _ { rnd, tex };
-            rnd->draw(rnd->make_static_texture(surf)).to(rect.pos)();
+            rnd->draw(hal::static_texture { rnd, surf }).to(rect.pos)();
 
             return { rect.pos, sz };
         }

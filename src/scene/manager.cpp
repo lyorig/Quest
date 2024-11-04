@@ -93,7 +93,8 @@ void manager::update_cached(flag f) {
         break;
 
     default:
-        std::unreachable();
+        // FIXME: Why is std::unreachable() not available in <utility> on macOS?!?!
+        break;
     }
 }
 

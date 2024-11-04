@@ -2,6 +2,8 @@
 
 #include <halcyon/video.hpp>
 
+#include <vector>
+
 // atlas.hpp:
 // A texture atlas.
 namespace hq {

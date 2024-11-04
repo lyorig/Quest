@@ -83,12 +83,12 @@ const char* console::shuffle_bag::next() {
 
 console::console(game& g)
     : base { flag::enable_process }
-    , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size().y * 0.045)) }
-    , m_padding { g.renderer.size().x * consts::padding_pc }
+    , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size().get().y * 0.045)) }
+    , m_padding { g.renderer.size().get().x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
-    , m_wrap { static_cast<hal::pixel_t>(g.renderer.size().x - m_texBegin - m_padding) }
+    , m_wrap { static_cast<hal::pixel_t>(g.renderer.size().get().x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u16>(std::min(g.renderer.info().max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
+    , m_maxChars { static_cast<hal::u16>(std::min(g.renderer.info()->max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
     , m_repaint { false }
     , m_cursorVis { true } {
@@ -157,7 +157,7 @@ void console::draw(game& g) {
     using namespace hal::literals;
 
     for (; m_line.size().x - crd.pos.x > 0;
-         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
         rnd->draw(m_line).from(crd).to(where)();
     }
 
@@ -173,7 +173,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_prefix = g.renderer.make_static_texture(m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type));
+    m_prefix = { g.renderer, m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type) };
 }
 
 void console::deactivate() {
@@ -247,7 +247,7 @@ void console::repaint(hal::lref<hal::renderer> rnd) {
                    .fg(consts::input_color)(consts::text_render_type);
     }
 
-    m_line = rnd->make_static_texture(text);
+    m_line = { rnd, text };
 }
 
 void console::set_cursor() {
