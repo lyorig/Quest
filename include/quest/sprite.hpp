@@ -5,8 +5,6 @@
 
 #include <halcyon/video/texture.hpp>
 
-#include <halcyon/internal/scaler.hpp>
-
 namespace hq {
     class sprite {
     public:
@@ -17,7 +15,11 @@ namespace hq {
 
         void draw(hal::ref<hal::renderer> rnd) const;
 
-        void reset(hal::static_texture tex, hal::scaler scl);
+        template <std::invocable<hal::pixel::point> F>
+        void reset(hal::static_texture tex, F&& scale_func) {
+            texture     = std::move(tex);
+            hitbox.size = scale_func(texture.size());
+        }
 
         void pos(hal::coord::point where);
 

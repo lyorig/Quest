@@ -20,8 +20,3 @@ void sprite::draw(hal::ref<hal::renderer> rnd) const {
         rnd->draw(texture).to(hitbox)();
     }
 }
-
-void sprite::reset(hal::static_texture tex, hal::scaler scl) {
-    texture     = std::move(tex);
-    hitbox.size = scl(texture.size());
-}

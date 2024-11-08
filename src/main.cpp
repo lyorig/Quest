@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
 
         g.main_loop();
     } catch (hal::exception) {
-        std::puts(hal::last_error().data());
+        std::puts(hal::debug::last_error());
     }
 
     return EXIT_SUCCESS;

@@ -8,23 +8,19 @@
 #include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
 
-#include <bitset>
-
 namespace hq {
     class args {
     public:
         args(int argc, char** argv);
         args(int argc, char** argv, std::nothrow_t);
 
+        int size() const;
+
         bool operator[](std::string_view what) const;
 
-        constexpr static std::size_t max_args() {
-            return decltype(m_checked) {}.size();
-        }
-
     private:
-        std::span<const char*>  m_span;
-        mutable std::bitset<64> m_checked;
+        std::span<const char*> m_span;
+        int                    m_size;
     };
 
     class game {

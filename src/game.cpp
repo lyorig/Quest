@@ -24,19 +24,20 @@ namespace {
 
 args::args(int argc, char** argv)
     : args { argc, argv, std::nothrow } {
-    if (argc > max_args()) {
-        throw std::length_error { hal::string_from_pack("Too many args (max. ", max_args(), ", actual ", argc, ')') };
-    }
 }
 
 args::args(int argc, char** argv, std::nothrow_t)
-    : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
+    : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) }
+    , m_size { argc } {
+}
+
+int args::size() const {
+    return m_size;
 }
 
 bool args::operator[](std::string_view what) const {
-    for (std::size_t i { 0 }; m_checked.test(i) && i < m_span.size(); ++i) {
+    for (std::size_t i { 0 }; i < m_span.size(); ++i) {
         if (what == m_span[i]) {
-            m_checked.set(i);
             return true;
         }
     }
@@ -44,16 +45,18 @@ bool args::operator[](std::string_view what) const {
     return false;
 }
 
-game::game(args a)
-    : systems { std::nothrow }
-    , img { hal::image::init_format::jpg }
-    , window { systems, "HalQuest", hal::tag::fullscreen }
-    , renderer { blended_renderer(window, a) }
-    , scenes { *this }
-    , atlas { renderer, renderer.size().get() / 2 }
-    , timescale { 1.0 }
-    , running { true }
-    , screenshot { false } {
+game::game(args a) try
+    : systems{}
+    , img{ hal::image::init_format::jpg }
+    , window{ systems, "HalQuest", hal::tag::fullscreen }
+    , renderer{ blended_renderer(window, a) }
+    , scenes{ *this }
+    , atlas{ renderer, renderer.size().get() / 2 }
+    , timescale{ 1.0 }
+    , running{ true }
+    , screenshot{ false } {
+} catch (hal::exception e) {
+    HAL_PRINT("Exception raised: ", e.with_error());
 }
 
 void game::main_loop() {

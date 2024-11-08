@@ -1,5 +1,5 @@
-#include "halcyon/video/texture.hpp"
 #include <quest/atlas.hpp>
+#include <quest/helpers.hpp>
 
 #include <halcyon/utility/guard.hpp>
 
@@ -13,7 +13,7 @@ namespace {
 
 atlas::atlas(hal::lref<hal::renderer> rnd, hal::pixel::point size)
     : free { { hal::tag::as_size, size } }
-    , fmt { rnd().info().get().formats().front() }
+    , fmt { rnd().info()->formats().front() }
     , tex { make_texture(rnd, size) } {
     HAL_PRINT("<Atlas> Preferred format is ", fmt);
 }
