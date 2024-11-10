@@ -5,7 +5,6 @@
 
 #include <halcyon/image.hpp>
 
-#include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
 
 namespace hq {
@@ -14,13 +13,12 @@ namespace hq {
         args(int argc, char** argv);
         args(int argc, char** argv, std::nothrow_t);
 
-        int size() const;
+        std::size_t size() const;
 
         bool operator[](std::string_view what) const;
 
     private:
         std::span<const char*> m_span;
-        int                    m_size;
     };
 
     class game {
@@ -48,7 +46,6 @@ namespace hq {
         hal::renderer renderer;
 
         scene::manager scenes;
-        atlas          atlas;
 
     private:
         event_vector m_polled;

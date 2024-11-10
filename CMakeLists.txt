@@ -15,7 +15,6 @@ add_executable(TheGame WIN32
 	src/scene/dummy.cpp
 	src/scene/main_menu.cpp
 	src/scene/manager.cpp
-	src/atlas.cpp
 	src/game.cpp
 	src/helpers.cpp
 	src/main.cpp

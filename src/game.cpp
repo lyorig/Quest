@@ -27,12 +27,11 @@ args::args(int argc, char** argv)
 }
 
 args::args(int argc, char** argv, std::nothrow_t)
-    : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) }
-    , m_size { argc } {
+    : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
 
-int args::size() const {
-    return m_size;
+std::size_t args::size() const {
+    return m_span.size();
 }
 
 bool args::operator[](std::string_view what) const {
@@ -51,7 +50,6 @@ game::game(args a) try
     , window{ systems, "HalQuest", hal::tag::fullscreen }
     , renderer{ blended_renderer(window, a) }
     , scenes{ *this }
-    , atlas{ renderer, renderer.size().get() / 2 }
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
@@ -88,7 +86,7 @@ delta_t game::delta() const {
 }
 
 void game::take_screenshot() const {
-    HAL_DEBUG_TIMER(tmr);
+    namespace fs = std::filesystem;
 
     hal::surface s { renderer.read_pixels() };
 
@@ -102,19 +100,19 @@ void game::take_screenshot() const {
 
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
-    const std::filesystem::path directory { "screenshots" };
+    const fs::path directory { "screenshots" };
 
-    std::filesystem::path current;
+    fs::path current;
 
-    if (!std::filesystem::is_directory(directory)) {
-        std::filesystem::create_directory(directory);
+    if (!fs::is_directory(directory)) {
+        fs::create_directory(directory);
     }
 
     std::size_t i { 0 };
 
     do {
         std::strcpy(std::to_chars(filename + pfxlen, std::end(filename) - 1, i++).ptr, HQ_SCREENSHOT_EXT);
-    } while (std::filesystem::exists(current = directory / filename)
+    } while (fs::exists(current = directory / filename)
         && i != max_ss_attempts);
 
     // Rust users can suck it, this is true paranoia
@@ -124,8 +122,6 @@ void game::take_screenshot() const {
     }
 
     img.save(s, hal::image::save_format::png, current);
-
-    HAL_PRINT("<Game> Saved ", current.filename().string(), " in ", tmr);
 
 #undef HQ_SCREENSHOT_EXT
 #undef HQ_SCREENSHOT_PFX
@@ -147,12 +143,6 @@ void game::collect_events() {
             switch (m_eventHandler.keyboard().button()) {
                 using enum hal::keyboard::button;
 
-            case enter: {
-                hal::surface s { { 200, 200 } };
-                s.fill(hal::palette::cyan);
-                atlas.add(renderer, s);
-            } break;
-
             case F12:
                 screenshot = true;
                 break;
@@ -167,6 +157,4 @@ void game::collect_events() {
             break;
         }
     }
-
-    renderer.draw(atlas.tex)();
 }
