@@ -23,7 +23,7 @@ namespace hq {
 
     class game {
     public:
-        using event_vector = std::vector<hal::event::holder>;
+        using event_vector = std::vector<hal::event::variant>;
 
         game(args a);
 
@@ -34,7 +34,7 @@ namespace hq {
         delta_t delta() const;
 
     private:
-        hal::event::holder m_eventHandler;
+        hal::event::variant m_eventHandler;
 
     public:
         HAL_NO_SIZE hal::cleanup_init<hal::system::video, hal::system::audio> systems;
