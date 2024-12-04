@@ -39,6 +39,7 @@ manager::manager(game& g)
     , m_cUpdate { 0 }
     , m_cDraw { 0 } {
 }
+
 // Process -> update -> draw.
 void manager::update(game& g) {
     m_curr = 0;
@@ -64,7 +65,7 @@ void manager::update_one(T& obj, game& g) {
         obj.draw(g);
     }
 
-    // Get flag diff
+    // Get flag diff.
     flg ^= obj.flags;
 
     for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
@@ -77,7 +78,7 @@ void manager::update_one(T& obj, game& g) {
 }
 
 void manager::update_cached(flag f) {
-    hal::u8 iter { find_last_with_flag(f) };
+    std::uint8_t iter { find_last_with_flag(f) };
 
     switch (f) {
     case flag::block_process:
@@ -93,13 +94,12 @@ void manager::update_cached(flag f) {
         break;
 
     default:
-        // FIXME: Why is std::unreachable() not available in <utility> on macOS?!?!
-        break;
+        std::unreachable();
     }
 }
 
-hal::u8 manager::find_last_with_flag(flag m) const {
-    hal::u8 ret { 0 };
+std::uint8_t manager::find_last_with_flag(flag m) const {
+    std::uint8_t ret { 0 };
 
     reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });
 

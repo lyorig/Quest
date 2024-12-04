@@ -1,8 +1,8 @@
 #pragma once
 
-#include <algorithm>
-
 #include <quest/types.hpp>
+
+#include <algorithm>
 
 namespace hq {
     namespace easing {
@@ -40,7 +40,7 @@ namespace hq {
 
         animatable() = default;
 
-        animatable(const value_t& initial)
+        animatable(value_t initial)
             : m_start { initial } {
         }
 
@@ -55,11 +55,11 @@ namespace hq {
             }
         }
 
-        void jump(const value_t& val) {
+        void jump(value_t val) {
             start(val, 0.0);
         }
 
-        void start(const value_t& val, delta_t time) {
+        void start(value_t val, delta_t time) {
             m_start = value();
             target(val);
 
@@ -69,7 +69,7 @@ namespace hq {
 
         // Change the target.
         // This is only really useful when retargeting mid-animation.
-        void target(const value_t& val) {
+        void target(value_t val) {
             m_dist = val - m_start;
         }
 

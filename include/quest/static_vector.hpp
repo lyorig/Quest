@@ -4,8 +4,6 @@
 #include <cassert>
 #include <utility>
 
-#include <halcyon/types/numeric.hpp>
-
 // static_vector.hpp:
 // A lobotomy-inducing vector with a fixed capacity.
 
@@ -28,7 +26,7 @@ namespace hq {
         // Constructors & destructor
 
         constexpr static_vector()
-            : m_size { 0 } {};
+            : m_size { 0 } { };
 
         constexpr static_vector(std::initializer_list<T> il)
             : m_size { static_cast<Size_Type>(il.size()) } {

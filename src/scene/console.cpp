@@ -9,6 +9,7 @@
 #include <quest/helpers.hpp>
 
 using namespace hq::scene;
+using namespace hal::literals;
 
 namespace hq::consts {
     constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
@@ -71,7 +72,7 @@ console::shuffle_bag::shuffle_bag()
     , m_index { num_texts } {
 }
 
-const char* console::shuffle_bag::next() {
+hal::c_string console::shuffle_bag::next() {
     if (m_index == num_texts) { // Need to refresh.
         HAL_PRINT("<Console> Shuffling placeholder indices...");
         std::shuffle(std::begin(m_texts), std::end(m_texts), std::mt19937_64 { std::random_device {}() });
@@ -88,8 +89,8 @@ console::console(game& g)
     , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
-    , m_maxChars { static_cast<hal::u16>(std::min(g.renderer.info()->max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
-    , m_lineChars { static_cast<hal::u8>(m_wrap / m_outline.size.x) }
+    , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.info()->max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
+    , m_lineChars { static_cast<std::uint8_t>(m_wrap / m_outline.size.x) }
     , m_repaint { false }
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
@@ -151,13 +152,13 @@ void console::draw(game& g) {
     hal::coord::point where { m_texBegin, consts::text_offset.y };
 
     hal::coord::rect crd;
-    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size().x, m_wrap));
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size()->x, m_wrap));
     crd.size.y = m_outline.size.y;
 
     using namespace hal::literals;
 
-    for (; m_line.size().x - crd.pos.x > 0;
-        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size().x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+    for (; m_line.size()->x - crd.pos.x > 0;
+        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size()->x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
         rnd->draw(m_line).from(crd).to(where)();
     }
 
@@ -252,7 +253,7 @@ void console::repaint(hal::lref<hal::renderer> rnd) {
 
 void console::set_cursor() {
     m_outline.pos.x = m_texBegin + (m_field.cursor % m_lineChars) * m_outline.size.x;
-    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<hal::u8>(m_field.cursor / m_lineChars);
+    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<std::uint8_t>(m_field.cursor / m_lineChars);
 
     m_cursorTime = consts::cursor_blink_time / 2.0;
     m_cursorVis  = true;

@@ -21,7 +21,7 @@ main_menu::main_menu(game& g)
     : base { flag::all_enable }
     , m_theme { g.renderer.color().get() }
     , m_outline { { .x = lc::invalid_outline } }
-    , m_currentTheme { static_cast<hal::u8>(std::size(lc::colors) - 1) } {
+    , m_currentTheme { static_cast<std::uint8_t>(std::size(lc::colors) - 1) } {
     const hal::font font { find_sized_font(g.ttf, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
     constexpr const char* texts[] { "New game", "Continue", "Settings", "Exit" };

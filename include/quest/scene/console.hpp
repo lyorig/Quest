@@ -14,16 +14,16 @@ namespace hq {
         private:
             class shuffle_bag {
             public:
-                static constexpr hal::u8 num_texts { 31 };
+                static constexpr std::uint8_t num_texts { 31 };
 
                 shuffle_bag();
 
-                const char* next();
+                hal::c_string next();
 
             private:
-                const char* m_texts[num_texts];
+                hal::c_string m_texts[num_texts];
 
-                hal::u8 m_index;
+                std::uint8_t m_index;
             };
 
         public:
@@ -66,10 +66,10 @@ namespace hq {
             // size = glyph size (constant)
             hal::coord::rect m_outline;
 
-            hal::f64 m_cursorTime;
+            double m_cursorTime;
 
-            hal::u16 m_maxChars;
-            hal::u8  m_lineChars;
+            std::uint16_t m_maxChars;
+            std::uint8_t  m_lineChars;
 
             bool m_repaint, m_cursorVis;
         };

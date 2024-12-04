@@ -30,7 +30,7 @@ namespace hq::scene {
         std::array<sprite, 4> m_widgets;
         hal::coord::rect      m_outline;
 
-        hal::u8 m_currentTheme;
+        std::uint8_t m_currentTheme;
     };
 
     static_assert(interface<main_menu>);

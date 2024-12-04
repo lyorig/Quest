@@ -44,18 +44,11 @@ namespace hq {
             get<T>().emplace_back(std::forward<Args>(ctor_args)...);
         }
 
-        // Invoke a functor to all entities. Compilation will fail if at least one entity type
-        // is not invocable with the functor.
+        // Invoke a functor to all entities.
         template <typename Func>
             requires(std::invocable<Func, Ts&> && ...)
         void visit_all(Func&& f) {
             (rfem_leaf<Ts>::visit(std::forward<Func>(f)), ...);
-        }
-
-        // Visit all entity types that are supported by the functor.
-        template <typename Func>
-        void visit_applicable(Func&& f) {
-            ([&]() {if constexpr (std::invocable<Func, Ts&>) {rfem_leaf<Ts>::visit(std::forward<Func>(f));} }(), ...);
         }
     };
 }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <quest/static_vector.hpp>
-
 #include <quest/scene/console.hpp>
 #include <quest/scene/dummy.hpp>
 #include <quest/scene/main_menu.hpp>
@@ -15,31 +13,29 @@ namespace hq {
     class game;
 
     namespace scene {
-        // A LIFO scene manager.
+        // Holds and takes care of scenes.
         class manager {
         public:
-            using base_up      = std::unique_ptr<scene::base>;
-            using scene_vector = static_vector<base_up, 2>;
-
-            using iterator       = scene_vector::iterator;
-            using const_iterator = scene_vector::const_iterator;
-
             manager(game& g);
 
-            // Update the scene manager.
+            // Performs the process-update-draw cycle.
             void update(game& g);
 
         private:
             std::tuple<main_menu, console> m_tuple;
 
-            hal::u8 m_curr, m_cProcess, m_cUpdate, m_cDraw;
+            std::uint8_t
+                m_curr,     // The scene currently being processed.
+                m_cProcess, // Where to start processing.
+                m_cUpdate,  // Where to start updating.
+                m_cDraw;    // Where to start drawing.
 
             template <typename T>
             void update_one(T& x, game& g);
 
             void update_cached(flag f);
 
-            hal::u8 find_last_with_flag(flag m) const;
+            std::uint8_t find_last_with_flag(flag m) const;
         };
     }
 }

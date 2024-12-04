@@ -1,10 +1,11 @@
 #pragma once
 
-#include <halcyon/utility/concepts.hpp>
+#include <halcyon/utility/metaprogramming.hpp>
+
 #include <vector>
 
 namespace hq {
-    template <hal::meta::bare T>
+    template <hal::meta::innermost T>
     class rfem_leaf {
     public:
         template <typename Functor>
@@ -20,7 +21,7 @@ namespace hq {
     // The Really Fast Entity Manager (RFEM).
     // Its key advantage is that it makes the compiler do a lot of work.
     // And disadvantages? 24 extra bytes per type.
-    template <hal::meta::bare... Entities>
+    template <hal::meta::innermost... Entities>
     class rfem_template : public rfem_leaf<Entities>... {
     public:
         using types = hal::meta::type_list<Entities...>;
