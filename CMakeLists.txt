@@ -10,7 +10,7 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithD
 
 add_subdirectory(halcyon)
 
-add_executable(TheGame WIN32
+add_executable(game WIN32
 	src/scene/console.cpp
 	src/scene/dummy.cpp
 	src/scene/main_menu.cpp
@@ -22,36 +22,36 @@ add_executable(TheGame WIN32
 	src/field.cpp
 )
 
-target_compile_features(TheGame PRIVATE
+target_compile_features(game PRIVATE
 	cxx_std_23
 )
 
 # Is there a strip utility?
 if (CMAKE_STRIP)
-	add_custom_command(TARGET TheGame POST_BUILD
+	add_custom_command(TARGET game POST_BUILD
 		COMMAND 
-		"$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:${CMAKE_STRIP};$<TARGET_FILE:TheGame>>"
+		"$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:${CMAKE_STRIP};$<TARGET_FILE:game>>"
 		COMMAND_EXPAND_LISTS VERBATIM
 	)
 endif()
 
-target_compile_options(TheGame PRIVATE
+target_compile_options(game PRIVATE
 	$<$<NOT:$<OR:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>>:-march=native> # Optimize to the max!
 	$<IF:$<CXX_COMPILER_ID:MSVC>,/Wall,-Wall -Wpedantic> # Enable warnings.
 )
 
-target_include_directories(TheGame PRIVATE
+target_include_directories(game PRIVATE
 	include/
 )
 
-target_link_libraries(TheGame PRIVATE
+target_link_libraries(game PRIVATE
 	Halcyon::Halcyon
 )
 
 # Enable LTO.
-set_target_properties(TheGame PROPERTIES
+set_target_properties(game PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
 	$<NOT:$<CONFIG:Debug>:INTERPROCEDURAL_OPTIMIZATION TRUE>
 )
 
-install(FILES $<TARGET_RUNTIME_DLLS:TheGame> TYPE BIN)
+install(FILES $<TARGET_RUNTIME_DLLS:game> TYPE BIN)

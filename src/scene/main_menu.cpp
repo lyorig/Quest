@@ -9,18 +9,13 @@
 using namespace hq::scene;
 
 namespace lc { // Local constants.
-    using namespace hal::literals;
-
     constexpr hal::color   colors[] { 0xd3ad00, 0x0d0145, 0x5c0501, 0x01451a };
-    constexpr hal::coord_t pt { 0.02_crd };
-
-    constexpr hal::coord_t invalid_outline { std::numeric_limits<hal::coord_t>::infinity() };
+    constexpr hal::coord_t pt { 0.02 };
 }
 
 main_menu::main_menu(game& g)
     : base { flag::all_enable }
     , m_theme { g.renderer.color().get() }
-    , m_outline { { .x = lc::invalid_outline } }
     , m_currentTheme { static_cast<std::uint8_t>(std::size(lc::colors) - 1) } {
     const hal::font font { find_sized_font(g.ttf, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
@@ -32,7 +27,7 @@ main_menu::main_menu(game& g)
     hal::coord_t       accum { offset };
 
     for (std::size_t i { 0 }; i < std::size(texts); ++i) {
-        m_widgets[i] = { { g.renderer, font.render(texts[i])(hal::font::render_type::blended) }, { offset, accum } };
+        m_widgets[i] = { { { g.renderer, font.render(texts[i])(hal::font::render_type::blended) }, { offset, accum } } };
         accum += sz;
     }
 }
@@ -55,22 +50,9 @@ void main_menu::process(game& g) {
             }
             break;
 
-        case mouse_moved:
-            for (const auto& wgt : m_widgets) {
-                if (static_cast<hal::coord::point>(e.mouse_motion().pos()) | wgt.hitbox) {
-                    m_outline = wgt.hitbox;
-                    goto Breakout;
-                }
-            }
-
-            m_outline.pos.x = lc::invalid_outline;
-
-        Breakout:
-            break;
-
         case mouse_pressed:
             if (e.mouse_button().button() == hal::mouse::button::left) {
-                if (static_cast<hal::coord::point>(e.mouse_button().pos()) | m_widgets.back().hitbox) {
+                if (static_cast<hal::coord::point>(e.mouse_button().pos()) | m_widgets.back().s.hitbox) {
                     g.running = false;
                     break;
                 }
@@ -83,20 +65,33 @@ void main_menu::process(game& g) {
 }
 
 void main_menu::update(game& g) {
-    m_theme.update(g.delta());
+    const delta_t d { g.delta() };
+
+    m_theme.update(d);
+
+    for (auto& wgt : m_widgets) {
+        const bool hit { static_cast<hal::coord::point>(g.systems.events.mouse_pos_rel()) | wgt.s.hitbox };
+
+        if (hit && wgt.d == widget::dir::down) {
+            wgt.c.start({ hal::palette::cyan, 128 }, 0.2);
+            wgt.d = widget::dir::up;
+        } else if (!hit && wgt.d == widget::dir::up) {
+            wgt.c.start(hal::palette::transparent, 0.1);
+            wgt.d = widget::dir::down;
+        }
+
+        wgt.c.update(d);
+    }
 }
 
 void main_menu::draw(game& g) {
     hal::ref<hal::renderer> rnd { g.renderer };
 
-    rnd->color(m_theme.value());
+    rnd->fill(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
-        wgt.draw(rnd);
-
-        if (m_outline.pos.x != lc::invalid_outline) {
-            rnd->fill(m_outline, { 0x00FFFF, 32 });
-        }
+        wgt.s.draw(rnd);
+        rnd->fill(wgt.s.hitbox, wgt.c.value());
     }
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "halcyon/types/color.hpp"
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
 
@@ -22,13 +23,23 @@ namespace hq::scene {
         void draw(game& g);
 
     private:
-        void set_widget(std::size_t index, const hal::font& fnt, std::string_view text);
+        struct widget {
+            sprite s;
+
+            animatable<hal::color, easing::linear> c { hal::palette::transparent };
+
+            enum class dir : bool {
+                up,
+                down
+            } d { dir::down };
+        };
+
+        void set_widget(std::size_t index, hal::ref<hal::font> fnt, std::string_view text);
         void switch_theme();
 
         animatable<hal::color, easing::in_out::bezier> m_theme;
 
-        std::array<sprite, 4> m_widgets;
-        hal::coord::rect      m_outline;
+        std::array<widget, 4> m_widgets;
 
         std::uint8_t m_currentTheme;
     };
