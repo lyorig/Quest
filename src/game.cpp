@@ -53,6 +53,8 @@ game::game(args a) try
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
+    HAL_PRINT("<Game> Window info: ", window);
+    HAL_PRINT("<Game> Renderer info: ", renderer.info().get());
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }

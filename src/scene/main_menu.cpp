@@ -19,7 +19,7 @@ main_menu::main_menu(game& g)
     , m_currentTheme { static_cast<std::uint8_t>(std::size(lc::colors) - 1) } {
     const hal::font font { find_sized_font(g.ttf, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
-    constexpr const char* texts[] { "New game", "Continue", "Settings", "Exit" };
+    constexpr hal::c_string texts[] { "New game", "Continue", "Settings", "Exit" };
     static_assert(std::tuple_size_v<decltype(m_widgets)> == std::size(texts));
 
     const hal::coord_t offset = g.renderer.size()->x * lc::pt;
@@ -30,6 +30,8 @@ main_menu::main_menu(game& g)
         m_widgets[i] = { { { g.renderer, font.render(texts[i])(hal::font::render_type::blended) }, { offset, accum } } };
         accum += sz;
     }
+
+    HAL_PRINT("<Main menu> Initialized.");
 }
 
 void main_menu::process(game& g) {

@@ -69,8 +69,9 @@ void manager::update_one(T& obj, game& g) {
     flg ^= obj.flags;
 
     for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
-        if (flg[f]) {
+        if (flg.any(f)) {
             update_cached(f);
+            HAL_PRINT("Updated cached.");
         }
     }
 
