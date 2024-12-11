@@ -16,7 +16,7 @@ using lims = std::numeric_limits<T>;
 
 namespace {
     hal::renderer blended_renderer(hal::lref<const hal::window> wnd, args a) {
-        hal::renderer rnd { wnd, cond_enum(hal::renderer::flag::vsync, a["--vsync"]) };
+        hal::renderer rnd { wnd, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) };
         rnd.blend(hal::blend_mode::alpha);
         return rnd;
     }

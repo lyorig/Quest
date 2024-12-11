@@ -18,7 +18,9 @@ namespace hq {
 
         namespace out // TODO
         {
-
+            constexpr delta_t quad(delta_t t) {
+                return t * (2 - t);
+            }
         }
 
         namespace in_out {

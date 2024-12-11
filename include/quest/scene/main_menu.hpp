@@ -37,7 +37,7 @@ namespace hq::scene {
         void set_widget(std::size_t index, hal::ref<hal::font> fnt, std::string_view text);
         void switch_theme();
 
-        animatable<hal::color, easing::in_out::bezier> m_theme;
+        animatable<hal::color, easing::out::quad> m_theme;
 
         std::array<widget, 4> m_widgets;
 

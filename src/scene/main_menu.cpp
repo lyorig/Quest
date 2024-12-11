@@ -73,7 +73,7 @@ void main_menu::update(game& g) {
         const bool hit { static_cast<hal::coord::point>(g.systems.events.mouse_pos_rel()) | wgt.s.hitbox };
 
         if (hit && wgt.d == widget::dir::down) {
-            wgt.c.start({ hal::palette::cyan, 128 }, 0.2);
+            wgt.c.start({ hal::palette::cyan, 128 }, 0.1);
             wgt.d = widget::dir::up;
         } else if (!hit && wgt.d == widget::dir::up) {
             wgt.c.start(hal::palette::transparent, 0.1);
