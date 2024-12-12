@@ -3,6 +3,7 @@
 #include <quest/types.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 namespace hq {
     namespace easing {
