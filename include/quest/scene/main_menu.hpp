@@ -26,7 +26,7 @@ namespace hq::scene {
         struct widget {
             sprite s;
 
-            animatable<hal::color, easing::linear> c { hal::palette::transparent };
+            animatable<hal::color, easing::linear> c { hal::palette::white };
 
             enum class dir : bool {
                 up,

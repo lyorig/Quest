@@ -61,6 +61,20 @@ void main_menu::process(game& g) {
             }
             break;
 
+        case mouse_moved:
+            for (auto& wgt : m_widgets) {
+                const bool hit { static_cast<hal::coord::point>(e.mouse_motion().pos()) | wgt.s.hitbox };
+
+                if (hit && wgt.d == widget::dir::down) {
+                    wgt.c.start({ hal::palette::cyan, 128 }, 0.2);
+                    wgt.d = widget::dir::up;
+                } else if (!hit && wgt.d == widget::dir::up) {
+                    wgt.c.start(hal::palette::white, 0.2);
+                    wgt.d = widget::dir::down;
+                }
+            }
+            break;
+
         default:
             break;
         }
@@ -72,17 +86,9 @@ void main_menu::update(game& g) {
     m_theme.update(d);
 
     for (auto& wgt : m_widgets) {
-        const bool hit { static_cast<hal::coord::point>(g.systems.events.mouse_pos_rel()) | wgt.s.hitbox };
-
-        if (hit && wgt.d == widget::dir::down) {
-            wgt.c.start({ hal::palette::cyan, 128 }, 0.1);
-            wgt.d = widget::dir::up;
-        } else if (!hit && wgt.d == widget::dir::up) {
-            wgt.c.start(hal::palette::transparent, 0.1);
-            wgt.d = widget::dir::down;
+        if (wgt.c.update(d)) {
+            wgt.s.texture.color_mod(wgt.c.value());
         }
-
-        wgt.c.update(d);
     }
 }
 
@@ -93,7 +99,6 @@ void main_menu::draw(game& g) {
 
     for (const auto& wgt : m_widgets) {
         wgt.s.draw(rnd);
-        rnd->fill(wgt.s.hitbox, wgt.c.value());
     }
 }
 
