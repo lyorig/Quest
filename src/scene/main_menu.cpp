@@ -93,12 +93,10 @@ void main_menu::update(game& g) {
 }
 
 void main_menu::draw(game& g) {
-    hal::ref<hal::renderer> rnd { g.renderer };
-
-    rnd->fill(m_theme.value());
+    g.renderer.fill(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
-        wgt.s.draw(rnd);
+        wgt.s.draw(g.renderer);
     }
 }
 

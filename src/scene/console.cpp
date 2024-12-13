@@ -1,3 +1,4 @@
+#include "halcyon/utility/printing.hpp"
 #include <quest/scene/console.hpp>
 
 #include <random>
@@ -96,7 +97,7 @@ console::console(game& g)
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 
     HAL_WARN_IF(!m_font.mono(), '\"', m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
-    HAL_PRINT("<Console> Max ", m_maxChars, " chars");
+    HAL_PRINT("<Console> Initialized. Supports up to ", hal::to_printable_int(m_maxChars), " chars.");
 }
 
 void console::process(game& g) {

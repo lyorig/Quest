@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <halcyon/cpu.hpp>
 #include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
 
@@ -15,7 +16,18 @@ template <typename T>
 using lims = std::numeric_limits<T>;
 
 namespace {
-    hal::renderer blended_renderer(hal::lref<const hal::window> wnd, args a) {
+    hal::window create_window(hal::proxy::video v, args a) {
+        constexpr hal::c_string title { "HalQuest" };
+
+        return {
+            v,
+            title,
+            v.display_info_native(0)->size() * 0.75,
+            { cond_enum(hal::window::flag::hidden, a["--dump"]), hal::window::flag::resizable }
+        };
+    }
+
+    hal::renderer create_renderer(hal::lref<const hal::window> wnd, args a) {
         hal::renderer rnd { wnd, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) };
         rnd.blend(hal::blend_mode::alpha);
         return rnd;
@@ -47,14 +59,24 @@ bool args::operator[](std::string_view what) const {
 game::game(args a) try
     : systems{}
     , img{ hal::image::init_format::jpg }
-    , window{ systems, "HalQuest", hal::tag::fullscreen }
-    , renderer{ blended_renderer(window, a) }
+    , window{ create_window(systems, a) }
+    , renderer{ create_renderer(window, a) }
     , scenes{ *this }
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
-    HAL_PRINT("<Game> Window info: ", window);
-    HAL_PRINT("<Game> Renderer info: ", renderer.info().get());
+    if (a["--dump"]) {
+        HAL_DEBUG_TIMER(i);
+
+        HAL_PRINT("<Dump> Window:\t\t", window);
+        HAL_PRINT("<Dump> Renderer:\t", renderer.info().get());
+        HAL_PRINT("<Dump> CPU:\t\t", hal::cpu::info);
+
+        HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
+
+        running = false;
+    }
+
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }
