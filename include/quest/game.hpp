@@ -37,7 +37,7 @@ namespace hq {
         hal::event::variant m_eventHandler;
 
     public:
-        HAL_NO_SIZE hal::cleanup_init<hal::system::video, hal::system::audio> systems;
+        HAL_NO_SIZE hal::cleanup_init<hal::subsystem::video, hal::subsystem::audio> systems;
 
         HAL_NO_SIZE hal::ttf::context ttf;
         HAL_NO_SIZE hal::image::context img;

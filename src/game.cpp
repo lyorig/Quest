@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <halcyon/cpu.hpp>
+#include <halcyon/system.hpp>
 #include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
 
@@ -68,9 +68,11 @@ game::game(args a) try
     if (a["--dump"]) {
         HAL_DEBUG_TIMER(i);
 
+        HAL_PRINT("<Dump> Platform:\t", hal::platform());
         HAL_PRINT("<Dump> Window:\t\t", window);
         HAL_PRINT("<Dump> Renderer:\t", renderer.info().get());
         HAL_PRINT("<Dump> CPU:\t\t", hal::cpu::info);
+        HAL_PRINT("<Dump> RAM:\t\t", hal::total_ram(), " MiB");
 
         HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
 
