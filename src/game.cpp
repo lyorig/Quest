@@ -42,18 +42,22 @@ args::args(int argc, char** argv, std::nothrow_t)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
 
-std::size_t args::size() const {
+args::pos_t args::size() const {
     return m_span.size();
 }
 
-bool args::operator[](std::string_view what) const {
-    for (std::size_t i { 0 }; i < m_span.size(); ++i) {
+args::info args::operator[](std::string_view what) const {
+    for (pos_t i { 0 }; i < m_span.size(); ++i) {
         if (what == m_span[i]) {
-            return true;
+            return { i };
         }
     }
 
-    return false;
+    return { info::invalid_pos() };
+}
+
+hal::c_string args::operator[](pos_t p) const {
+    return m_span[p];
 }
 
 game::game(args a) try
@@ -77,6 +81,14 @@ game::game(args a) try
         HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
 
         running = false;
+    }
+
+    if (args::info i { a["--url"] }) {
+        if (const auto npos = i.pos + 1; npos != a.size()) {
+            HAL_PRINT("hal::open_url outcome: ", hal::open_url(a[npos]));
+        } else {
+            HAL_PRINT("--url specified but no file given.");
+        }
     }
 
 } catch (hal::exception e) {

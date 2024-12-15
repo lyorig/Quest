@@ -1,21 +1,38 @@
 #pragma once
 
+#include "halcyon/types/c_string.hpp"
 #include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
 #include <halcyon/image.hpp>
 
+#include <limits>
 #include <quest/scene/manager.hpp>
 
 namespace hq {
     class args {
     public:
+        using pos_t = std::int32_t;
+
         args(int argc, char** argv);
         args(int argc, char** argv, std::nothrow_t);
 
-        std::size_t size() const;
+        pos_t size() const;
 
-        bool operator[](std::string_view what) const;
+        struct info {
+            consteval static pos_t invalid_pos() {
+                return std::numeric_limits<pos_t>::max();
+            }
+
+            pos_t pos;
+
+            constexpr operator bool() const {
+                return pos != invalid_pos();
+            }
+        };
+
+        info          operator[](std::string_view what) const;
+        hal::c_string operator[](pos_t pos) const;
 
     private:
         std::span<const char*> m_span;
