@@ -10,6 +10,10 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithD
 
 add_subdirectory(halcyon)
 
+target_compile_definitions(Halcyon PRIVATE
+	$<$<CONFIG:Debug>:HAL_DEBUG_ADVANCED>
+)
+
 add_executable(game WIN32
 	src/scene/console.cpp
 	src/scene/dummy.cpp
@@ -20,6 +24,10 @@ add_executable(game WIN32
 	src/main.cpp
 	src/sprite.cpp
 	src/field.cpp
+)
+
+target_compile_definitions(game PRIVATE
+	$<$<CONFIG:Debug>:HAL_DEBUG_ADVANCED>
 )
 
 target_compile_features(game PRIVATE
