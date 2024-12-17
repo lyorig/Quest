@@ -77,6 +77,8 @@ game::game(args a) try
         HAL_PRINT("<Dump> Renderer:\t", renderer.info().get());
         HAL_PRINT("<Dump> CPU:\t\t", hal::cpu::info);
         HAL_PRINT("<Dump> RAM:\t\t", hal::total_ram(), " MiB");
+        HAL_PRINT("<Dump> Base path:\t", hal::base_path());
+        HAL_PRINT("<Dump> Power:\t", hal::power_state::get());
 
         HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
 
