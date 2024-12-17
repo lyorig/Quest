@@ -23,7 +23,7 @@ namespace {
             v,
             title,
             v.display_info_native(0)->size() * 0.75,
-            { cond_enum(hal::window::flag::hidden, a["--dump"]), hal::window::flag::resizable }
+            { cond_enum(hal::window::flag::hidden, a["--dump"]) }
         };
 
         return ret;
@@ -80,7 +80,7 @@ game::game(args a) try
         HAL_PRINT("<Dump> CPU:\t\t", hal::cpu::info);
         HAL_PRINT("<Dump> RAM:\t\t", hal::total_ram(), " MiB");
         HAL_PRINT("<Dump> Base path:\t", hal::base_path());
-        HAL_PRINT("<Dump> Power:\t", hal::power_state::get());
+        HAL_PRINT("<Dump> Power:\t\t", hal::power_state::get());
 
         HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
 
@@ -181,6 +181,16 @@ void game::collect_events() {
             running = false;
             break;
 
+        case window_event:
+            switch (m_eventHandler.window().kind()) {
+                using enum hal::event::window::type;
+
+            default:
+                break;
+            }
+
+            break;
+
         case key_pressed:
             switch (m_eventHandler.keyboard().button()) {
                 using enum hal::keyboard::button;
@@ -190,13 +200,15 @@ void game::collect_events() {
                 break;
 
             default:
-                m_polled.push_back(m_eventHandler);
+                break;
             }
+
             break;
 
         default:
-            m_polled.push_back(m_eventHandler);
             break;
         }
+
+        m_polled.push_back(m_eventHandler);
     }
 }

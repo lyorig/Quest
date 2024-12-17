@@ -9,14 +9,14 @@
 using namespace hq::scene;
 
 namespace lc { // Local constants.
-    constexpr hal::color   colors[] { 0xd3ad00, 0x0d0145, 0x5c0501, 0x01451a };
+    constexpr hal::color   colors[] { 0x000000, 0xd3ad00, 0x0d0145, 0x5c0501, 0x01451a };
     constexpr hal::coord_t pt { 0.02 };
 }
 
 main_menu::main_menu(game& g)
     : base { flag::all_enable }
     , m_theme { g.renderer.color().get() }
-    , m_currentTheme { static_cast<std::uint8_t>(std::size(lc::colors) - 1) } {
+    , m_currentTheme { 0 } {
     const hal::font font { find_sized_font(g.ttf, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
     constexpr hal::c_string texts[] { "New game", "Continue", "Settings", "Exit" };
@@ -30,6 +30,8 @@ main_menu::main_menu(game& g)
         m_widgets[i] = { { { g.renderer, font.render(texts[i])(hal::font::render_type::blended) }, { offset, accum } } };
         accum += sz;
     }
+
+    g.renderer.color(lc::colors[m_currentTheme]);
 
     HAL_PRINT("<Main menu> Initialized.");
 }

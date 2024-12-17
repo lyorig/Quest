@@ -38,7 +38,7 @@ namespace hq {
 
             // Process a keystroke.
             // Returns whether the console's state should be switched.
-            bool process(hal::keyboard::key k, hal::proxy::video vid);
+            bool process(game& g, hal::keyboard::key k, hal::proxy::video vid);
 
             // Process entered text.
             void process(std::string_view inp);

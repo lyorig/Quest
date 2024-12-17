@@ -106,7 +106,7 @@ void console::process(game& g) {
             using enum hal::event::type;
 
         case key_pressed:
-            if (process(evt.keyboard().key(), g.systems)) {
+            if (process(g, evt.keyboard().key(), g.systems)) {
                 if (flags.all(consts::enablers)) {
                     flags -= consts::enablers;
                     deactivate();
@@ -187,12 +187,18 @@ void console::deactivate() {
     }
 }
 
-bool console::process(hal::keyboard::key k, hal::proxy::video vid) {
+bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
     switch (k) {
         using enum hal::keyboard::key;
 
     case F1:
         return true;
+
+    case F12:
+        if (flags[consts::enablers]) {
+            g.screenshot = false; // Intercept screenshot requests.
+        }
+        break;
 
     default: {
         const field::op op { m_field.process(k, vid) };
