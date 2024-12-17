@@ -19,12 +19,14 @@ namespace {
     hal::window create_window(hal::proxy::video v, args a) {
         constexpr hal::c_string title { "HalQuest" };
 
-        return {
+        hal::window ret {
             v,
             title,
             v.display_info_native(0)->size() * 0.75,
             { cond_enum(hal::window::flag::hidden, a["--dump"]), hal::window::flag::resizable }
         };
+
+        return ret;
     }
 
     hal::renderer create_renderer(hal::lref<const hal::window> wnd, args a) {
