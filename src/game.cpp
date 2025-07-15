@@ -16,16 +16,15 @@ using namespace hq;
 
 namespace {
     hal::window create_window(hal::proxy::video v) {
-        constexpr hal::c_string title { "HalQuest" };
-
-        hal::window ret { v, title, hal::tag::fullscreen };
-
-        return ret;
+        return { v, "HalQuest Regent", hal::tag::fullscreen };
     }
 
-    hal::renderer create_renderer(hal::lref<const hal::window> wnd, args a) {
-        hal::renderer rnd { wnd };
+    hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
+        hal::renderer::create_properties p;
+
+        hal::renderer rnd { p.window(wnd).vsync(!a["--no-vsync"]) };
         rnd.blend(hal::blend_mode::alpha);
+
         return rnd;
     }
 }
@@ -64,7 +63,6 @@ game::game(args a) try
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
-
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }

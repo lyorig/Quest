@@ -35,13 +35,6 @@ namespace hq::consts {
     constexpr flag_bitmask enablers { flag::enable_draw, flag::enable_update, flag::block_process };
 }
 
-namespace {
-    hal::pixel::point size_text(hal::ref<const hal::font> f, std::string_view t) {
-        hal::text_engine::surface s;
-        return s.make_text(f, t).size().get();
-    }
-}
-
 console::shuffle_bag::shuffle_bag()
     : m_texts {
         "[enter command here]",
@@ -96,7 +89,7 @@ console::console(game& g)
     , m_texBegin { consts::text_offset.x + size_text(m_font, consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
     , m_outline { { m_texBegin, consts::text_offset.y }, size_text(m_font, " ") }
-    , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.info()->max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
+    , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.props().max_texture_size() / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<std::uint8_t>(m_wrap / m_outline.size.x) }
     , m_repaint { false }
     , m_cursorVis { true } {
@@ -115,7 +108,7 @@ void console::process(game& g) {
             if (process(g, evt.keyboard().key(), g.systems)) {
                 if (flags.all(consts::enablers)) {
                     flags -= consts::enablers;
-                    deactivate();
+                    deactivate(g);
                 } else {
                     flags += consts::enablers;
                     activate(g);
@@ -154,7 +147,7 @@ void console::draw(game& g) {
         repaint(rnd);
     }
 
-    rnd->draw(m_prefix).to(consts::text_offset)();
+    rnd->draw(m_prefix).to(consts::text_offset).render();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
 
@@ -166,7 +159,7 @@ void console::draw(game& g) {
 
     for (; m_line.size()->x - crd.pos.x > 0;
         where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size()->x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        rnd->draw(m_line).from(crd).to(where)();
+        rnd->draw(m_line).from(crd).to(where).render();
     }
 
     if (m_cursorVis) {
@@ -182,9 +175,13 @@ void console::activate(game& g) {
     m_cursorVis  = true;
 
     m_prefix = { g.renderer, m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type) };
+
+    g.systems.events.text_input_start(g.window);
 }
 
-void console::deactivate() {
+void console::deactivate(game& g) {
+    g.systems.events.text_input_stop(g.window);
+
     m_prefix.reset();
     m_line.reset();
 

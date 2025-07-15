@@ -23,7 +23,7 @@ main_menu::main_menu(game& g)
     static_assert(std::tuple_size_v<decltype(m_widgets)> == std::size(texts));
 
     const hal::coord_t offset = g.renderer.size()->x * lc::pt;
-    const hal::pixel_t sz { font.size_text(" ").y };
+    const hal::pixel_t sz { size_text(font, " ").y };
     hal::coord_t       accum { offset };
 
     for (std::size_t i { 0 }; i < std::size(texts); ++i) {

@@ -2,6 +2,8 @@
 
 #include <halcyon/utility/enum_bits.hpp>
 
+#include <cstdint>
+
 // state/base.hpp:
 // Base state class.
 

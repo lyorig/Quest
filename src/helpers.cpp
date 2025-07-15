@@ -1,5 +1,7 @@
 #include <quest/helpers.hpp>
 
+#include <halcyon/ttf.hpp>
+
 namespace {
     consteval bool is_upper(char c) {
         return c >= 'A' && c <= 'Z';
@@ -21,4 +23,8 @@ hal::font hq::find_sized_font(hal::ttf::context& ttf, hal::c_string path, hal::p
     } while (f.render(TestChar)().size().y < desired_height);
 
     return f;
+}
+
+hal::pixel::point hq::size_text(hal::ref<const hal::font> f, std::string_view text) {
+    return hal::text { f, text }.size().get();
 }

@@ -34,7 +34,7 @@ namespace hq {
             void draw(game& g);
 
             void activate(game& g);
-            void deactivate();
+            void deactivate(game& g);
 
             // Process a keystroke.
             // Returns whether the console's state should be switched.

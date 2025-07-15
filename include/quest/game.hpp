@@ -17,7 +17,7 @@ namespace hq {
         pos_t size() const;
 
         struct info {
-            consteval static pos_t invalid_pos() {
+            constexpr static pos_t invalid_pos() {
                 return lim<pos_t>::max();
             }
 
@@ -25,6 +25,10 @@ namespace hq {
 
             constexpr operator bool() const {
                 return pos != invalid_pos();
+            }
+
+            constexpr bool operator!() const {
+                return pos == invalid_pos();
             }
         };
 

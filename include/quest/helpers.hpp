@@ -4,6 +4,9 @@ namespace hq {
     // Find a font whose height of rendered text is the closest possible to the one requested.
     hal::font find_sized_font(hal::ttf::context& ttf, hal::c_string path, hal::pixel_t desired_height);
 
+    // Get the size of a font and text.
+    hal::pixel::point size_text(hal::ref<const hal::font> f, std::string_view text);
+
     // An enum that has a "none" variant.
     template <typename T>
     concept has_none = std::is_enum_v<T> && requires {
