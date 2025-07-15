@@ -25,6 +25,8 @@ namespace {
         hal::renderer rnd { p.window(wnd).vsync(!a["--no-vsync"]) };
         rnd.blend(hal::blend_mode::alpha);
 
+        rnd.clear();
+
         return rnd;
     }
 }
