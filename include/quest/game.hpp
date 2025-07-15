@@ -1,13 +1,10 @@
 #pragma once
 
-#include "halcyon/types/c_string.hpp"
-#include <halcyon/audio.hpp>
 #include <halcyon/video.hpp>
 
-#include <halcyon/image.hpp>
-
-#include <limits>
 #include <quest/scene/manager.hpp>
+
+#include <vector>
 
 namespace hq {
     class args {
@@ -21,7 +18,7 @@ namespace hq {
 
         struct info {
             consteval static pos_t invalid_pos() {
-                return std::numeric_limits<pos_t>::max();
+                return lim<pos_t>::max();
             }
 
             pos_t pos;
@@ -54,10 +51,9 @@ namespace hq {
         hal::event::variant m_eventHandler;
 
     public:
-        HAL_NO_SIZE hal::cleanup_init<hal::subsystem::video, hal::subsystem::audio> systems;
+        HAL_NO_SIZE hal::cleanup_init<hal::subsystem::video> systems;
 
         HAL_NO_SIZE hal::ttf::context ttf;
-        HAL_NO_SIZE hal::image::context img;
 
         hal::window   window;
         hal::renderer renderer;

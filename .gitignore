@@ -6,6 +6,5 @@ bin/*
 
 build/
 
-.clangd
 .DS_Store
 CMakeSettings.json

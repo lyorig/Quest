@@ -32,10 +32,6 @@ if (WIN32)
 	)
 endif()
 
-target_compile_features(game PRIVATE
-	cxx_std_23
-)
-
 # Is there a strip utility?
 if (CMAKE_STRIP)
 	add_custom_command(TARGET game POST_BUILD
@@ -45,22 +41,31 @@ if (CMAKE_STRIP)
 	)
 endif()
 
-target_compile_options(game PRIVATE
-	$<$<NOT:$<OR:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>>:-march=native> # Optimize to the max!
-	$<IF:$<CXX_COMPILER_ID:MSVC>,/Wall,-Wall -Wpedantic> # Enable warnings.
-)
+# Enable warnings.
+if (CMAKE_CXX_COMPILER_FRONTEND STREQUAL "MSVC")
+	target_compile_options(game PRIVATE
+		/Wall
+	)
+else()
+	target_compile_options(game PRIVATE
+		-Wall -Wpedantic
+	)
+endif()
 
 target_include_directories(game PRIVATE
-	include/
+	include
 )
 
 target_link_libraries(game PRIVATE
 	Halcyon::Halcyon
 )
 
+set(BinPath ${CMAKE_CURRENT_SOURCE_DIR})
+cmake_path(APPEND BinPath bin)
+
 # Enable LTO.
 set_target_properties(game PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/
+	RUNTIME_OUTPUT_DIRECTORY ${BinPath}
 	$<NOT:$<CONFIG:Debug>:INTERPROCEDURAL_OPTIMIZATION TRUE>
 )
 

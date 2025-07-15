@@ -1,4 +1,3 @@
-#include "halcyon/utility/printing.hpp"
 #include <quest/scene/console.hpp>
 
 #include <random>
@@ -34,6 +33,13 @@ namespace hq::consts {
     constexpr std::size_t desired_max_chars { 128 };
 
     constexpr flag_bitmask enablers { flag::enable_draw, flag::enable_update, flag::block_process };
+}
+
+namespace {
+    hal::pixel::point size_text(hal::ref<const hal::font> f, std::string_view t) {
+        hal::text_engine::surface s;
+        return s.make_text(f, t).size().get();
+    }
 }
 
 console::shuffle_bag::shuffle_bag()
@@ -87,9 +93,9 @@ console::console(game& g)
     : base { flag::enable_process }
     , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
     , m_padding { g.renderer.size()->x * consts::padding_pc }
-    , m_texBegin { consts::text_offset.x + m_font.size_text(consts::prefix_text).x + m_padding }
+    , m_texBegin { consts::text_offset.x + size_text(m_font, consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
-    , m_outline { { m_texBegin, consts::text_offset.y }, m_font.size_text(" ") }
+    , m_outline { { m_texBegin, consts::text_offset.y }, size_text(m_font, " ") }
     , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.info()->max_texture_size().x / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
     , m_lineChars { static_cast<std::uint8_t>(m_wrap / m_outline.size.x) }
     , m_repaint { false }

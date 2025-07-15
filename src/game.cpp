@@ -1,6 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <halcyon/image.hpp>
 #include <halcyon/system.hpp>
+
 #include <halcyon/utility/strutil.hpp>
 #include <halcyon/utility/timer.hpp>
 
@@ -12,25 +14,17 @@
 
 using namespace hq;
 
-template <typename T>
-using lims = std::numeric_limits<T>;
-
 namespace {
-    hal::window create_window(hal::proxy::video v, args a) {
+    hal::window create_window(hal::proxy::video v) {
         constexpr hal::c_string title { "HalQuest" };
 
-        hal::window ret {
-            v,
-            title,
-            v.display_info_native(0)->size() * 0.75,
-            { cond_enum(hal::window::flag::hidden, a["--dump"]) }
-        };
+        hal::window ret { v, title, hal::tag::fullscreen };
 
         return ret;
     }
 
     hal::renderer create_renderer(hal::lref<const hal::window> wnd, args a) {
-        hal::renderer rnd { wnd, cond_enum(hal::renderer::flag::vsync, !a["--no-vsync"]) };
+        hal::renderer rnd { wnd };
         rnd.blend(hal::blend_mode::alpha);
         return rnd;
     }
@@ -64,36 +58,12 @@ hal::c_string args::operator[](pos_t p) const {
 
 game::game(args a) try
     : systems{}
-    , img{ hal::image::init_format::jpg }
-    , window{ create_window(systems, a) }
+    , window{ create_window(systems) }
     , renderer{ create_renderer(window, a) }
     , scenes{ *this }
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
-    if (a["--dump"]) {
-        HAL_DEBUG_TIMER(i);
-
-        HAL_PRINT("<Dump> Platform:\t", hal::platform());
-        HAL_PRINT("<Dump> Window:\t\t", window);
-        HAL_PRINT("<Dump> Renderer:\t", renderer.info().get());
-        HAL_PRINT("<Dump> CPU:\t\t", hal::cpu::info);
-        HAL_PRINT("<Dump> RAM:\t\t", hal::total_ram(), " MiB");
-        HAL_PRINT("<Dump> Base path:\t", hal::base_path());
-        HAL_PRINT("<Dump> Power:\t\t", hal::power_state::get());
-
-        HAL_PRINT("<Dump> Finished in ", std::fixed, i, '.');
-
-        running = false;
-    }
-
-    if (args::info i { a["--url"] }) {
-        if (const auto npos = i.pos + 1; npos != a.size()) {
-            HAL_PRINT("hal::open_url outcome: ", hal::open_url(a[npos]));
-        } else {
-            HAL_PRINT("--url specified but no file given.");
-        }
-    }
 
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
@@ -110,7 +80,7 @@ void game::main_loop() {
 
         scenes.update(*this);
 
-        if (screenshot) [[unlikely]] {
+        if (screenshot) {
             take_screenshot();
             screenshot = false;
         }
@@ -136,10 +106,11 @@ void game::take_screenshot() const {
 #define HQ_SCREENSHOT_EXT ".png"
 
     constexpr std::size_t
-        digits { std::numeric_limits<decltype(digits)>::digits10 },
+        digits { lim<decltype(digits)>::digits10 },
         pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) },
-        max_ss_attempts { std::numeric_limits<decltype(max_ss_attempts)>::max() };
+        max_ss_attempts { lim<decltype(max_ss_attempts)>::max() };
 
+    // [LMC] In modern C++, prefer using std::array instead of C arrays.
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
     const fs::path directory { "screenshots" };
@@ -158,12 +129,12 @@ void game::take_screenshot() const {
         && i != max_ss_attempts);
 
     // Rust users can suck it, this is true paranoia
-    if (i == max_ss_attempts) [[unlikely]] {
+    if (i == max_ss_attempts) {
         HAL_PRINT(hal::debug::severity::warning, "Exhausted numbering of screenshots. Aborting save.");
         return;
     }
 
-    img.save(s, hal::image::save_format::png, current);
+    hal::image::save::png(s, current);
 
 #undef HQ_SCREENSHOT_EXT
 #undef HQ_SCREENSHOT_PFX
@@ -179,16 +150,6 @@ void game::collect_events() {
 
         case quit_requested:
             running = false;
-            break;
-
-        case window_event:
-            switch (m_eventHandler.window().kind()) {
-                using enum hal::event::window::type;
-
-            default:
-                break;
-            }
-
             break;
 
         case key_pressed:

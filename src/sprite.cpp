@@ -17,6 +17,6 @@ sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::poi
 
 void sprite::draw(hal::ref<hal::renderer> rnd) const {
     if (texture.valid()) {
-        rnd->draw(texture).to(hitbox)();
+        rnd->draw(texture).to(hitbox).render();
     }
 }

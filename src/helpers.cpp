@@ -18,7 +18,7 @@ hal::font hq::find_sized_font(hal::ttf::context& ttf, hal::c_string path, hal::p
     do {
         f = ttf.load(path, curr);
         curr += incr;
-    } while (f.size_text(TestChar).y < desired_height);
+    } while (f.render(TestChar)().size().y < desired_height);
 
     return f;
 }
