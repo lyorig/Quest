@@ -16,7 +16,9 @@ using namespace hq;
 
 namespace {
     hal::window create_window(hal::proxy::video v) {
-        return { v, "HalQuest Regent", hal::tag::fullscreen };
+        hal::window::create_properties props {};
+
+        return { v, props.title("HalQuest Regent").fullscreen(true) };
     }
 
     hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
@@ -32,10 +34,6 @@ namespace {
 }
 
 args::args(int argc, char** argv)
-    : args { argc, argv, std::nothrow } {
-}
-
-args::args(int argc, char** argv, std::nothrow_t)
     : m_span { const_cast<const char**>(argv), static_cast<std::size_t>(argc) } {
 }
 

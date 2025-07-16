@@ -12,7 +12,6 @@ namespace hq {
         using pos_t = std::int32_t;
 
         args(int argc, char** argv);
-        args(int argc, char** argv, std::nothrow_t);
 
         pos_t size() const;
 
