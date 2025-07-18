@@ -2,8 +2,8 @@
 
 using namespace hq::scene;
 
-void dummy::process(game& g) { }
+void dummy::process(game&) { }
 
-void dummy::update(game& g) { }
+void dummy::update(game&) { }
 
-void dummy::draw(game& g) { }
+void dummy::draw(game&) { }

@@ -17,7 +17,7 @@ main_menu::main_menu(game& g)
     : base { flag::all_enable }
     , m_theme { g.renderer.color().get() }
     , m_currentTheme { 0 } {
-    const hal::font font { find_sized_font(g.ttf, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
+    const hal::font font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
     constexpr hal::c_string texts[] { "New game", "Continue", "Settings", "Exit" };
     static_assert(std::tuple_size_v<decltype(m_widgets)> == std::size(texts));

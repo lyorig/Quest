@@ -12,7 +12,7 @@ using namespace hq::scene;
 using namespace hal::literals;
 
 namespace hq::consts {
-    constexpr std::string_view font_path { "assets/Ubuntu Mono.ttf" }, prefix_text { "root@Console ~ %" };
+    constexpr std::string_view prefix_text { "root@Console ~ %" };
 
     constexpr hal::coord_t padding_pc { 0.015_crd };
 
@@ -60,14 +60,16 @@ console::shuffle_bag::shuffle_bag()
         "[watch?v=lo5cG0FhWro]",
         "[no man page here, sorry]",
         "[womp womp]",
-        "[40.7736N, 29.7564W]",
+        "[49.0481N, 17.4838E]",
         "[sudo deez nuts]",
         "[docker? I barely know 'er!]",
         "[running out of time]",
         "[not actually random]",
         "[see you again]",
         "[forget me not]",
-        "[one big CVE]"
+        "[one big CVE]",
+        "[with eye serene]",
+        "[ševalicious out tomorrow]"
     }
     , m_index { num_texts } {
 }
@@ -84,7 +86,7 @@ hal::c_string console::shuffle_bag::next() {
 
 console::console(game& g)
     : base { flag::enable_process }
-    , m_font { find_sized_font(g.ttf, consts::font_path, static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
+    , m_font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
     , m_padding { g.renderer.size()->x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + size_text(m_font, consts::prefix_text).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
@@ -95,7 +97,7 @@ console::console(game& g)
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
 
-    HAL_WARN_IF(!m_font.mono(), '\"', m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
+    HAL_WARN_IF(!m_font.mono(), "<Console> \"", m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
     HAL_PRINT("<Console> Initialized. Supports up to ", hal::to_printable_int(m_maxChars), " chars.");
 }
 
@@ -117,8 +119,10 @@ void console::process(game& g) {
             break;
 
         case text_input:
-            if (active())
+            if (active()) {
                 process(evt.text_input().text());
+            }
+
             break;
 
         default:

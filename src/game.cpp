@@ -16,9 +16,7 @@ using namespace hq;
 
 namespace {
     hal::window create_window(hal::proxy::video v) {
-        hal::window::create_properties props {};
-
-        return { v, props.title("HalQuest Regent").fullscreen(true) };
+        return { v, "HalQuest Regent", { 1280, 720 } };
     }
 
     hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
@@ -42,7 +40,7 @@ args::pos_t args::size() const {
 }
 
 args::info args::operator[](std::string_view what) const {
-    for (pos_t i { 0 }; i < m_span.size(); ++i) {
+    for (pos_t i { 0 }; i < static_cast<int>(m_span.size()); ++i) {
         if (what == m_span[i]) {
             return { i };
         }
@@ -108,7 +106,6 @@ void game::take_screenshot() const {
         pfxlen { hal::strlen(HQ_SCREENSHOT_PFX) }, extlen { hal::strlen(HQ_SCREENSHOT_EXT) },
         max_ss_attempts { lim<decltype(max_ss_attempts)>::max() };
 
-    // [LMC] In modern C++, prefer using std::array instead of C arrays.
     char filename[pfxlen + digits + extlen + 1] { HQ_SCREENSHOT_PFX };
 
     const fs::path directory { "screenshots" };

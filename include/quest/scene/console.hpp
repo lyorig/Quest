@@ -14,7 +14,7 @@ namespace hq {
         private:
             class shuffle_bag {
             public:
-                static constexpr std::uint8_t num_texts { 31 };
+                constexpr static std::uint8_t num_texts { 33 };
 
                 shuffle_bag();
 

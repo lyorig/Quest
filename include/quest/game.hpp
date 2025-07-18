@@ -1,5 +1,6 @@
 #pragma once
 
+#include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
 
 #include <quest/scene/manager.hpp>
@@ -61,11 +62,14 @@ namespace hq {
         hal::window   window;
         hal::renderer renderer;
 
+        hal::fs::resource_loader loader;
+
         scene::manager scenes;
 
     private:
         event_vector m_polled;
 
+    private:
         delta_t m_delta; // Intentionally uninitialized.
 
     public:
