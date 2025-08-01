@@ -16,7 +16,7 @@ using namespace hq;
 
 namespace {
     hal::window create_window(hal::proxy::video v) {
-        return { v, "HalQuest Regent", { 1280, 720 } };
+        return { v, "HalQuest [Regent]", { 1280, 720 } };
     }
 
     hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
@@ -61,6 +61,10 @@ game::game(args a) try
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
+    using hal::debug::severity::init;
+    HAL_PRINT(init, "Game class initialized!");
+    HAL_PRINT("Base path: ", loader.base());
+    HAL_PRINT("Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }
