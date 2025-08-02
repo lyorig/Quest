@@ -105,7 +105,8 @@ void main_menu::draw(game& g) {
 void main_menu::switch_theme() {
     using namespace hal::palette;
 
-    m_currentTheme = ++m_currentTheme % std::size(lc::colors);
+    ++m_currentTheme;
+    m_currentTheme %= std::size(lc::colors);
 
     m_theme.start(lc::colors[m_currentTheme], 0.5);
 }
