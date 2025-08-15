@@ -9,17 +9,26 @@ set(CMAKE_BUILD_TYPE Debug CACHE STRING "Quest's build type.")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
 
 add_subdirectory(halcyon)
+add_subdirectory(rectpack2D)
+
+set(SOURCES
+	scene/console
+	scene/dummy
+	scene/main_menu
+	scene/manager
+	atlas
+	field
+	game
+	helpers
+	main
+	sprite
+)
+
+list(TRANSFORM SOURCES PREPEND src/)
+list(TRANSFORM SOURCES APPEND .cpp)
 
 add_executable(game WIN32
-	src/scene/console.cpp
-	src/scene/dummy.cpp
-	src/scene/main_menu.cpp
-	src/scene/manager.cpp
-	src/game.cpp
-	src/helpers.cpp
-	src/main.cpp
-	src/sprite.cpp
-	src/field.cpp
+	${SOURCES}
 )
 
 if (WIN32)
@@ -52,6 +61,7 @@ target_include_directories(game PRIVATE
 
 target_link_libraries(game PRIVATE
 	Halcyon::Halcyon
+	rectpack2D::rectpack2D
 )
 
 set(BinPath ${CMAKE_CURRENT_SOURCE_DIR})

@@ -10,7 +10,7 @@
 namespace hq {
     class field {
     public:
-        enum class op {
+        enum class action {
             nothing,
             text_added,
             text_removed,
@@ -23,9 +23,9 @@ namespace hq {
         bool process(std::string_view inp);
 
         // Process a key. Returns what happened to the field.
-        op process(hal::keyboard::key k, hal::proxy::video vid);
+        action process(hal::keyboard::key k, hal::proxy::video vid);
 
-        // Trim the field from [off] to the end.
+        // Trim the field from `off` to the end.
         void trim(std::size_t off);
 
         std::string text;

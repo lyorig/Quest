@@ -1,5 +1,6 @@
 #pragma once
 
+#include "quest/atlas.hpp"
 #include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
 
@@ -51,18 +52,24 @@ namespace hq {
 
         delta_t delta() const;
 
+        // Convenience atlas functions.
+        void        atlas_queue(hal::surface s, hal::pixel::rect& out);
+        void        atlas_pack();
+        hal::copyer atlas_draw(hal::pixel::rect src);
+
     private:
         hal::event::variant m_eventHandler;
 
     public:
         HAL_NO_SIZE hal::cleanup_init<hal::subsystem::video> systems;
-
         HAL_NO_SIZE hal::ttf::context ttf;
 
         hal::window   window;
         hal::renderer renderer;
 
         hal::fs::resource_loader loader;
+
+        texture_atlas atlas;
 
         scene::manager scenes;
 

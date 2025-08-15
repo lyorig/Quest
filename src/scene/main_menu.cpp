@@ -27,7 +27,7 @@ main_menu::main_menu(game& g)
     hal::coord_t       accum { offset };
 
     for (std::size_t i { 0 }; i < std::size(texts); ++i) {
-        m_widgets[i] = { { { g.renderer, font.render_blended(texts[i], hal::colors::white) }, { offset, accum } } };
+        m_widgets[i] = widget { { g, font.render_blended(texts[i], hal::colors::white), { offset, accum } }, hal::colors::white };
         accum += sz;
     }
 
@@ -89,7 +89,7 @@ void main_menu::update(game& g) {
 
     for (auto& wgt : m_widgets) {
         if (wgt.c.update(d)) {
-            wgt.s.texture.color_mod(wgt.c.value());
+            wgt.mod = wgt.c.value();
         }
     }
 }
@@ -98,7 +98,8 @@ void main_menu::draw(game& g) {
     g.renderer.fill(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
-        wgt.s.draw(g.renderer);
+        hal::guard::color_mod guard { g.atlas.texture, wgt.mod };
+        wgt.s.draw(g);
     }
 }
 

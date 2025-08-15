@@ -22,7 +22,7 @@ bool field::process(std::string_view inp) {
     return false;
 }
 
-field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
+field::action field::process(hal::keyboard::key k, hal::proxy::video vid) {
     switch (k) {
         using key = hal::keyboard::key;
         using mod = hal::keyboard::mod;
@@ -76,7 +76,7 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
 
             text.erase(text.begin() + begin, text.begin() + end);
 
-            return op::text_removed;
+            return action::text_removed;
 
         } else { // delete one character
             if (cursor != 0) {
@@ -85,7 +85,7 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
 
             text.erase(text.begin() + cursor);
 
-            return op::text_removed;
+            return action::text_removed;
         }
 
     case key::left_arrow:
@@ -93,18 +93,18 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
             --cursor;
         }
 
-        return op::cursor_moved;
+        return action::cursor_moved;
 
     case key::right_arrow:
         cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
 
-        return op::cursor_moved;
+        return action::cursor_moved;
 
     case key::tab:
         text.insert(cursor, consts::tab_size, ' ');
         cursor += consts::tab_size;
 
-        return op::text_added;
+        return action::text_added;
 
     case key::V:
         if ((vid.events.keyboard_mod().any(mod::ctrl_both)) && vid.clipboard_has_text()) {
@@ -114,7 +114,7 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
             text.insert(cursor, str.c_str(), sz);
             cursor += sz;
 
-            return op::text_added;
+            return action::text_added;
         }
 
         break;
@@ -125,7 +125,7 @@ field::op field::process(hal::keyboard::key k, hal::proxy::video vid) {
 
     HAL_WARN_IF(cursor > text.size(), "<Text Field> Cursor is OOB @ ", cursor);
 
-    return op::nothing;
+    return action::nothing;
 }
 
 void field::trim(std::size_t off) {

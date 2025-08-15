@@ -1,3 +1,4 @@
+#include <quest/atlas.hpp>
 #include <quest/game.hpp>
 
 #include <halcyon/main.hpp>

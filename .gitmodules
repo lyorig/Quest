@@ -1,3 +1,6 @@
 [submodule "halcyon"]
 	path = halcyon
 	url = https://github.com/lyorig/halcyon
+[submodule "rectpack2D"]
+	path = rectpack2D
+	url = https://github.com/TeamHypersomnia/rectpack2D.git

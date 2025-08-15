@@ -1,22 +1,26 @@
 #include <quest/sprite.hpp>
 
+#include <quest/game.hpp>
+
 #include <halcyon/utility/guard.hpp>
 #include <halcyon/video/renderer.hpp>
 
 using namespace hq;
 
-sprite::sprite(hal::static_texture&& tex, hal::coord::point pos)
-    : texture { std::move(tex) }
-    , hitbox { pos, *texture.size() } {
+sprite::sprite(game& g, hal::surface surf, hal::coord::point pos)
+    : hitbox { pos, surf.size() } {
+    g.atlas_queue(surf, texture);
 }
 
-sprite::sprite(hal::static_texture&& tex, hal::coord::point pos, hal::coord::point size)
-    : texture { std::move(tex) }
-    , hitbox { pos, size } {
+sprite::sprite(game& g, hal::surface surf, hal::coord::point pos, hal::coord::point size)
+    : hitbox { pos, size } {
+    g.atlas_queue(surf, texture);
 }
 
-void sprite::draw(hal::ref<hal::renderer> rnd) const {
-    if (texture.valid()) {
-        rnd->draw(texture).to(hitbox).render();
+void sprite::draw(game& g) const {
+    if (hitbox.size.x == 0) {
+        return;
     }
+
+    g.atlas_draw(texture).to(hitbox).render();
 }

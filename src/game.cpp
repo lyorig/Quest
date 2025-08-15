@@ -65,6 +65,8 @@ game::game(args a) try
     HAL_PRINT(init, "Game class initialized!");
     HAL_PRINT("Base path: ", loader.base());
     HAL_PRINT("Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
+
+    atlas.pack(renderer);
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }
@@ -95,6 +97,18 @@ const game::event_vector& game::polled() const {
 
 delta_t game::delta() const {
     return m_delta * timescale;
+}
+
+void game::atlas_queue(hal::surface s, hal::pixel::rect& out) {
+    atlas.queue({ renderer, s }, out);
+}
+
+void game::atlas_pack() {
+    atlas.pack(renderer);
+}
+
+hal::copyer game::atlas_draw(hal::pixel::rect src) {
+    return renderer.draw(atlas.texture).from(src);
 }
 
 void game::take_screenshot() const {

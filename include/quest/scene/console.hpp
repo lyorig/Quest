@@ -47,7 +47,7 @@ namespace hq {
             bool active();
 
         private:
-            void repaint(hal::lref<hal::renderer> rnd);
+            void repaint(game& g);
             void set_cursor();
 
             field m_field;
@@ -56,7 +56,7 @@ namespace hq {
 
             hal::font m_font;
 
-            hal::static_texture m_prefix, m_line;
+            hal::pixel::rect m_prefix, m_line;
 
             hal::coord_t m_padding;
             hal::coord_t m_texBegin;

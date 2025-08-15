@@ -146,22 +146,22 @@ void console::draw(game& g) {
 
     if (m_repaint) {
         m_repaint = false;
-        repaint(rnd);
+        repaint(g);
     }
 
-    rnd->draw(m_prefix).to(consts::text_offset).render();
+    g.atlas_draw(m_prefix).to(consts::text_offset).render();
 
     hal::coord::point where { m_texBegin, consts::text_offset.y };
 
     hal::coord::rect crd;
-    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size()->x, m_wrap));
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size.x, m_wrap));
     crd.size.y = m_outline.size.y;
 
     using namespace hal::literals;
 
-    for (; m_line.size()->x - crd.pos.x > 0;
-        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size()->x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        rnd->draw(m_line).from(crd).to(where).render();
+    for (; m_line.size.x - crd.pos.x > 0;
+        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size.x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        g.atlas_draw(m_line).from(crd).to(where).render();
     }
 
     if (m_cursorVis) {
@@ -176,7 +176,8 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_prefix = { g.renderer, m_font.render_blended(consts::prefix_text, consts::prefix_color) };
+    g.atlas_queue(m_font.render_blended(consts::prefix_text, consts::prefix_color), m_prefix);
+    g.atlas_pack();
 
     g.systems.events.text_input_start(g.window);
 }
@@ -184,8 +185,8 @@ void console::activate(game& g) {
 void console::deactivate(game& g) {
     g.systems.events.text_input_stop(g.window);
 
-    m_prefix.reset();
-    m_line.reset();
+    g.atlas.free(m_prefix);
+    g.atlas.free(m_line);
 
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();
@@ -206,14 +207,14 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
         break;
 
     default: {
-        const field::op op { m_field.process(k, vid) };
+        const field::action op { m_field.process(k, vid) };
 
         if (m_field.text.size() > m_maxChars) {
             m_field.trim(m_maxChars);
         }
 
         switch (op) {
-            using enum field::op;
+            using enum field::action;
 
         case text_added:
         case text_removed:
@@ -249,7 +250,7 @@ bool console::active() {
     return flags[consts::enablers];
 }
 
-void console::repaint(hal::lref<hal::renderer> rnd) {
+void console::repaint(game& g) {
     hal::surface text;
 
     if (m_field.text.empty()) {
@@ -258,7 +259,8 @@ void console::repaint(hal::lref<hal::renderer> rnd) {
         text = m_font.render_blended(m_field.text, consts::input_color);
     }
 
-    m_line = { rnd, text };
+    g.atlas.free(m_line);
+    g.atlas_queue(text, m_line);
 }
 
 void console::set_cursor() {

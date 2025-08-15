@@ -35,10 +35,12 @@ namespace hq {
         }
 
         constexpr ~static_vector() {
-            if constexpr (!std::is_trivially_destructible_v<T>) {
-                for (auto& obj : *this) {
-                    obj.~T();
-                }
+            if constexpr (std::is_trivially_destructible_v<T>) {
+                return;
+            }
+
+            for (auto& obj : *this) {
+                obj.~T();
             }
         }
 
