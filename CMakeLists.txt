@@ -42,15 +42,9 @@ if (CMAKE_STRIP)
 endif()
 
 # Enable warnings.
-if (CMAKE_CXX_COMPILER_FRONTEND STREQUAL "MSVC")
-	target_compile_options(game PRIVATE
-		/Wall
-	)
-else()
-	target_compile_options(game PRIVATE
-		-Wall -Wpedantic -Wextra -Wno-c++98-compat
-	)
-endif()
+target_compile_options(game PRIVATE
+	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
+)
 
 target_include_directories(game PRIVATE
 	include
