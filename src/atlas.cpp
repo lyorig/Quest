@@ -14,13 +14,24 @@ namespace {
 
     template <typename A, typename B>
         requires(sizeof(A) == sizeof(B))
-    constexpr bool memsame(const A& lhs, const B& rhs) {
+    bool memsame(const A& lhs, const B& rhs) {
         return std::memcmp(&lhs, &rhs, sizeof(A)) == 0;
+    }
+
+    // TODO naming
+    constexpr texture_atlas::rect_t badabing(hal::pixel::point pt) {
+        return { 0, 0, pt.x, pt.y };
     }
 }
 
 void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
-    m_queued.emplace_back(std::move(tex), &out);
+    m_queued.push_back(std::move(tex));
+    m_taken.push_back(badabing(tex.size().get()));
+    m_output.push_back(&out);
+}
+
+hal::pixel::rect texture_atlas::add(hal::static_texture tex) {
+    return {};
 }
 
 void texture_atlas::free(hal::pixel::rect r) {
@@ -38,12 +49,6 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
 
     static_assert(sizeof(hal::pixel::rect) == sizeof(rect_t));
 
-    m_taken.resize(this->m_queued.size());
-    std::ranges::transform(this->m_queued.begin(), this->m_queued.end(), m_taken.begin(), [](const data& t) {
-        const hal::pixel::point size { t.tex.size().get() };
-        return rect_t { 0, 0, size.x, size.y };
-    });
-
     const auto size = r2d::find_best_packing<spaces_t>(
         m_taken,
         r2d::make_finder_input(
@@ -56,20 +61,20 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     {
         hal::guard::target t { rnd, this->texture };
 
-        for (const auto& zip : std::views::zip(m_taken, m_queued)) {
-            const auto& foo {
+        for (const auto& zip : std::views::zip(m_queued, m_taken, m_output)) {
+            const auto& queued {
+                std::get<0>(zip)
+            };
+
+            const auto& taken {
                 reinterpret_cast<const hal::pixel::rect&>(std::get<0>(zip))
             };
 
-            const auto& bar {
-                std::get<1>(zip)
-            };
-
-            rnd->draw(bar.tex)
-                .to(foo)
+            rnd->draw(queued)
+                .to(taken)
                 .render();
 
-            *bar.out = foo;
+            *std::get<2>(zip) = taken;
         }
     }
 
