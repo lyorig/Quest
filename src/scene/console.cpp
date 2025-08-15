@@ -16,15 +16,13 @@ namespace hq::consts {
 
     constexpr hal::coord_t padding_pc { 0.015_crd };
 
-    constexpr hal::color input_color { hal::palette::white },
-        background_color { hal::palette::black, 128 },
-        cursor_color { hal::palette::white, 128 },
+    constexpr hal::color input_color { hal::colors::white },
+        background_color { hal::colors::black, 128 },
+        cursor_color { hal::colors::white, 128 },
         placeholder_color { 0x808080 },
-        prefix_color { hal::palette::green };
+        prefix_color { hal::colors::green };
 
     constexpr hal::coord::point text_offset { 10, 10 };
-
-    constexpr hal::font::render_type text_render_type { hal::font::render_type::blended };
 
     constexpr bool clear_on_close { false };
 
@@ -178,7 +176,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_prefix = { g.renderer, m_font.render(consts::prefix_text).fg(consts::prefix_color)(consts::text_render_type) };
+    m_prefix = { g.renderer, m_font.render_blended(consts::prefix_text, consts::prefix_color) };
 
     g.systems.events.text_input_start(g.window);
 }
@@ -255,11 +253,9 @@ void console::repaint(hal::lref<hal::renderer> rnd) {
     hal::surface text;
 
     if (m_field.text.empty()) {
-        text = m_font.render(m_placeholders.next())
-                   .fg(consts::placeholder_color)(consts::text_render_type);
+        text = m_font.render_blended(m_placeholders.next(), consts::placeholder_color);
     } else {
-        text = m_font.render(m_field.text)
-                   .fg(consts::input_color)(consts::text_render_type);
+        text = m_font.render_blended(m_field.text, consts::input_color);
     }
 
     m_line = { rnd, text };

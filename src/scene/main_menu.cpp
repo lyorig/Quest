@@ -27,7 +27,7 @@ main_menu::main_menu(game& g)
     hal::coord_t       accum { offset };
 
     for (std::size_t i { 0 }; i < std::size(texts); ++i) {
-        m_widgets[i] = { { { g.renderer, font.render(texts[i])(hal::font::render_type::blended) }, { offset, accum } } };
+        m_widgets[i] = { { { g.renderer, font.render_blended(texts[i], hal::colors::white) }, { offset, accum } } };
         accum += sz;
     }
 
@@ -68,10 +68,10 @@ void main_menu::process(game& g) {
                 const bool hit { static_cast<hal::coord::point>(e.mouse_motion().pos()) | wgt.s.hitbox };
 
                 if (hit && wgt.d == widget::dir::down) {
-                    wgt.c.start({ hal::palette::cyan, 128 }, 0.2);
+                    wgt.c.start({ hal::colors::cyan, 128 }, 0.2);
                     wgt.d = widget::dir::up;
                 } else if (!hit && wgt.d == widget::dir::up) {
-                    wgt.c.start(hal::palette::white, 0.2);
+                    wgt.c.start(hal::colors::white, 0.2);
                     wgt.d = widget::dir::down;
                 }
             }
@@ -103,7 +103,7 @@ void main_menu::draw(game& g) {
 }
 
 void main_menu::switch_theme() {
-    using namespace hal::palette;
+    using namespace hal::colors;
 
     ++m_currentTheme;
     m_currentTheme %= std::size(lc::colors);
