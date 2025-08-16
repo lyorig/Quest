@@ -4,6 +4,7 @@
 
 #include <rectpack2D/finders_interface.h>
 
+#include <span>
 #include <vector>
 
 namespace hq {
@@ -26,7 +27,7 @@ namespace hq {
 
         texture_atlas() = default;
 
-        // Queue a texture to be added to this atlas by calling `texture_atlas::pack()`.
+        // Queue a texture to be added to this atlas manually by `texture_atlas::pack()`.
         void queue(hal::static_texture tex, hal::pixel::rect& out);
 
         // Immediately add a texture to this atlas.
@@ -45,13 +46,13 @@ namespace hq {
         void pack(hal::ref<hal::renderer> rnd);
 
     private:
-        // It's unfortunate that there have to be
-        // three separate arrays, but rectpack2D
-        // only takes a `std::vector<rect_t>` as a parameter.
+        struct data {
+            hal::static_texture tex;
+            rect_t              taken;
+            hal::pixel::rect*   out;
+        };
 
-        std::vector<hal::static_texture> m_queued;
-        std::vector<rect_t>              m_taken;
-        std::vector<hal::pixel::rect*>   m_output;
+        std::vector<data> m_data;
 
     public:
         // The atlas texture itself. Don't you dare release this.

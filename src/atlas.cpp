@@ -18,16 +18,13 @@ namespace {
         return std::memcmp(&lhs, &rhs, sizeof(A)) == 0;
     }
 
-    // TODO naming
-    constexpr texture_atlas::rect_t badabing(hal::pixel::point pt) {
+    constexpr texture_atlas::rect_t pt2rect(hal::pixel::point pt) {
         return { 0, 0, pt.x, pt.y };
     }
 }
 
 void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
-    m_queued.push_back(std::move(tex));
-    m_taken.push_back(badabing(tex.size().get()));
-    m_output.push_back(&out);
+    m_data.emplace_back(std::move(tex), pt2rect(tex.size().get()), &out);
 }
 
 void texture_atlas::add(hal::static_texture tex, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
@@ -41,17 +38,13 @@ void texture_atlas::replace(hal::static_texture tex, hal::pixel::rect& out, hal:
 }
 
 void texture_atlas::free(hal::pixel::rect r) {
-    auto iter = m_output.begin();
-    for (auto& taken : m_taken) {
-        if (memsame(taken, r)) {
-            std::swap(taken, m_taken.back());
-            m_taken.pop_back();
-            m_output.erase(iter);
+    for (auto iter = m_data.begin(); iter != m_data.end(); ++iter) {
+        if (memsame(iter->taken, r)) {
+            std::swap(*iter, m_data.back());
+            m_data.pop_back();
 
             return;
         }
-
-        ++iter;
     }
 }
 
@@ -60,8 +53,12 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
 
     static_assert(sizeof(hal::pixel::rect) == sizeof(rect_t));
 
+    std::vector<rect_t> rects(m_data.size());
+    std::ranges::transform(m_data, rects.begin(), [](const data& d) { return d.taken; });
+
+    // Find the best possible packing for these rects...
     const auto size = r2d::find_best_packing<spaces_t>(
-        m_taken,
+        rects,
         r2d::make_finder_input(
             max_side,
             discard_step,
@@ -69,21 +66,23 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
             [](const rect_t&) { return cr::CONTINUE_PACKING; },
             r2d::flipping_option::DISABLED));
 
-    {
-        hal::guard::target t { rnd, this->texture };
-
-        for (const auto& zip : std::views::zip(m_queued, m_taken, m_output)) {
-            const auto& taken {
-                reinterpret_cast<const hal::pixel::rect&>(std::get<1>(zip))
-            };
-
-            rnd->draw(std::get<0>(zip))
-                .to(taken)
-                .render();
-
-            *std::get<2>(zip) = taken;
-        }
-    }
-
     this->texture = { rnd, { size.w, size.h } };
+
+    hal::guard::target t { rnd, this->texture };
+
+    // A tuple of (data, rect_t).
+    for (const auto& tuple : std::views::zip(m_data, rects)) {
+        auto& d = std::get<0>(tuple);
+        d.taken = std::get<1>(tuple);
+
+        const auto& taken {
+            reinterpret_cast<const hal::pixel::rect&>(d.taken)
+        };
+
+        rnd->draw(d.tex)
+            .to(taken)
+            .render();
+
+        *d.out = taken;
+    }
 }
