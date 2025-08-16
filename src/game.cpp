@@ -87,6 +87,8 @@ void game::main_loop() {
             screenshot = false;
         }
 
+        // atlas.debug_draw(renderer, {}, hal::colors::red, hal::colors::orange);
+
         renderer.present();
     }
 }

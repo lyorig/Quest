@@ -21,6 +21,10 @@ namespace {
     constexpr texture_atlas::rect_t pt2rect(hal::pixel::point pt) {
         return { 0, 0, pt.x, pt.y };
     }
+
+    constexpr hal::pixel::rect rect2hal(texture_atlas::rect_t r) {
+        return std::bit_cast<hal::pixel::rect>(r);
+    }
 }
 
 void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
@@ -67,7 +71,7 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
             max_side,
             discard_step,
             [](const rect_t&) { return cr::CONTINUE_PACKING; },
-            [](const rect_t&) { return cr::CONTINUE_PACKING; },
+            [](const rect_t&) { return cr::ABORT_PACKING; },
             r2d::flipping_option::DISABLED));
 
     this->texture = { rnd, { size.w, size.h } };
@@ -94,4 +98,17 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     }
 
     HAL_PRINT("<Atlas> pack() finished in ", tmr);
+}
+
+void texture_atlas::debug_draw(
+    hal::ref<hal::renderer> rnd,
+    hal::coord::point       dst,
+    hal::color              outline_atlas,
+    hal::color              outline_block) const {
+    rnd->draw(texture).outline(outline_atlas).to(dst).render();
+    for (const data& d : m_data) {
+        auto rect = rect2hal(d.taken);
+        rect.pos += dst;
+        rnd->draw(rect, outline_block);
+    }
 }

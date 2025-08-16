@@ -1,7 +1,7 @@
 #pragma once
 
-// widget.hpp:
-// Main menu clickable widgets.
+// sprite.hpp:
+// Well, you know what a sprite is, right?
 
 #include <halcyon/video/texture.hpp>
 
@@ -12,14 +12,14 @@ namespace hq {
     public:
         sprite() = default;
 
-        sprite(game& g, hal::surface surf, hal::coord::point pos);
-        sprite(game& g, hal::surface surf, hal::coord::point pos, hal::coord::point size);
+        sprite(hal::coord::point pos);
+
+        void atlas_queue(game& g, hal::surface surf);
+        void atlas_queue(game& g, hal::surface surf, hal::coord::point size);
 
         void draw(game& g) const;
 
-        void pos(hal::coord::point where);
-
-        hal::pixel::rect texture;
+        hal::pixel::rect atlas_ref;
         hal::coord::rect hitbox;
     };
 }

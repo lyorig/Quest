@@ -5,6 +5,7 @@
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
 #include <quest/helpers.hpp>
+#include <ranges>
 
 using namespace hq::scene;
 
@@ -26,8 +27,11 @@ main_menu::main_menu(game& g)
     const hal::pixel_t sz { size_text(font, " ").y };
     hal::coord_t       accum { offset };
 
-    for (std::size_t i { 0 }; i < std::size(texts); ++i) {
-        m_widgets[i] = widget { { g, font.render_blended(texts[i], hal::colors::white), { offset, accum } }, hal::colors::white };
+    for (const auto& tuple : std::views::zip(m_widgets, texts)) {
+        widget& w { std::get<0>(tuple) };
+        w = { sprite { { offset, accum } } };
+        w.s.atlas_queue(g, font.render_blended(std::get<1>(tuple), hal::colors::white));
+
         accum += sz;
     }
 
@@ -88,9 +92,7 @@ void main_menu::update(game& g) {
     m_theme.update(d);
 
     for (auto& wgt : m_widgets) {
-        if (wgt.c.update(d)) {
-            wgt.mod = wgt.c.value();
-        }
+        wgt.c.update(d);
     }
 }
 
@@ -98,7 +100,7 @@ void main_menu::draw(game& g) {
     g.renderer.fill(m_theme.value());
 
     for (const auto& wgt : m_widgets) {
-        hal::guard::color_mod guard { g.atlas.texture, wgt.mod };
+        hal::guard::color_mod guard { g.atlas.texture, wgt.c.value() };
         wgt.s.draw(g);
     }
 }

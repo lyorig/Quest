@@ -4,7 +4,6 @@
 
 #include <rectpack2D/finders_interface.h>
 
-#include <span>
 #include <vector>
 
 namespace hq {
@@ -44,6 +43,12 @@ namespace hq {
 
         // Create the atlas from queued textures.
         void pack(hal::ref<hal::renderer> rnd);
+
+        void debug_draw(
+            hal::ref<hal::renderer> rnd,
+            hal::coord::point       dst,
+            hal::color              outline_atlas,
+            hal::color              outline_block) const;
 
     private:
         struct data {

@@ -24,8 +24,7 @@ namespace hq::scene {
 
     private:
         struct widget {
-            sprite     s;
-            hal::color mod;
+            sprite s;
 
             animatable<hal::color, easing::linear> c { hal::colors::white };
 

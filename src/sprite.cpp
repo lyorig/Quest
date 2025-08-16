@@ -7,20 +7,26 @@
 
 using namespace hq;
 
-sprite::sprite(game& g, hal::surface surf, hal::coord::point pos)
-    : hitbox { pos, surf.size() } {
-    g.atlas_queue(surf, texture);
+sprite::sprite(hal::coord::point pos)
+    : hitbox { pos } {
 }
 
-sprite::sprite(game& g, hal::surface surf, hal::coord::point pos, hal::coord::point size)
-    : hitbox { pos, size } {
-    g.atlas_queue(surf, texture);
+void sprite::atlas_queue(game& g, hal::surface surf) {
+    const auto size = surf.size();
+    atlas_queue(g, std::move(surf), size);
+}
+
+void sprite::atlas_queue(game& g, hal::surface surf, hal::coord::point size) {
+    hitbox.size = size;
+    g.atlas_queue(std::move(surf), atlas_ref);
 }
 
 void sprite::draw(game& g) const {
-    if (hitbox.size.x == 0) {
+    // Either dimension being zero-sized means
+    // there's no need to render.
+    if (hitbox.size.x == 0 || hitbox.size.y == 0) {
         return;
     }
 
-    g.atlas_draw(texture).to(hitbox).render();
+    g.atlas_draw(atlas_ref).to(hitbox).render();
 }
