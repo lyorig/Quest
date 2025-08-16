@@ -30,17 +30,28 @@ void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
     m_output.push_back(&out);
 }
 
-hal::pixel::rect texture_atlas::add(hal::static_texture tex) {
-    return {};
+void texture_atlas::add(hal::static_texture tex, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
+    queue(std::move(tex), out);
+    pack(rnd);
+}
+
+void texture_atlas::replace(hal::static_texture tex, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
+    free(out);
+    add(std::move(tex), out, rnd);
 }
 
 void texture_atlas::free(hal::pixel::rect r) {
-    for (auto& foo : m_taken) {
-        if (memsame(foo, r)) {
-            std::swap(foo, m_taken.back());
+    auto iter = m_output.begin();
+    for (auto& taken : m_taken) {
+        if (memsame(taken, r)) {
+            std::swap(taken, m_taken.back());
             m_taken.pop_back();
+            m_output.erase(iter);
+
             return;
         }
+
+        ++iter;
     }
 }
 
@@ -62,15 +73,11 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
         hal::guard::target t { rnd, this->texture };
 
         for (const auto& zip : std::views::zip(m_queued, m_taken, m_output)) {
-            const auto& queued {
-                std::get<0>(zip)
-            };
-
             const auto& taken {
-                reinterpret_cast<const hal::pixel::rect&>(std::get<0>(zip))
+                reinterpret_cast<const hal::pixel::rect&>(std::get<1>(zip))
             };
 
-            rnd->draw(queued)
+            rnd->draw(std::get<0>(zip))
                 .to(taken)
                 .render();
 
