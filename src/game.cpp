@@ -62,6 +62,7 @@ game::game(args a) try
     , running{ true }
     , screenshot{ false } {
     using hal::debug::severity::init;
+
     HAL_PRINT(init, "<Game> Initialized.");
     HAL_PRINT("<Game> Base path: ", loader.base());
     HAL_PRINT("<Game> Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
@@ -87,7 +88,7 @@ void game::main_loop() {
             screenshot = false;
         }
 
-        // atlas.debug_draw(renderer, {}, hal::colors::red, hal::colors::orange);
+        atlas.debug_draw(renderer, { 400, 200 }, hal::colors::red, hal::colors::orange);
 
         renderer.present();
     }
@@ -105,12 +106,20 @@ void game::atlas_queue(hal::surface s, hal::pixel::rect& out) {
     atlas.queue({ renderer, s }, out);
 }
 
+void game::atlas_add(hal::surface s, hal::pixel::rect& out) {
+    atlas.add(s, out, renderer);
+}
+
+void game::atlas_replace(hal::surface s, hal::pixel::rect& out) {
+    atlas.replace(s, out, renderer);
+}
+
 void game::atlas_pack() {
     atlas.pack(renderer);
 }
 
-hal::copyer game::atlas_draw(hal::pixel::rect src) {
-    return renderer.draw(atlas.texture).from(src);
+texture_atlas_copyer game::atlas_draw(hal::pixel::rect src) {
+    return atlas.draw(renderer, src);
 }
 
 void game::take_screenshot() const {

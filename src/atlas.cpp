@@ -1,3 +1,5 @@
+#include "halcyon/surface.hpp"
+#include "halcyon/utility/timer.hpp"
 #include <quest/atlas.hpp>
 
 #include <halcyon/utility/guard.hpp>
@@ -25,23 +27,31 @@ namespace {
     constexpr hal::pixel::rect rect2hal(texture_atlas::rect_t r) {
         return std::bit_cast<hal::pixel::rect>(r);
     }
+
+    constexpr texture_atlas::rect_t hal2rect(hal::pixel::rect r) {
+        return std::bit_cast<texture_atlas::rect_t>(r);
+    }
 }
 
 void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
-    m_data.emplace_back(std::move(tex), pt2rect(tex.size().get()), &out);
+    m_data.emplace_back(pt2rect(tex.size().get()), std::move(tex), &out);
 }
 
-void texture_atlas::add(hal::static_texture tex, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
-    queue(std::move(tex), out);
+void texture_atlas::add(hal::surface surf, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
+    queue({ rnd, surf }, out);
     pack(rnd);
 }
 
-void texture_atlas::replace(hal::static_texture tex, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
+void texture_atlas::replace(hal::surface surf, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
     free(out);
-    add(std::move(tex), out, rnd);
+    add(std::move(surf), out, rnd);
 }
 
 void texture_atlas::free(hal::pixel::rect r) {
+    if (r == hal::pixel::rect {}) {
+        return;
+    }
+
     for (auto iter = m_data.begin(); iter != m_data.end(); ++iter) {
         if (memsame(iter->taken, r)) {
             std::swap(*iter, m_data.back());
@@ -57,9 +67,7 @@ void texture_atlas::free(hal::pixel::rect r) {
 void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     using cr = r2d::callback_result;
 
-    static_assert(sizeof(hal::pixel::rect) == sizeof(rect_t));
-
-    HAL_DEBUG_TIMER(tmr);
+    hal::timer t;
 
     std::vector<rect_t> rects(m_data.size());
     std::ranges::transform(m_data, rects.begin(), [](const data& d) { return d.taken; });
@@ -74,30 +82,45 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
             [](const rect_t&) { return cr::ABORT_PACKING; },
             r2d::flipping_option::DISABLED));
 
-    this->texture = { rnd, { size.w, size.h } };
+    // ...then create the texture itself.
+    this->texture = create(rnd, { size.w, size.h }, rects);
 
-    hal::guard::target t { rnd, this->texture };
+    std::println("Took {}s", t());
+}
+
+hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz, std::span<const rect_t> rects) {
+    hal::target_texture ret { rnd, sz };
+    hal::guard::target  t { rnd, ret };
 
     // A tuple of (data, rect_t).
     for (const auto& tuple : std::views::zip(m_data, rects)) {
-        auto& d = std::get<0>(tuple);
-        d.taken = std::get<1>(tuple);
+        auto& d       = std::get<0>(tuple);
+        auto  new_pos = rect2hal(std::get<1>(tuple));
 
-        const auto& taken {
-            reinterpret_cast<const hal::pixel::rect&>(d.taken)
-        };
+        if (d.tex.valid()) { // Newly added.
+            rnd->draw(d.tex)
+                .to(new_pos)
+                .render();
 
-        rnd->draw(d.tex)
-            .to(taken)
-            .render();
+            d.tex.reset();
+        } else { // Present in the old atlas texture.
+            auto old_pos = rect2hal(d.taken);
 
-        // The original texture is no longer needed at this point.
-        d.tex.reset();
+            rnd->draw(this->texture)
+                .from(old_pos)
+                .to(new_pos)
+                .render();
+        }
 
-        *d.out = taken;
+        d.taken = hal2rect(new_pos);
+        *d.out  = new_pos;
     }
 
-    HAL_PRINT("<Atlas> pack() finished in ", tmr);
+    return ret;
+}
+
+texture_atlas_copyer texture_atlas::draw(hal::ref<hal::renderer> rnd, hal::pixel::rect src) {
+    return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(src) };
 }
 
 void texture_atlas::debug_draw(
@@ -105,10 +128,17 @@ void texture_atlas::debug_draw(
     hal::coord::point       dst,
     hal::color              outline_atlas,
     hal::color              outline_block) const {
-    rnd->draw(texture).outline(outline_atlas).to(dst).render();
     for (const data& d : m_data) {
         auto rect = rect2hal(d.taken);
         rect.pos += dst;
         rnd->draw(rect, outline_block);
     }
+
+    rnd->draw(texture).to(dst).outline(outline_atlas).render();
+}
+
+using tac = texture_atlas_copyer;
+
+tac::texture_atlas_copyer(hal::pass_key<texture_atlas>, hal::copyer c)
+    : hal::copyer { std::move(c) } {
 }

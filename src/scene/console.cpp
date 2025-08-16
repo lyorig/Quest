@@ -176,8 +176,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    g.atlas_queue(m_font.render_blended(consts::prefix_text, consts::prefix_color), m_prefix);
-    g.atlas_pack();
+    g.atlas_add(m_font.render_blended(consts::prefix_text, consts::prefix_color), m_prefix);
 
     g.systems.events.text_input_start(g.window);
 }
@@ -187,6 +186,7 @@ void console::deactivate(game& g) {
 
     g.atlas.free(m_prefix);
     g.atlas.free(m_line);
+    g.atlas_pack();
 
     if constexpr (consts::clear_on_close) {
         m_field.text.clear();
@@ -259,8 +259,7 @@ void console::repaint(game& g) {
         text = m_font.render_blended(m_field.text, consts::input_color);
     }
 
-    g.atlas.free(m_line);
-    g.atlas_queue(text, m_line);
+    g.atlas_replace(std::move(text), m_line);
 }
 
 void console::set_cursor() {
