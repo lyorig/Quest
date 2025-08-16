@@ -31,15 +31,18 @@ add_executable(game WIN32
 	${SOURCES}
 )
 
-if (WIN32)
-	target_compile_definitions(Halcyon PRIVATE
-		$<$<CONFIG:Debug>:HAL_DEBUG_ADVANCED>
-	)
+# Make sure we actually get any debuggable output on Windows.
+target_compile_definitions(Halcyon PUBLIC
+    $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:HAL_DEBUG_ADVANCED>
+)
 
-	target_compile_definitions(game PRIVATE
-		$<$<CONFIG:Debug>:HAL_DEBUG_ADVANCED>
-	)
-endif()
+target_compile_options(game PRIVATE
+	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
+)
+
+target_include_directories(game PRIVATE
+	include
+)
 
 # Is there a strip utility?
 if (CMAKE_STRIP)
@@ -49,15 +52,6 @@ if (CMAKE_STRIP)
 		COMMAND_EXPAND_LISTS VERBATIM
 	)
 endif()
-
-# Enable warnings.
-target_compile_options(game PRIVATE
-	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
-)
-
-target_include_directories(game PRIVATE
-	include
-)
 
 target_link_libraries(game PRIVATE
 	Halcyon::Halcyon

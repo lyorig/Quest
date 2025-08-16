@@ -46,12 +46,16 @@ void texture_atlas::free(hal::pixel::rect r) {
             return;
         }
     }
+
+    HAL_WARN("<Atlas> Freeing unknown rectangle ", r);
 }
 
 void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     using cr = r2d::callback_result;
 
     static_assert(sizeof(hal::pixel::rect) == sizeof(rect_t));
+
+    HAL_DEBUG_TIMER(tmr);
 
     std::vector<rect_t> rects(m_data.size());
     std::ranges::transform(m_data, rects.begin(), [](const data& d) { return d.taken; });
@@ -83,6 +87,11 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
             .to(taken)
             .render();
 
+        // The original texture is no longer needed at this point.
+        d.tex.reset();
+
         *d.out = taken;
     }
+
+    HAL_PRINT("<Atlas> pack() finished in ", tmr);
 }

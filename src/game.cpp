@@ -62,9 +62,9 @@ game::game(args a) try
     , running{ true }
     , screenshot{ false } {
     using hal::debug::severity::init;
-    HAL_PRINT(init, "Game class initialized!");
-    HAL_PRINT("Base path: ", loader.base());
-    HAL_PRINT("Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
+    HAL_PRINT(init, "<Game> Initialized.");
+    HAL_PRINT("<Game> Base path: ", loader.base());
+    HAL_PRINT("<Game> Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
 
     atlas.pack(renderer);
 } catch (hal::exception e) {

@@ -3,13 +3,8 @@
 	"configurePresets": [
 		{
 			"name": "dbg",
-			"generator": "Ninja",
 			"binaryDir": "build",
 			"cacheVariables": {
-				"CMAKE_EXPORT_COMPILE_COMMANDS": {
-					"type": "BOOL",
-					"value": "ON"
-				},
 				"CMAKE_BUILD_TYPE": {
 					"type": "STRING",
 					"value": "Debug"
