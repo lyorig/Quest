@@ -97,7 +97,6 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
     hal::guard::target  _ { rnd, canvas };
 
     // Clear the texture (added after noticing weird graphical glitches on Windows).
-    // FIXME: Atlas debug drawing fails
     rnd->clear();
 
     for (data& d : m_data) {
