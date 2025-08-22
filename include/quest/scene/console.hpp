@@ -9,24 +9,50 @@
 #include <halcyon/video.hpp>
 
 namespace hq {
+    constexpr std::string_view console_placeholders[] {
+        "[enter command here]",
+        "[be not afraid]",
+        "[food for thought]",
+        "[waiting for user input]",
+        "[rm -rf / --no-preserve-root]",
+        "[at your service]",
+        "[not POSIX compliant]",
+        "[made with Halcyon]",
+        "[start typing, please]",
+        "[non-euclidean interface]",
+        "[commands not included]",
+        "[who needs documentation]",
+        "[your turn]",
+        "[segfaulting since 2021]",
+        "[quoth the raven, nevermore]",
+        "[sudo pacman -S lyofetch]",
+        "[redacted]",
+        "[is anyone there?]",
+        "[licensed under the WTFPL]",
+        "[openest source]",
+        "[watch?v=lo5cG0FhWro]",
+        "[no man page here, sorry]",
+        "[womp womp]",
+        "[49.0481N, 17.4838E]",
+        "[sudo deez nuts]",
+        "[docker? I barely know 'er!]",
+        "[running out of time]",
+        "[not actually random]",
+        "[see you again]",
+        "[forget me not]",
+        "[one big CVE]",
+        "[with eye serene]",
+        "[ševalicious out tomorrow]",
+        "[kevin's heart]",
+
+#ifdef SDL_PLATFORM_WINDOWS
+        "[MSVC is the real final boss]",
+#endif
+    };
+
     namespace scene {
         // A console. Designed for use with mono fonts.
         class console final : public base {
-        private:
-            class shuffle_bag {
-            public:
-                constexpr static std::uint8_t num_texts { 33 };
-
-                shuffle_bag();
-
-                hal::c_string next();
-
-            private:
-                hal::c_string m_texts[num_texts];
-
-                std::uint8_t m_index;
-            };
-
         public:
             console(game& g);
 
@@ -53,16 +79,24 @@ namespace hq {
             hal::surface make_line();
             hal::surface make_placeholder();
 
+            std::string_view generate_placeholder();
+
             field m_field;
 
-            shuffle_bag m_placeholders;
+            std::uint8_t
+                m_placeholderIndex,
+                m_placeholderOrder[std::size(console_placeholders)];
 
             hal::font m_font;
 
-            texture_atlas::id_t m_prefix, m_line;
+            texture_atlas::id_t
+                m_prefix,
+                m_line;
 
-            hal::coord_t m_padding;
-            hal::coord_t m_texBegin;
+            hal::coord_t
+                m_padding,
+                m_texBegin;
+
             hal::pixel_t m_wrap;
 
             // pos = current outline pos
@@ -74,7 +108,9 @@ namespace hq {
             std::uint16_t m_maxChars;
             std::uint8_t  m_lineChars;
 
-            bool m_repaint, m_cursorVis;
+            bool
+                m_repaint,   // Should we repaint?
+                m_cursorVis; // Is the cursor visible?
         };
 
         static_assert(interface<console>);

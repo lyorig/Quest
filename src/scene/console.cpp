@@ -1,12 +1,13 @@
 #include <quest/scene/console.hpp>
 
-#include <random>
-
 #include <halcyon/utility/guard.hpp>
 
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
 #include <quest/helpers.hpp>
+
+#include <numeric>
+#include <random>
 
 using namespace hq::scene;
 using namespace hal::literals;
@@ -31,57 +32,9 @@ namespace hq::consts {
     constexpr flag_bitmask enablers { flag::enable_draw, flag::enable_update, flag::block_process };
 }
 
-console::shuffle_bag::shuffle_bag()
-    : m_texts {
-        "[enter command here]",
-        "[be not afraid]",
-        "[food for thought]",
-        "[waiting for user input]",
-        "[rm -rf / --no-preserve-root]",
-        "[at your service]",
-        "[not POSIX compliant]",
-        "[made with Halcyon]",
-        "[start typing, please]",
-        "[non-euclidean interface]",
-        "[commands not included]",
-        "[who needs documentation]",
-        "[your turn]",
-        "[segfaulting since 2021]",
-        "[quoth the raven, nevermore]",
-        "[sudo pacman -S lyofetch]",
-        "[redacted]",
-        "[is anyone there?]",
-        "[licensed under the WTFPL]",
-        "[openest source]",
-        "[watch?v=lo5cG0FhWro]",
-        "[no man page here, sorry]",
-        "[womp womp]",
-        "[49.0481N, 17.4838E]",
-        "[sudo deez nuts]",
-        "[docker? I barely know 'er!]",
-        "[running out of time]",
-        "[not actually random]",
-        "[see you again]",
-        "[forget me not]",
-        "[one big CVE]",
-        "[with eye serene]",
-        "[ševalicious out tomorrow]"
-    }
-    , m_index { num_texts } {
-}
-
-hal::c_string console::shuffle_bag::next() {
-    if (m_index == num_texts) { // Need to refresh.
-        HAL_PRINT("<Console> Shuffling placeholder indices...");
-        std::shuffle(std::begin(m_texts), std::end(m_texts), std::mt19937_64 { std::random_device {}() });
-        m_index = 0;
-    }
-
-    return m_texts[m_index++];
-}
-
 console::console(game& g)
     : base { flag::enable_process }
+    , m_placeholderIndex { std::size(console_placeholders) }
     , m_font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
     , m_padding { g.renderer.size()->x * consts::padding_pc }
     , m_texBegin { consts::text_offset.x + size_text(m_font, consts::prefix_text).x + m_padding }
@@ -92,6 +45,8 @@ console::console(game& g)
     , m_repaint { false }
     , m_cursorVis { true } {
     m_wrap -= m_wrap % static_cast<hal::pixel_t>(m_outline.size.x);
+
+    std::iota(std::begin(m_placeholderOrder), std::end(m_placeholderOrder), 0);
 
     HAL_WARN_IF(!m_font.mono(), "<Console> \"", m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
     HAL_PRINT("<Console> Initialized. Supports up to ", hal::to_printable_int(m_maxChars), " chars.");
@@ -256,7 +211,17 @@ hal::surface console::make_line() {
 }
 
 hal::surface console::make_placeholder() {
-    return m_font.render_blended(m_placeholders.next(), consts::placeholder_color);
+    return m_font.render_blended(generate_placeholder(), consts::placeholder_color);
+}
+
+std::string_view console::generate_placeholder() {
+    if (m_placeholderIndex == std::size(console_placeholders)) { // Need to refresh.
+        HAL_PRINT("<Console> Shuffling placeholder indices...");
+        std::shuffle(std::begin(m_placeholderOrder), std::end(m_placeholderOrder), std::mt19937_64 { std::random_device {}() });
+        m_placeholderIndex = 0;
+    }
+
+    return console_placeholders[m_placeholderOrder[m_placeholderIndex++]];
 }
 
 void console::set_cursor() {

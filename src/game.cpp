@@ -1,4 +1,3 @@
-#include "quest/atlas.hpp"
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <halcyon/hint.hpp>
@@ -22,11 +21,9 @@ namespace {
     }
 
     hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
-        hal::renderer::create_properties p;
-
-        hal::renderer rnd { p.window(wnd).vsync(!a["--no-vsync"]) };
+        hal::renderer rnd { wnd };
         rnd.blend(hal::blend_mode::alpha);
-
+        rnd.vsync(!a["--no-vsync"]);
         rnd.clear();
 
         return rnd;
@@ -88,8 +85,6 @@ void game::main_loop() {
             screenshot = false;
         }
 
-        atlas.debug_draw(renderer, { 400, 200 }, hal::colors::red, hal::colors::orange);
-
         renderer.present();
     }
 }
@@ -148,7 +143,7 @@ void game::take_screenshot() const {
     } while (fs::exists(current = directory / filename)
         && i != max_ss_attempts);
 
-    // Rust users can suck it, this is true paranoia
+    // Rust users can suck it, this is true paranoia.
     if (i == max_ss_attempts) {
         HAL_PRINT(hal::debug::severity::warning, "Exhausted numbering of screenshots. Aborting save.");
         return;

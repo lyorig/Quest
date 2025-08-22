@@ -33,7 +33,7 @@ namespace hq {
             // Do something for every scene in the tuple.
             // Takes care of updating and respecting starting positions.
             template <typename F>
-            void for_each(std::uint8_t end, F func);
+            void for_each(flag enabler, std::uint8_t end, F func);
 
             // Find starting positions for all three update types.
             void update_cached(flag f);
