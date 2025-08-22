@@ -20,7 +20,7 @@ main_menu::main_menu(game& g)
     , m_currentTheme { 0 } {
     const hal::font font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
-    constexpr hal::c_string texts[] { "New game", "Continue", "Settings", "Exit" };
+    constexpr std::string_view texts[] { "New game", "Continue", "Settings", "Exit" };
     static_assert(std::tuple_size_v<decltype(m_widgets)> == std::size(texts));
 
     const hal::coord_t offset = g.renderer.size()->x * lc::pt;
@@ -28,10 +28,7 @@ main_menu::main_menu(game& g)
     hal::coord_t       accum { offset };
 
     for (const auto& tuple : std::views::zip(m_widgets, texts)) {
-        widget& w { std::get<0>(tuple) };
-        w = { sprite { { offset, accum } } };
-        w.s.atlas_queue(g, font.render_blended(std::get<1>(tuple), hal::colors::white));
-
+        std::get<0>(tuple) = { sprite { g, font.render_blended(std::get<1>(tuple), hal::colors::white), { offset, accum } } };
         accum += sz;
     }
 

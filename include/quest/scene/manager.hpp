@@ -19,22 +19,26 @@ namespace hq {
             manager(game& g);
 
             // Performs the process-update-draw cycle.
+            // Also packs the game's texture atlas.
             void update(game& g);
 
         private:
             std::tuple<main_menu, console> m_tuple;
 
             std::uint8_t
-                m_curr,     // The scene currently being processed.
                 m_cProcess, // Where to start processing.
                 m_cUpdate,  // Where to start updating.
                 m_cDraw;    // Where to start drawing.
 
-            template <typename T>
-            void update_one(T& x, game& g);
+            // Do something for every scene in the tuple.
+            // Takes care of updating and respecting starting positions.
+            template <typename F>
+            void for_each(std::uint8_t end, F func);
 
+            // Find starting positions for all three update types.
             void update_cached(flag f);
 
+            // Find the index of the last scene whose flags contain `m`.
             std::uint8_t find_last_with_flag(flag m) const;
         };
     }

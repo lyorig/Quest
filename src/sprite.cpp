@@ -7,18 +7,9 @@
 
 using namespace hq;
 
-sprite::sprite(hal::coord::point pos)
-    : hitbox { pos } {
-}
-
-void sprite::atlas_queue(game& g, hal::surface surf) {
-    const auto size = surf.size();
-    atlas_queue(g, std::move(surf), size);
-}
-
-void sprite::atlas_queue(game& g, hal::surface surf, hal::coord::point size) {
-    hitbox.size = size;
-    g.atlas_queue(std::move(surf), atlas_ref);
+sprite::sprite(game& g, hal::surface surf, hal::coord::point pos)
+    : hitbox { pos, surf.size() }
+    , m_atlasId { g.atlas_add(std::move(surf)) } {
 }
 
 void sprite::draw(game& g) const {
@@ -28,5 +19,5 @@ void sprite::draw(game& g) const {
         return;
     }
 
-    g.atlas_draw(atlas_ref).to(hitbox).render();
+    g.atlas_draw(m_atlasId).to(hitbox).render();
 }

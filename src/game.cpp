@@ -1,5 +1,7 @@
+#include "quest/atlas.hpp"
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <halcyon/hint.hpp>
 #include <halcyon/image.hpp>
 #include <halcyon/system.hpp>
 
@@ -66,8 +68,6 @@ game::game(args a) try
     HAL_PRINT(init, "<Game> Initialized.");
     HAL_PRINT("<Game> Base path: ", loader.base());
     HAL_PRINT("<Game> Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
-
-    atlas.pack(renderer);
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }
@@ -76,7 +76,7 @@ void game::main_loop() {
     hal::timer timer;
 
     while (running) {
-        m_delta = timer();
+        m_delta = timer.get();
         timer.reset();
 
         collect_events();
@@ -102,24 +102,20 @@ delta_t game::delta() const {
     return m_delta * timescale;
 }
 
-void game::atlas_queue(hal::surface s, hal::pixel::rect& out) {
-    atlas.queue({ renderer, s }, out);
+texture_atlas::id_t game::atlas_add(hal::surface s) {
+    return atlas.add(renderer, std::move(s));
 }
 
-void game::atlas_add(hal::surface s, hal::pixel::rect& out) {
-    atlas.add(s, out, renderer);
-}
-
-void game::atlas_replace(hal::surface s, hal::pixel::rect& out) {
-    atlas.replace(s, out, renderer);
+void game::atlas_replace(texture_atlas::id_t id, hal::surface s) {
+    atlas.replace(id, renderer, std::move(s));
 }
 
 void game::atlas_pack() {
     atlas.pack(renderer);
 }
 
-texture_atlas_copyer game::atlas_draw(hal::pixel::rect src) {
-    return atlas.draw(renderer, src);
+texture_atlas_copyer game::atlas_draw(texture_atlas::id_t id) {
+    return atlas.draw(id, renderer);
 }
 
 void game::take_screenshot() const {

@@ -3,6 +3,8 @@
 // sprite.hpp:
 // Well, you know what a sprite is, right?
 
+#include <quest/atlas.hpp>
+
 #include <halcyon/video/texture.hpp>
 
 namespace hq {
@@ -11,15 +13,13 @@ namespace hq {
     class sprite {
     public:
         sprite() = default;
-
-        sprite(hal::coord::point pos);
-
-        void atlas_queue(game& g, hal::surface surf);
-        void atlas_queue(game& g, hal::surface surf, hal::coord::point size);
+        sprite(game& g, hal::surface surf, hal::coord::point pos);
 
         void draw(game& g) const;
 
-        hal::pixel::rect atlas_ref;
         hal::coord::rect hitbox;
+
+    private:
+        texture_atlas::id_t m_atlasId;
     };
 }

@@ -1,126 +1,133 @@
-#include "halcyon/surface.hpp"
-#include "halcyon/utility/timer.hpp"
 #include <quest/atlas.hpp>
 
+#include <halcyon/surface.hpp>
 #include <halcyon/utility/guard.hpp>
+#include <halcyon/utility/timer.hpp>
 #include <halcyon/video/renderer.hpp>
-
-#include <algorithm>
-#include <ranges>
 
 using namespace hq;
 
 namespace {
-    constexpr std::size_t  max_side { 1024 };
-    constexpr std::int32_t discard_step { -4 };
-
-    template <typename A, typename B>
-        requires(sizeof(A) == sizeof(B))
-    bool memsame(const A& lhs, const B& rhs) {
-        return std::memcmp(&lhs, &rhs, sizeof(A)) == 0;
-    }
-
-    constexpr texture_atlas::rect_t pt2rect(hal::pixel::point pt) {
-        return { 0, 0, pt.x, pt.y };
-    }
-
-    constexpr hal::pixel::rect rect2hal(texture_atlas::rect_t r) {
-        return std::bit_cast<hal::pixel::rect>(r);
-    }
-
-    constexpr texture_atlas::rect_t hal2rect(hal::pixel::rect r) {
-        return std::bit_cast<texture_atlas::rect_t>(r);
-    }
+    constexpr std::size_t  MAX_SIDE { 1024 };
+    constexpr std::int32_t DISCARD_STEP { -4 };
+    constexpr hal::pixel_t INVALID_POS { -1 };
 }
 
-void texture_atlas::queue(hal::static_texture tex, hal::pixel::rect& out) {
-    m_data.emplace_back(pt2rect(tex.size().get()), std::move(tex), &out);
-}
+texture_atlas::texture_atlas()
+    : m_repack { false } { }
 
-void texture_atlas::add(hal::surface surf, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
-    queue({ rnd, surf }, out);
-    pack(rnd);
-}
+texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
+    m_repack = true;
 
-void texture_atlas::replace(hal::surface surf, hal::pixel::rect& out, hal::ref<hal::renderer> rnd) {
-    free(out);
-    add(std::move(surf), out, rnd);
-}
+    const hal::pixel::rect rect { hal::tag::as_size, surf.size() };
+    hal::static_texture    tex { rnd, std::move(surf) };
 
-void texture_atlas::free(hal::pixel::rect r) {
-    if (r == hal::pixel::rect {}) {
-        return;
-    }
+    id_t i { 0 };
 
-    for (auto iter = m_data.begin(); iter != m_data.end(); ++iter) {
-        if (memsame(iter->taken, r)) {
-            std::swap(*iter, m_data.back());
-            m_data.pop_back();
+    // Can we reuse a slot in the vector?
+    for (; i < m_data.size(); ++i) {
+        data& d { m_data[i] };
 
-            return;
+        if (d.staged.pos.x == INVALID_POS) {
+            d.tex    = std::move(tex);
+            d.staged = rect;
+
+            return i;
         }
     }
 
-    HAL_WARN("<Atlas> Freeing unknown rectangle ", r);
+    m_data.emplace_back(
+        hal::pixel::rect {},
+        rect,
+        std::move(tex));
+
+    return i;
+}
+
+void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+    data& d { m_data[id] };
+
+    if (surf.size() == d.area) {
+        return replace_exact(id, rnd, std::move(surf));
+    }
+
+    m_repack = true;
+
+    d.staged = { hal::tag::as_size, surf.size() };
+    d.tex    = { rnd, std::move(surf) };
+}
+
+void texture_atlas::replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+    hal::guard::target  _ { rnd, texture };
+    hal::static_texture tex { rnd, std::move(surf) };
+
+    rnd->draw(tex).to(m_data[id].area).render();
+}
+
+void texture_atlas::free(id_t id) {
+    m_data[id].staged.pos.x = INVALID_POS;
 }
 
 void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     using cr = r2d::callback_result;
 
-    hal::timer t;
+    // Check whether there's actually anything to do.
+    if (!m_repack) {
+        return;
+    }
 
-    std::vector<rect_t> rects(m_data.size());
-    std::ranges::transform(m_data, rects.begin(), [](const data& d) { return d.taken; });
+    m_repack = false;
 
     // Find the best possible packing for these rects...
     const auto size = r2d::find_best_packing<spaces_t>(
-        rects,
+        m_data,
         r2d::make_finder_input(
-            max_side,
-            discard_step,
+            MAX_SIDE,
+            DISCARD_STEP,
             [](const rect_t&) { return cr::CONTINUE_PACKING; },
             [](const rect_t&) { return cr::ABORT_PACKING; },
             r2d::flipping_option::DISABLED));
 
     // ...then create the texture itself.
-    this->texture = create(rnd, { size.w, size.h }, rects);
-
-    std::println("Took {}s", t());
+    texture = create(rnd, std::bit_cast<hal::pixel::point>(size));
 }
 
-hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz, std::span<const rect_t> rects) {
-    hal::target_texture ret { rnd, sz };
-    hal::guard::target  t { rnd, ret };
+hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz) {
+    hal::target_texture canvas { rnd, sz };
+    hal::guard::target  _ { rnd, canvas };
 
-    // A tuple of (data, rect_t).
-    for (const auto& tuple : std::views::zip(m_data, rects)) {
-        auto& d       = std::get<0>(tuple);
-        auto  new_pos = rect2hal(std::get<1>(tuple));
+    for (data& d : m_data) {
+        if (d.staged.pos.x == INVALID_POS) {
+            continue;
+        }
 
         if (d.tex.valid()) { // Newly added.
             rnd->draw(d.tex)
-                .to(new_pos)
+                .to(d.staged)
                 .render();
 
             d.tex.reset();
         } else { // Present in the old atlas texture.
-            auto old_pos = rect2hal(d.taken);
-
-            rnd->draw(this->texture)
-                .from(old_pos)
-                .to(new_pos)
+            rnd->draw(texture)
+                .from(d.area)
+                .to(d.staged)
                 .render();
         }
 
-        d.taken = hal2rect(new_pos);
-        *d.out  = new_pos;
+        d.area = d.staged;
     }
 
-    return ret;
+    return canvas;
 }
 
-texture_atlas_copyer texture_atlas::draw(hal::ref<hal::renderer> rnd, hal::pixel::rect src) {
-    return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(src) };
+texture_atlas_copyer texture_atlas::draw(id_t id, hal::ref<hal::renderer> rnd) {
+    HAL_ASSERT(m_data[id].staged.pos.x != INVALID_POS, "Drawing invalid texture");
+
+    return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(m_data[id].area) };
+}
+
+hal::pixel::rect texture_atlas::area(id_t id) const {
+    return m_data[id].area;
 }
 
 void texture_atlas::debug_draw(
@@ -129,16 +136,32 @@ void texture_atlas::debug_draw(
     hal::color              outline_atlas,
     hal::color              outline_block) const {
     for (const data& d : m_data) {
-        auto rect = rect2hal(d.taken);
+        if (d.staged.pos.x == INVALID_POS) {
+            continue;
+        }
+
+        hal::pixel::rect rect { d.area };
         rect.pos += dst;
+        rect.pos += { 1, 1 };
+        rect.size -= { 2, 2 };
+
         rnd->draw(rect, outline_block);
     }
 
     rnd->draw(texture).to(dst).outline(outline_atlas).render();
 }
 
+constexpr texture_atlas::rect_t& texture_atlas::data::get_rect() {
+    return reinterpret_cast<rect_t&>(staged);
+}
+
 using tac = texture_atlas_copyer;
 
 tac::texture_atlas_copyer(hal::pass_key<texture_atlas>, hal::copyer c)
     : hal::copyer { std::move(c) } {
+}
+
+tac& tac::from(hal::pixel::rect src) {
+    src.pos += this->m_posSrc.pos;
+    return static_cast<texture_atlas_copyer&>(copyer::from(src));
 }

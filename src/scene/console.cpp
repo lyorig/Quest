@@ -24,8 +24,6 @@ namespace hq::consts {
 
     constexpr hal::coord::point text_offset { 10, 10 };
 
-    constexpr bool clear_on_close { false };
-
     constexpr delta_t cursor_blink_time { 0.5 };
 
     constexpr std::size_t desired_max_chars { 128 };
@@ -129,54 +127,12 @@ void console::process(game& g) {
     }
 }
 
-void console::update(game& g) {
-    m_cursorTime += g.delta();
-
-    if (m_cursorTime >= consts::cursor_blink_time) {
-        m_cursorTime -= consts::cursor_blink_time;
-        m_cursorVis = !m_cursorVis;
-    }
-}
-
-void console::draw(game& g) {
-    hal::lref<hal::renderer> rnd { g.renderer };
-
-    hal::guard::color lock { rnd, consts::background_color };
-    rnd->fill();
-
-    if (m_repaint) {
-        m_repaint = false;
-        repaint(g);
-    }
-
-    g.atlas_draw(m_prefix).to(consts::text_offset).render();
-
-    hal::coord::point where { m_texBegin, consts::text_offset.y };
-
-    hal::coord::rect crd;
-    crd.size.x = static_cast<hal::coord_t>(std::min(m_line.size.x, m_wrap));
-    crd.size.y = m_outline.size.y;
-
-    using namespace hal::literals;
-
-    for (; m_line.size.x - crd.pos.x > 0;
-        where.y += m_outline.size.y, crd.pos.x += m_wrap, crd.size.x = std::min<hal::coord_t>(m_line.size.x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
-        g.atlas_draw(m_line).from(crd).to(where).render();
-    }
-
-    if (m_cursorVis) {
-        lock.set(consts::cursor_color);
-        rnd->fill(m_outline);
-    }
-}
-
 void console::activate(game& g) {
-    m_repaint = true;
-
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    g.atlas_add(m_font.render_blended(consts::prefix_text, consts::prefix_color), m_prefix);
+    m_prefix = g.atlas_add(m_font.render_blended(consts::prefix_text, consts::prefix_color));
+    m_line   = g.atlas_add(make_placeholder());
 
     g.systems.events.text_input_start(g.window);
 }
@@ -186,11 +142,9 @@ void console::deactivate(game& g) {
 
     g.atlas.free(m_prefix);
     g.atlas.free(m_line);
-    g.atlas_pack();
 
-    if constexpr (consts::clear_on_close) {
-        m_field.text.clear();
-    }
+    m_field.clear();
+    set_cursor();
 }
 
 bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
@@ -234,14 +188,57 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
     return false;
 }
 
+void console::update(game& g) {
+    m_cursorTime += g.delta();
+
+    if (m_cursorTime >= consts::cursor_blink_time) {
+        m_cursorTime -= consts::cursor_blink_time;
+        m_cursorVis = !m_cursorVis;
+    }
+}
+
+void console::draw(game& g) {
+    hal::lref<hal::renderer> rnd { g.renderer };
+
+    hal::guard::color lock { rnd, consts::background_color };
+    rnd->fill();
+
+    g.atlas_draw(m_prefix).to(consts::text_offset).render();
+
+    hal::coord::point where { m_texBegin, consts::text_offset.y };
+
+    hal::coord::rect   crd;
+    const hal::pixel_t m_line_size_x = g.atlas.area(m_line).size.x;
+
+    crd.size.x = static_cast<hal::coord_t>(std::min(m_line_size_x, m_wrap));
+    crd.size.y = m_outline.size.y;
+
+    using namespace hal::literals;
+
+    for (; m_line_size_x - crd.pos.x > 0;
+        where.y += m_outline.size.y,
+        crd.pos.x += m_wrap,
+        crd.size.x = std::min<hal::coord_t>(m_line_size_x - crd.pos.x, static_cast<hal::coord_t>(m_wrap))) {
+        g.atlas_draw(m_line).from(crd).to(where).render();
+    }
+
+    if (m_cursorVis) {
+        lock.set(consts::cursor_color);
+        rnd->fill(m_outline);
+    }
+
+    if (m_repaint) {
+        m_repaint = false;
+        g.atlas_replace(m_line, make_line());
+    }
+}
+
 void console::process(std::string_view inp) {
     m_repaint = m_field.process(inp);
 
     if (m_field.text.size() > m_maxChars) {
         m_field.trim(m_maxChars);
     }
-
-    m_repaint = true;
 
     set_cursor();
 }
@@ -250,16 +247,16 @@ bool console::active() {
     return flags[consts::enablers];
 }
 
-void console::repaint(game& g) {
-    hal::surface text;
-
+hal::surface console::make_line() {
     if (m_field.text.empty()) {
-        text = m_font.render_blended(m_placeholders.next(), consts::placeholder_color);
+        return make_placeholder();
     } else {
-        text = m_font.render_blended(m_field.text, consts::input_color);
+        return m_font.render_blended(m_field.text, consts::input_color);
     }
+}
 
-    g.atlas_replace(std::move(text), m_line);
+hal::surface console::make_placeholder() {
+    return m_font.render_blended(m_placeholders.next(), consts::placeholder_color);
 }
 
 void console::set_cursor() {

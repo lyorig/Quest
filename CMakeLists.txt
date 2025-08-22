@@ -5,9 +5,6 @@ project(Quest
 	LANGUAGES CXX
 )
 
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Quest's build type.")
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
-
 add_subdirectory(halcyon)
 add_subdirectory(rectpack2D)
 

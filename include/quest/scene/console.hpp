@@ -1,5 +1,6 @@
 #pragma once
 
+#include <quest/atlas.hpp>
 #include <quest/field.hpp>
 #include <quest/scene/base.hpp>
 #include <quest/types.hpp>
@@ -47,8 +48,10 @@ namespace hq {
             bool active();
 
         private:
-            void repaint(game& g);
             void set_cursor();
+
+            hal::surface make_line();
+            hal::surface make_placeholder();
 
             field m_field;
 
@@ -56,7 +59,7 @@ namespace hq {
 
             hal::font m_font;
 
-            hal::pixel::rect m_prefix, m_line;
+            texture_atlas::id_t m_prefix, m_line;
 
             hal::coord_t m_padding;
             hal::coord_t m_texBegin;

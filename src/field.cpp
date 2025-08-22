@@ -135,3 +135,8 @@ void field::trim(std::size_t off) {
 
     text.erase(off);
 }
+
+void field::clear() {
+    text.clear();
+    cursor = 0;
+}

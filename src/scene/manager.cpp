@@ -5,76 +5,82 @@
 using namespace hq::scene;
 
 namespace {
-    template <std::size_t N, typename T, typename F>
-    void forward_tuple_iter(T& tuple, F func) {
-        func(std::get<N>(tuple));
+    template <typename Tuple, typename Func, std::size_t... Is>
+    consteval bool tuple_fwd_iterable(std::index_sequence<Is...>) {
+        return (std::is_invocable_r_v<void, Func, std::tuple_element_t<Is, Tuple>&> && ...);
+    }
+
+    template <typename F, typename Ret, typename Tuple>
+    concept tuple_iter_func_r = tuple_fwd_iterable<Tuple, F>(std::make_index_sequence<std::tuple_size_v<Tuple>>());
+
+    template <std::size_t N, typename T, tuple_iter_func_r<void, T> F>
+    void forward_tuple_iter(T& tuple, std::uint8_t end, F func) {
+        if (N >= end) {
+            func(std::get<N>(tuple));
+        }
+
         if constexpr (N != std::tuple_size_v<T> - 1) {
-            forward_tuple_iter<N + 1>(tuple, func);
+            forward_tuple_iter<N + 1>(tuple, end, func);
         }
     }
 
     template <typename T, typename F>
-    void forward_tuple(T& tuple, F func) {
-        forward_tuple_iter<0>(tuple, func);
+    void forward_tuple(T& tuple, std::uint8_t end, F func) {
+        forward_tuple_iter<0>(tuple, end, func);
     }
 
-    template <std::size_t N, typename T, typename F>
-    void reverse_tuple_iter(T& tuple, F func) {
-        func(std::get<N>(tuple));
+    template <std::size_t N, typename T, tuple_iter_func_r<bool, T> F>
+    void reverse_tuple_iter(T& tuple, std::uint8_t end, F func) {
+        if (N < end) {
+            return;
+        }
+
+        if (func(std::get<N>(tuple))) {
+            return;
+        }
+
         if constexpr (N != 0) {
-            reverse_tuple_iter<N - 1>(tuple, func);
+            reverse_tuple_iter<N - 1>(tuple, end, func);
         }
     }
 
-    template <typename T, typename F>
-    void reverse_tuple(T& tuple, F func) {
-        reverse_tuple_iter<std::tuple_size_v<T> - 1>(tuple, func);
+    template <typename T, tuple_iter_func_r<bool, T> F>
+    void reverse_tuple(T& tuple, std::uint8_t end, F func) {
+        reverse_tuple_iter<std::tuple_size_v<std::remove_cvref_t<T>> - 1>(tuple, end, func);
     }
 }
 
 manager::manager(game& g)
     : m_tuple { g, g }
-    , m_curr { 0 }
     , m_cProcess { 0 }
     , m_cUpdate { 0 }
     , m_cDraw { 0 } {
 }
 
-// Process -> update -> draw.
 void manager::update(game& g) {
-    m_curr = 0;
-    forward_tuple(m_tuple, [&](auto& obj) { update_one(obj, g); });
+    for_each(m_cProcess, [&](interface auto& scene) { scene.process(g); });
+    for_each(m_cUpdate, [&](interface auto& scene) { scene.update(g); });
+
+    g.atlas_pack();
+    for_each(m_cDraw, [&](interface auto& scene) { scene.draw(g); });
 }
 
-template <typename T>
-void manager::update_one(T& obj, game& g) {
-    flag_bitmask flg { obj.flags };
+template <typename F>
+void manager::for_each(std::uint8_t end, F func) {
+    forward_tuple(m_tuple, end, [&](interface auto& scene) {
+        flag_bitmask flg { scene.flags };
 
-    // Process:
-    if (obj.flags[flag::enable_process] && m_curr >= m_cProcess) {
-        obj.process(g);
-    }
+        func(scene);
 
-    // Update:
-    if (obj.flags[flag::enable_update] && m_curr >= m_cUpdate) {
-        obj.update(g);
-    }
+        // Check which flags changed.
+        flg ^= scene.flags;
 
-    // Draw:
-    if (obj.flags[flag::enable_draw] && m_curr >= m_cDraw) {
-        obj.draw(g);
-    }
-
-    // Get flag diff.
-    flg ^= obj.flags;
-
-    for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
-        if (flg.any(f)) {
-            update_cached(f);
+        for (const flag f : { flag::block_process, flag::block_update, flag::block_draw }) {
+            if (flg[f]) {
+                update_cached(f);
+            }
         }
-    }
-
-    ++m_curr;
+    });
 }
 
 void manager::update_cached(flag f) {
@@ -99,9 +105,16 @@ void manager::update_cached(flag f) {
 }
 
 std::uint8_t manager::find_last_with_flag(flag m) const {
-    std::uint8_t ret { 0 };
+    std::uint8_t ret { std::tuple_size_v<decltype(m_tuple)> - 1 };
 
-    reverse_tuple(m_tuple, [&](const auto& obj) {if (obj.flags[m]) {++ret;} });
+    reverse_tuple(m_tuple, 0, [&](const interface auto& scene) {
+        if (scene.flags[m]) {
+            return false;
+        }
+
+        --ret;
+        return true;
+    });
 
     return ret;
 }

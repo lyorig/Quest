@@ -28,6 +28,9 @@ namespace hq {
         // Trim the field from `off` to the end.
         void trim(std::size_t off);
 
+        // Clear the string and reset the cursor.
+        void clear();
+
         std::string text;
         std::size_t cursor;
     };
