@@ -72,6 +72,8 @@ void game::main_loop() {
     hal::timer timer;
 
     while (running) {
+        renderer.clear();
+
         m_delta = timer.get();
         timer.reset();
 
