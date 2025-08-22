@@ -21,7 +21,7 @@ namespace {
     }
 
     hal::renderer create_renderer(hal::ref<hal::window> wnd, args a) {
-        hal::renderer rnd { wnd, hal::tag::no_clear };
+        hal::renderer rnd { wnd };
         rnd.blend(hal::blend_mode::alpha);
         rnd.vsync(!a["--no-vsync"]);
 
