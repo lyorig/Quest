@@ -24,7 +24,6 @@ namespace {
         hal::renderer rnd { wnd };
         rnd.blend(hal::blend_mode::alpha);
         rnd.vsync(!a["--no-vsync"]);
-        rnd.clear();
 
         return rnd;
     }
@@ -84,6 +83,8 @@ void game::main_loop() {
             take_screenshot();
             screenshot = false;
         }
+
+        atlas.debug_draw(renderer, { 400, 200 }, hal::colors::blue, hal::colors::weezer_blue);
 
         renderer.present();
     }

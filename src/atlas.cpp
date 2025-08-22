@@ -96,7 +96,12 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
     hal::target_texture canvas { rnd, sz };
     hal::guard::target  _ { rnd, canvas };
 
+    // Clear the texture (added after noticing weird graphical glitches on Windows).
+    // FIXME: Atlas debug drawing fails
+    rnd->clear();
+
     for (data& d : m_data) {
+        // Skip unused entries.
         if (d.staged.pos.x == INVALID_POS) {
             continue;
         }
@@ -135,6 +140,8 @@ void texture_atlas::debug_draw(
     hal::coord::point       dst,
     hal::color              outline_atlas,
     hal::color              outline_block) const {
+    rnd->draw(texture).to(dst).render();
+
     for (const data& d : m_data) {
         if (d.staged.pos.x == INVALID_POS) {
             continue;
@@ -148,7 +155,7 @@ void texture_atlas::debug_draw(
         rnd->draw(rect, outline_block);
     }
 
-    rnd->draw(texture).to(dst).outline(outline_atlas).render();
+    rnd->draw({ dst, texture.size().get() }, outline_atlas);
 }
 
 constexpr texture_atlas::rect_t& texture_atlas::data::get_rect() {
