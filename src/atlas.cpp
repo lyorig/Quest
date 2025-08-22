@@ -94,7 +94,10 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
 
 hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz) {
     hal::target_texture canvas { rnd, sz };
-    hal::guard::target  _ { rnd, canvas };
+
+    // FIXME Metal apparently waits for VSync upon setting the render target.
+    // https://discourse.libsdl.org/t/sdl-setrendertargets-metal-implementation-apparently-waits-for-vsync/62009.
+    hal::guard::target _ { rnd, canvas };
 
     // Clear the texture (added after noticing weird graphical glitches on Windows).
     rnd->clear();
