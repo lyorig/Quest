@@ -3,6 +3,4 @@
 	url = git@github.com:lyorig/halcyon.git
 [submodule "rectpack2D"]
 	path = rectpack2D
-	url = https://github.com/TeamHypersomnia/rectpack2D.git
-[submodule "rectpack2d"]
-	url = git@github.com:TeamHypersomnia/rectpack2d.git
+	url = git@github.com:TeamHypersomnia/rectpack2D.git
