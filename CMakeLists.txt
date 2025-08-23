@@ -28,11 +28,6 @@ add_executable(game WIN32
 	${SOURCES}
 )
 
-# Make sure we actually get any debuggable output on Windows.
-target_compile_definitions(Halcyon PUBLIC
-    $<$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>:HAL_DEBUG_ADVANCED>
-)
-
 target_compile_options(game PRIVATE
 	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
 )

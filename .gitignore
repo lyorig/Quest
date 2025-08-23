@@ -8,4 +8,4 @@ build/
 
 .DS_Store
 CMakeSettings.json
-Halcyon Debug Output.txt
+halcyon_debug_output.txt

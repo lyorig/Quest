@@ -57,9 +57,7 @@ void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface s
 }
 
 void texture_atlas::replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
-    hal::guard::target               _t { rnd, texture };
-    hal::guard::blend<hal::renderer> _b { rnd, hal::blend_mode::none };
-
+    hal::guard::target  _ { rnd, texture };
     hal::static_texture tex { rnd, std::move(surf) };
 
     rnd->draw(tex).to(m_data[id].area).render();
