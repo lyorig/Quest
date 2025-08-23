@@ -1,14 +1,11 @@
 #pragma once
 
-#include "halcyon/types/color.hpp"
 #include <quest/animatable.hpp>
 #include <quest/sprite.hpp>
 
 #include <quest/scene/base.hpp>
 
 #include <halcyon/ttf.hpp>
-
-#include <array>
 
 // state/rest.hpp:
 // The rest of the state types.
@@ -34,14 +31,7 @@ namespace hq::scene {
             } d { dir::down };
         };
 
-        void set_widget(std::size_t index, hal::ref<hal::font> fnt, std::string_view text);
-        void switch_theme();
-
-        animatable<hal::color, easing::out::quad> m_theme;
-
-        std::array<widget, 4> m_widgets;
-
-        std::uint8_t m_currentTheme;
+        widget m_widgets[4];
     };
 
     static_assert(interface<main_menu>);

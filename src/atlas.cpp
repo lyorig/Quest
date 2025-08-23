@@ -10,7 +10,6 @@ using namespace hq;
 namespace {
     constexpr std::size_t  MAX_SIDE { 1024 };
     constexpr std::int32_t DISCARD_STEP { -4 };
-    constexpr hal::pixel_t INVALID_POS { -1 };
 }
 
 texture_atlas::texture_atlas()
@@ -28,7 +27,7 @@ texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface
     for (; i < m_data.size(); ++i) {
         data& d { m_data[i] };
 
-        if (d.staged.pos.x == INVALID_POS) {
+        if (!d.valid()) {
             d.tex    = std::move(tex);
             d.staged = rect;
 
@@ -58,14 +57,16 @@ void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface s
 }
 
 void texture_atlas::replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
-    hal::guard::target  _ { rnd, texture };
+    hal::guard::target               _t { rnd, texture };
+    hal::guard::blend<hal::renderer> _b { rnd, hal::blend_mode::none };
+
     hal::static_texture tex { rnd, std::move(surf) };
 
     rnd->draw(tex).to(m_data[id].area).render();
 }
 
 void texture_atlas::free(id_t id) {
-    m_data[id].staged.pos.x = INVALID_POS;
+    m_data[id].invalidate();
 }
 
 void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
@@ -79,14 +80,14 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     m_repack = false;
 
     // Find the best possible packing for these rects...
-    const auto size = r2d::find_best_packing<spaces_t>(
+    const r2d::rect_wh size { r2d::find_best_packing<spaces_t>(
         m_data,
         r2d::make_finder_input(
             MAX_SIDE,
             DISCARD_STEP,
             [](const rect_t&) { return cr::CONTINUE_PACKING; },
             [](const rect_t&) { return cr::ABORT_PACKING; },
-            r2d::flipping_option::DISABLED));
+            r2d::flipping_option::DISABLED)) };
 
     // ...then create the texture itself.
     texture = create(rnd, std::bit_cast<hal::pixel::point>(size));
@@ -104,7 +105,7 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
 
     for (data& d : m_data) {
         // Skip unused entries.
-        if (d.staged.pos.x == INVALID_POS) {
+        if (!d.valid()) {
             continue;
         }
 
@@ -128,7 +129,7 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
 }
 
 texture_atlas_copyer texture_atlas::draw(id_t id, hal::ref<hal::renderer> rnd) {
-    HAL_ASSERT(m_data[id].staged.pos.x != INVALID_POS, "Drawing invalid texture");
+    HAL_ASSERT(m_data[id].valid(), "Drawing invalid texture");
 
     return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(m_data[id].area) };
 }
@@ -145,7 +146,7 @@ void texture_atlas::debug_draw(
     rnd->draw(texture).to(dst).render();
 
     for (const data& d : m_data) {
-        if (d.staged.pos.x == INVALID_POS) {
+        if (!d.valid()) {
             continue;
         }
 
@@ -160,8 +161,20 @@ void texture_atlas::debug_draw(
     rnd->draw({ dst, texture.size().get() }, outline_atlas);
 }
 
-constexpr texture_atlas::rect_t& texture_atlas::data::get_rect() {
+texture_atlas::rect_t& texture_atlas::data::get_rect() {
     return reinterpret_cast<rect_t&>(staged);
+}
+
+const texture_atlas::rect_t& texture_atlas::data::get_rect() const {
+    return reinterpret_cast<const rect_t&>(staged);
+}
+
+void texture_atlas::data::invalidate() {
+    staged.pos.x = -1;
+}
+
+bool texture_atlas::data::valid() const {
+    return staged.pos.x != -1;
 }
 
 using tac = texture_atlas_copyer;

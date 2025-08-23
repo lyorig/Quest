@@ -69,7 +69,11 @@ namespace hq {
 
             hal::static_texture tex; // The texture source (only valid when queued)
 
-            constexpr rect_t& get_rect();
+            rect_t&       get_rect();
+            const rect_t& get_rect() const;
+
+            void invalidate();
+            bool valid() const;
         };
 
         std::vector<data> m_data;
