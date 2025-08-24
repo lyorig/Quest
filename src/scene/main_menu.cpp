@@ -82,7 +82,7 @@ void main_menu::update(game& g) {
 
 void main_menu::draw(game& g) {
     for (const auto& wgt : m_widgets) {
-        hal::guard::color_mod<hal::target_texture> guard { g.atlas.texture, wgt.c.value() };
+        hal::guard::color_mod<hal::static_texture> guard { g.atlas.texture, wgt.c.value() };
         wgt.s.draw(g);
     }
 }

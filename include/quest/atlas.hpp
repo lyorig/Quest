@@ -1,5 +1,6 @@
 #pragma once
 
+#include <halcyon/surface.hpp>
 #include <halcyon/video/renderer.hpp>
 
 #include <rectpack2D/finders_interface.h>
@@ -32,15 +33,15 @@ namespace hq {
 
         // Create and queue a texture for this atlas.
         // Returns the texture ID to draw with.
-        id_t add(hal::ref<hal::renderer> rnd, hal::surface surf);
+        id_t add(hal::surface surf);
 
         // Replace a texture. Use if you're unsure whether their dimensions are gonna be different.
         // Shorthand for `texture_atlas::free()` and `texture_atlas::add()`.
-        void replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf);
+        void replace(id_t id, hal::surface surf);
 
         // Replace a texture with an exact-size one.
         // This is particularly efficient as you don't need to repack.
-        void replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf);
+        void replace_exact(id_t id, hal::surface surf);
 
         // Free a space from the atlas.
         // This works because atlas rects are unique.
@@ -67,7 +68,7 @@ namespace hq {
                 area,   // Where the texture lies.
                 staged; // Temporary storage for repacking.
 
-            hal::static_texture tex; // The texture source (only valid when queued)
+            hal::surface tex; // The texture source (only valid when queued)
 
             rect_t&       get_rect();
             const rect_t& get_rect() const;
@@ -79,12 +80,13 @@ namespace hq {
         std::vector<data> m_data;
 
     public:
-        hal::target_texture texture;
+        hal::surface        surface; // The texture in the form of a surface.
+        hal::static_texture texture;
 
     private:
         bool m_repack;
 
-        hal::target_texture create(hal::ref<hal::renderer> rnd, hal::pixel::point sz);
+        hal::surface create(hal::pixel::point sz);
     };
 
     class texture_atlas_copyer : public hal::copyer {

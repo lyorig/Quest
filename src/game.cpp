@@ -101,11 +101,11 @@ delta_t game::delta() const {
 }
 
 texture_atlas::id_t game::atlas_add(hal::surface s) {
-    return atlas.add(renderer, std::move(s));
+    return atlas.add(std::move(s));
 }
 
 void game::atlas_replace(texture_atlas::id_t id, hal::surface s) {
-    atlas.replace(id, renderer, std::move(s));
+    atlas.replace(id, std::move(s));
 }
 
 void game::atlas_pack() {

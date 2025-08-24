@@ -15,11 +15,10 @@ namespace {
 texture_atlas::texture_atlas()
     : m_repack { false } { }
 
-texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
+texture_atlas::id_t texture_atlas::add(hal::surface surf) {
     m_repack = true;
 
     const hal::pixel::rect rect { hal::tag::as_size, surf.size() };
-    hal::static_texture    tex { rnd, std::move(surf) };
 
     id_t i { 0 };
 
@@ -28,7 +27,7 @@ texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface
         data& d { m_data[i] };
 
         if (!d.valid()) {
-            d.tex    = std::move(tex);
+            d.tex    = std::move(surf);
             d.staged = rect;
 
             return i;
@@ -38,29 +37,27 @@ texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface
     m_data.emplace_back(
         hal::pixel::rect {},
         rect,
-        std::move(tex));
+        std::move(surf));
 
     return i;
 }
 
-void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+void texture_atlas::replace(id_t id, hal::surface surf) {
     data& d { m_data[id] };
 
     if (surf.size() == d.area) {
-        return replace_exact(id, rnd, std::move(surf));
+        return replace_exact(id, std::move(surf));
     }
 
     m_repack = true;
 
     d.staged = { hal::tag::as_size, surf.size() };
-    d.tex    = { rnd, std::move(surf) };
+    d.tex    = std::move(surf);
 }
 
-void texture_atlas::replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
-    hal::guard::target  _ { rnd, texture };
-    hal::static_texture tex { rnd, std::move(surf) };
-
-    rnd->draw(tex).to(m_data[id].area).render();
+void texture_atlas::replace_exact(id_t id, hal::surface surf) {
+    // FIXME This doesn't sync with the texture!
+    surf.blit(surface).to(m_data[id].area).blit();
 }
 
 void texture_atlas::free(id_t id) {
@@ -87,19 +84,18 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
             [](const rect_t&) { return cr::ABORT_PACKING; },
             r2d::flipping_option::DISABLED)) };
 
+    hal::timer t;
+
     // ...then create the texture itself.
-    texture = create(rnd, std::bit_cast<hal::pixel::point>(size));
+    surface = create(std::bit_cast<hal::pixel::point>(size));
+    surface.save("lmao.bmp");
+    texture = { rnd, surface };
+
+    std::println("Creation took {}s", t.get());
 }
 
-hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz) {
-    hal::target_texture canvas { rnd, sz };
-
-    // FIXME Metal apparently waits for VSync upon setting the render target.
-    // https://discourse.libsdl.org/t/sdl-setrendertargets-metal-implementation-apparently-waits-for-vsync/62009.
-    hal::guard::target _ { rnd, canvas };
-
-    // Clear the texture (added after noticing weird graphical glitches on Windows).
-    rnd->clear();
+hal::surface texture_atlas::create(hal::pixel::point sz) {
+    hal::surface canvas { sz, hal::pixel::format::rgba32 };
 
     for (data& d : m_data) {
         // Skip unused entries.
@@ -108,16 +104,16 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
         }
 
         if (d.tex.valid()) { // Newly added.
-            rnd->draw(d.tex)
+            d.tex.blit(canvas)
                 .to(d.staged)
-                .render();
+                .blit();
 
             d.tex.reset();
         } else { // Present in the old atlas texture.
-            rnd->draw(texture)
+            surface.blit(canvas)
                 .from(d.area)
                 .to(d.staged)
-                .render();
+                .blit();
         }
 
         d.area = d.staged;
