@@ -87,11 +87,10 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     hal::timer t;
 
     // ...then create the texture itself.
-    surface = create(std::bit_cast<hal::pixel::point>(size));
-    surface.save("lmao.bmp");
-    texture = { rnd, surface };
+    this->surface = create(std::bit_cast<hal::pixel::point>(size));
+    this->texture = { rnd, create(std::bit_cast<hal::pixel::point>(size)) };
 
-    std::println("Creation took {}s", t.get());
+    std::println("<Atlas> Surface/texture creation took {:9f}s", t.get());
 }
 
 hal::surface texture_atlas::create(hal::pixel::point sz) {
@@ -110,7 +109,7 @@ hal::surface texture_atlas::create(hal::pixel::point sz) {
 
             d.tex.reset();
         } else { // Present in the old atlas texture.
-            surface.blit(canvas)
+            this->surface.blit(canvas)
                 .from(d.area)
                 .to(d.staged)
                 .blit();
@@ -152,7 +151,7 @@ void texture_atlas::debug_draw(
         rnd->draw(rect, outline_block);
     }
 
-    rnd->draw({ dst, texture.size().get() }, outline_atlas);
+    rnd->draw({ dst, surface.size() }, outline_atlas);
 }
 
 texture_atlas::rect_t& texture_atlas::data::get_rect() {
