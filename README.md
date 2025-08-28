@@ -50,7 +50,7 @@ UI scén, které dodržují tzv. _Process-Update-Draw_ (PUD) cyklus.
 
 Samotná hra -- třída `hq::game` -- sice připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
 nechvalně známým zdrojem problémů. Mnoho komponentů aplikace ale stále potřebuje komunikovat s různými jinými komponenty,
-kterých lze dosáhnout jen přes tuto třídu, takže většina funkcí a API má jako první argument `hq::game& g`, které propaguje
+kterých lze dosáhnout jen přes tuto třídu, takže většina funkcí má jako první argument `hq::game& g`, který propaguje
 dle potřeby do dalších funkcí.
 
 Žádná třída není přemrštěně velká, nýbrž jsou rozumně definovány zóny zodpovědnosti, které jsou reprezentovány přehlednou množinou tříd
