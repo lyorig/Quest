@@ -44,11 +44,32 @@ Programátor se tedy může soustředit na tvorbu samotné hry. Jmenný prostor 
 Projekt obsahuje několik konceptů:
 - **Texture atlas**, který s pomocí open-source knihovny _rectpack2D_ nabízí API pro ukládání vysokého množství textur
 na jednu velkou texturu a kreslení z ní; toto podstatně usnadňuje práci GPU a tím pádem i zrychluje program.
-- **Scene manager**, jehož šablonová černá magie umožňuje využití `std::tuple` pro ukládání a iteraci přes libovolné množství
+- **Scene Manager**, jehož šablonová černá magie umožňuje využití `std::tuple` pro ukládání a iteraci přes libovolné množství
 UI scén, které dodržují tzv. _Process-Update-Draw_ (PUD) cyklus.
 - V budoucnu bude implementováno API pro _Entity-Component System_ (ECS), nejspíše s pomocí knihovny [EnTT](https://github.com/skypjack/entt).
 
-Samotná hra -- třída `hq::game` -- sice připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
+#### Atlas API
+Atlas nabízí funkce, s nimiž se bitmapa (`hal::surface`) vloží do fronty, ze které se poté metodou `texture_atlas::pack()` vytvoří atlas.
+V té knihovna _rectpack2D_ určí pro dané textury optimální velikost atlasové textury a rozložení na něm, a třída následovně texturu dle těchto
+parametrů vytvoří a bitmapy ve frontě na ni narýsuje.
+
+> [!NOTE]
+> Některé funkce vyžadují jako parametr `hal::renderer` pro tvorbu textur. Za účelem pohodlí třída `hq::game` (viz níže) obsahuje
+> metody ve formátu `atlas_foo(...)`, které uvnitř volají `this->atlas.foo(..., this->renderer)`.
+
+#### Scénové API
+Cyklus se skládá ze tří operací:
+- **Process** - Zpracování všech událostí.
+- **Update** - Obnovení věcí, které závisí na čase (např. animace) pomocí `hq::game::delta()`.
+- **Draw** - Vykreslení grafických prvků na obrazovku.
+
+Scéna má k dispozici také bitmask _scénových modifikátorů_ (zděděná z `hq::scene::base`). Pro každou operaci cyklu existuje:
+- **Enabler** - Daná operace cyklu bude na třídě vykonána.
+- **Blocker** - Tato scéna bude poslední, na které je dána operace cyklu vykonána.
+
+Scéna může během kterékoliv operace svůj bitmask modifikovat a přidávat/oddělávat modifikátory. Například `hq::scene::console` má vždy nastavený bit `enable_process`, aby mohl naslouchat pro stisk klávesy F1 a otevřít se. Tehdy nastaví bit `block_process`, aby se veškerý vstup nepropagoval do dalších scén.
+
+Samotná hra -- třída `hq::game` -- sice svou velikostí připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
 nechvalně známým zdrojem problémů. Mnoho komponentů aplikace ale stále potřebuje komunikovat s různými jinými komponenty,
 kterých lze dosáhnout jen přes tuto třídu, takže většina funkcí má jako první argument `hq::game& g`, který propaguje
 dle potřeby do dalších funkcí.
