@@ -63,11 +63,9 @@ namespace hq {
 
     private:
         struct data {
-            hal::pixel::rect
-                area,   // Where the texture lies.
-                staged; // Temporary storage for repacking.
-
-            hal::static_texture tex; // The texture source (only valid when queued)
+            hal::pixel::rect    area;   // Where the texture lies.
+            rect_t              staged; // Temporary storage for repacking.
+            hal::static_texture tex;    // The texture source (only valid when queued)
 
             rect_t&       get_rect();
             const rect_t& get_rect() const;
