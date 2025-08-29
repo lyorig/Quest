@@ -10,6 +10,14 @@ using namespace hq;
 namespace {
     constexpr std::size_t  MAX_SIDE { 1024 };
     constexpr std::int32_t DISCARD_STEP { -4 };
+
+    constexpr hal::pixel::rect to_hal(texture_atlas::rect_t r) {
+        return std::bit_cast<hal::pixel::rect>(r);
+    }
+
+    constexpr texture_atlas::rect_t to_r2d(hal::pixel::point size) {
+        return { 0, 0, size.x, size.y };
+    }
 }
 
 texture_atlas::texture_atlas()
@@ -18,8 +26,8 @@ texture_atlas::texture_atlas()
 texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
     m_repack = true;
 
-    const hal::pixel::rect rect { hal::tag::as_size, surf.size() };
-    hal::static_texture    tex { rnd, std::move(surf) };
+    const rect_t        rect { to_r2d(surf.size()) };
+    hal::static_texture tex { rnd, std::move(surf) };
 
     id_t i { 0 };
 
@@ -52,7 +60,7 @@ void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface s
 
     m_repack = true;
 
-    d.staged = { hal::tag::as_size, surf.size() };
+    d.staged = to_r2d(surf.size());
     d.tex    = { rnd, std::move(surf) };
 }
 
@@ -109,18 +117,18 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
 
         if (d.tex.valid()) { // Newly added.
             rnd->draw(d.tex)
-                .to(d.staged)
+                .to(to_hal(d.staged))
                 .render();
 
             d.tex.reset();
         } else { // Present in the old atlas texture.
             rnd->draw(texture)
                 .from(d.area)
-                .to(d.staged)
+                .to(to_hal(d.staged))
                 .render();
         }
 
-        d.area = d.staged;
+        d.area = to_hal(d.staged);
     }
 
     return canvas;
@@ -160,19 +168,19 @@ void texture_atlas::debug_draw(
 }
 
 texture_atlas::rect_t& texture_atlas::data::get_rect() {
-    return reinterpret_cast<rect_t&>(staged);
+    return staged;
 }
 
 const texture_atlas::rect_t& texture_atlas::data::get_rect() const {
-    return reinterpret_cast<const rect_t&>(staged);
+    return staged;
 }
 
 void texture_atlas::data::invalidate() {
-    staged.pos.x = -1;
+    staged.x = -1;
 }
 
 bool texture_atlas::data::valid() const {
-    return staged.pos.x != -1;
+    return staged.x != -1;
 }
 
 using tac = texture_atlas_copyer;
