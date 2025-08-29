@@ -6,13 +6,13 @@ Z originálního nápadu tak vznikly dva projekty, které měly rozdělit probl�
 - **Halcyon**, C++ wrapper známé multimediální C knihovny [SDL3](https://github.com/libsdl-org/SDL), a
 - **Quest**, samotná hra, která využívá Halcyon.
 
-Projekty dlouhou dobu sloužily zejména k zlepšení znalostí jazyka C++.
+Projekty dlouhou dobu sloužily zejména ke zlepšení znalostí jazyka C++.
 
 ## Implementace
 
 ### Halcyon
 Cílem knihovny je vytvořit co nejblbuvzdornější wrapper SDL3 při zachování 1:1 rychlosti.
-Toto je zajištěno zejména pomocí asi nejlepší funkce, kterou C++ nabízí oproti C -- RAII.
+Toto je zajištěno zejména pomocí asi nejlepší funkce, kterou C++ nabízí oproti staršímu C: RAII.
 Třída `hal::detail::resource` pomocí šablon umožňuje jednoduchou implementaci sdílených metod
 pro veškeré objekty SDL3, se kterými se pracuje formou ukazatelů, přičemž je zjednodušena práce
 s pamětí, jelikož třída interně využívá `std::unique_ptr`.
@@ -21,13 +21,13 @@ Samotné wrappery objektů SDL3 zachovávají 1:1 chování, ale pomocí tříd 
 ```c
 SDL_Surface* surf = SDL_CreateSurface(256, 256, SDL_PIXELFORMAT_RGB24);
 uint8_t r, g, b;
-SDL_GetSurfaceColorMod(surf, &r, &g, &b);
+assert(SDL_GetSurfaceColorMod(surf, &r, &g, &b));
 SDL_DestroySurface(surf);
 ```
 vs.
 ```cpp
 hal::surface surf{{256, 256}, hal::pixel::format::rgb24};
-const hal::color mod{surf.color_mod().get()};
+hal::color mod{surf.color_mod().get()};
 // automatická dealokace
 ```
 Výsledkem je jednodušší a bezpečnější API s prakticky nulovým zpomalením.
