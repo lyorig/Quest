@@ -50,13 +50,13 @@ na jednu velkou texturu a kreslení z ní; toto podstatně usnadňuje práci GPU
 
 #### Scénové API
 Cyklus se skládá ze tří operací:
-- **Process** -- Zpracování všech událostí.
-- **Update** -- Obnovení věcí, které závisí na čase (např. animace) pomocí `hq::game::delta()`.
-- **Draw** -- Vykreslení grafických prvků na obrazovku.
+- **Process** &ndash; Zpracování všech událostí.
+- **Update** &ndash; Obnovení věcí, které závisí na čase (např. animace) pomocí `hq::game::delta()`.
+- **Draw** &ndash; Vykreslení grafických prvků na obrazovku.
 
 Scéna má k dispozici také bitmask _scénových modifikátorů_ (zděděná z `hq::scene::base`). Pro každou operaci cyklu existuje:
-- **Enabler** -- Daná operace cyklu bude na třídě vykonána.
-- **Blocker** -- Tato scéna bude poslední, na které je dána operace cyklu vykonána.
+- **Enabler** &ndash; Daná operace cyklu bude na třídě vykonána.
+- **Blocker** &ndash; Tato scéna bude poslední, na které je dána operace cyklu vykonána.
 
 #### Atlas API
 Atlas nabízí funkce, s nimiž se bitmapa (`hal::surface`) vloží do fronty, ze které se poté metodou `texture_atlas::pack()` vytvoří atlas.
@@ -72,7 +72,7 @@ index do řídkého pole souřadnic obdelníků náležícím dříve přidaným
 
 Scéna může během kterékoliv operace svůj bitmask modifikovat a přidávat/oddělávat modifikátory. Například `hq::scene::console` má vždy nastavený bit `enable_process`, aby mohl naslouchat pro stisk klávesy F1 a otevřít se. Tehdy nastaví bit `block_process`, aby se veškerý vstup nepropagoval do dalších scén.
 
-Samotná hra -- třída `hq::game` -- sice svou velikostí připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
+Samotná hra &ndash; třída `hq::game` &ndash; sice svou velikostí připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
 nechvalně známým zdrojem problémů. Mnoho komponentů aplikace ale stále potřebuje komunikovat s různými jinými komponenty,
 kterých lze dosáhnout jen přes tuto třídu, takže většina funkcí má jako první argument `hq::game& g`, který propaguje
 dle potřeby do dalších funkcí.
