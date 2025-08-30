@@ -4,6 +4,7 @@
 #include <halcyon/utility/guard.hpp>
 #include <halcyon/utility/timer.hpp>
 #include <halcyon/video/renderer.hpp>
+
 #include <ranges>
 
 using namespace hq;
@@ -18,6 +19,14 @@ namespace {
 
     constexpr texture_atlas::rect_t to_r2d(hal::pixel::point size) {
         return { 0, 0, size.x, size.y };
+    }
+
+    std::future<hal::static_texture> create_async(hal::ref<hal::renderer> rnd, hal::surface surf) {
+        // Capture by value, or `rnd` will get destructed and you'll
+        // be left with a `nullptr` texture (or some sort of UB)!
+        return std::async(std::launch::async, [=] {
+            return hal::static_texture { rnd, std::move(surf) };
+        });
     }
 }
 
@@ -37,7 +46,7 @@ texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface s
         data& d { m_data[i] };
 
         if (!d.valid()) {
-            d.tex    = std::move(tex);
+            d.tex    = create_async(rnd, std::move(surf));
             d.staged = rect;
 
             return static_cast<id>(i);
@@ -47,7 +56,7 @@ texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface s
     m_data.emplace_back(
         hal::pixel::rect {},
         rect,
-        std::move(tex));
+        create_async(rnd, std::move(surf)));
 
     return static_cast<id>(i);
 }
@@ -62,7 +71,7 @@ void texture_atlas::replace(id id, hal::ref<hal::renderer> rnd, hal::surface sur
     m_repack = true;
 
     d.staged = to_r2d(surf.size());
-    d.tex    = { rnd, std::move(surf) };
+    d.tex    = create_async(rnd, std::move(surf));
 }
 
 void texture_atlas::replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {
@@ -125,11 +134,9 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
         }
 
         if (d.tex.valid()) { // Newly added.
-            rnd->draw(d.tex)
+            rnd->draw(d.tex.get())
                 .to(to_hal(d.staged))
                 .render();
-
-            d.tex.reset();
         } else { // Present in the old atlas texture.
             rnd->draw(texture)
                 .from(d.area)
@@ -144,7 +151,7 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
 }
 
 texture_atlas_copyer texture_atlas::draw(id id, hal::ref<hal::renderer> rnd) {
-    HAL_ASSERT(m_data[id].valid(), "Drawing invalid texture");
+    HAL_ASSERT(m_data[std::to_underlying(id)].valid(), "Drawing invalid texture");
 
     return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(m_data[std::to_underlying(id)].area) };
 }

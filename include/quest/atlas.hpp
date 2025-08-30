@@ -1,5 +1,6 @@
 #pragma once
 
+#include <future>
 #include <halcyon/video/renderer.hpp>
 
 #include <rectpack2D/finders_interface.h>
@@ -69,9 +70,12 @@ namespace hq {
 
     private:
         struct data {
-            hal::pixel::rect    area;   // Where the texture lies.
-            rect_t              staged; // Temporary storage for repacking.
-            hal::static_texture tex;    // The texture source (only valid when queued)
+            hal::pixel::rect area;   // Where the texture lies.
+            rect_t           staged; // Temporary storage for repacking.
+
+            // The texture source.
+            // Textures are created asynchronously.
+            std::future<hal::static_texture> tex;
 
             rect_t&       get_rect();
             const rect_t& get_rect() const;
