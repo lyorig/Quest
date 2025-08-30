@@ -1,3 +1,4 @@
+#include <print>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <halcyon/hint.hpp>
@@ -64,6 +65,8 @@ game::game(args a) try
     HAL_PRINT(init, "<Game> Initialized.");
     HAL_PRINT("<Game> Base path: ", loader.base());
     HAL_PRINT("<Game> Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
+
+    pool.run([] { std::println("Hello World!"); });
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }

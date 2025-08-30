@@ -19,6 +19,7 @@ set(SOURCES
  helpers
  main
  sprite
+ thread_pool
 )
 
 list(TRANSFORM SOURCES PREPEND src/)
@@ -31,11 +32,6 @@ add_executable(game WIN32
 target_compile_options(game PRIVATE
  $<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
 )
-
-if (CMAKE_BUILD_TYPE STREQUAL Debug)
-    target_compile_options(game PRIVATE -fsanitize=address)
-    target_link_options(game PRIVATE -fsanitize=address)
-endif()
 
 target_include_directories(game PRIVATE
  include

@@ -2,6 +2,7 @@
 
 #include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
+#include <quest/thread_pool.hpp>
 
 #include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
@@ -73,6 +74,8 @@ namespace hq {
         texture_atlas atlas;
 
         scene::manager scenes;
+
+        thread_pool pool;
 
     private:
         event_vector m_polled;

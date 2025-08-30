@@ -1,3 +1,4 @@
+#include "halcyon/system.hpp"
 #include <quest/atlas.hpp>
 
 #include <halcyon/surface.hpp>
@@ -22,12 +23,24 @@ namespace {
     }
 
     std::future<hal::static_texture> create_async(hal::ref<hal::renderer> rnd, hal::surface s) {
-        // Capture by value, or `rnd` will get destructed and you'll
-        // be left with a `nullptr` texture (or some sort of UB)!
-        return std::async(std::launch::async,
-            [rnd, s = std::move(s)] {
-                return hal::static_texture { rnd, s };
-            });
+        namespace pf = hal::platform;
+
+        // Linux doesn't play well with textures being created in a separate thread.
+        if constexpr (pf::current[pf::type::linux_]) {
+            hal::static_texture t { rnd, s };
+
+            return std::async(std::launch::async,
+                [t = std::move(t)] mutable {
+                    return std::move(t);
+                });
+        } else {
+            // Capture by value, or `rnd` will get destructed and you'll
+            // be left with a `nullptr` texture (or some sort of UB)!
+            return std::async(std::launch::async,
+                [rnd, s = std::move(s)] {
+                    return hal::static_texture { rnd, s };
+                });
+        }
     }
 }
 
