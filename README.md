@@ -50,13 +50,13 @@ na jednu velkou texturu a kreslení z ní; toto podstatně usnadňuje práci GPU
 
 #### Scénové API
 Cyklus se skládá ze tří operací:
-- **Process** - Zpracování všech událostí.
-- **Update** - Obnovení věcí, které závisí na čase (např. animace) pomocí `hq::game::delta()`.
-- **Draw** - Vykreslení grafických prvků na obrazovku.
+- **Process** -- Zpracování všech událostí.
+- **Update** -- Obnovení věcí, které závisí na čase (např. animace) pomocí `hq::game::delta()`.
+- **Draw** -- Vykreslení grafických prvků na obrazovku.
 
 Scéna má k dispozici také bitmask _scénových modifikátorů_ (zděděná z `hq::scene::base`). Pro každou operaci cyklu existuje:
-- **Enabler** - Daná operace cyklu bude na třídě vykonána.
-- **Blocker** - Tato scéna bude poslední, na které je dána operace cyklu vykonána.
+- **Enabler** -- Daná operace cyklu bude na třídě vykonána.
+- **Blocker** -- Tato scéna bude poslední, na které je dána operace cyklu vykonána.
 
 #### Atlas API
 Atlas nabízí funkce, s nimiž se bitmapa (`hal::surface`) vloží do fronty, ze které se poté metodou `texture_atlas::pack()` vytvoří atlas.
