@@ -26,34 +26,40 @@ namespace hq {
         using spaces_t = r2d::empty_spaces<false>;
         using rect_t   = r2d::output_rect_t<spaces_t>;
 
-        using id_t = std::uint8_t;
+        // Make it less obvious that this is nothing more than an index
+        // into an array.
+        enum class id : std::uint8_t;
 
         texture_atlas();
 
         // Create and queue a texture for this atlas.
         // Returns the texture ID to draw with.
-        id_t add(hal::ref<hal::renderer> rnd, hal::surface surf);
+        id add(hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Replace a texture. Use if you're unsure whether their dimensions are gonna be different.
         // Shorthand for `texture_atlas::free()` and `texture_atlas::add()`.
-        void replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf);
+        void replace(id id, hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Replace a texture with an exact-size one.
         // This is particularly efficient as you don't need to repack.
-        void replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf);
+        void replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Free a space from the atlas.
         // This works because atlas rects are unique.
-        void free(id_t id);
+        void free(id id);
 
         // Create the atlas from queued textures.
         void pack(hal::ref<hal::renderer> rnd);
 
+        // Perform garbage collection, which is probably a misnomer, but at least it sounds cool.
+        // Removes all unused fields off the end of the data vector.
+        void gc();
+
         // Returns a specialized `hal::copyer`.
-        texture_atlas_copyer draw(id_t id, hal::ref<hal::renderer> rnd);
+        texture_atlas_copyer draw(id id, hal::ref<hal::renderer> rnd);
 
         // Get the area of a texture in the atlas.
-        hal::pixel::rect area(id_t id) const;
+        hal::pixel::rect area(id id) const;
 
         void debug_draw(
             hal::ref<hal::renderer> rnd,

@@ -20,6 +20,6 @@ namespace hq {
         hal::coord::rect hitbox;
 
     private:
-        texture_atlas::id_t m_atlasId;
+        texture_atlas::id m_atlasId;
     };
 }

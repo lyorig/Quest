@@ -4,6 +4,7 @@
 #include <halcyon/utility/guard.hpp>
 #include <halcyon/utility/timer.hpp>
 #include <halcyon/video/renderer.hpp>
+#include <ranges>
 
 using namespace hq;
 
@@ -23,13 +24,13 @@ namespace {
 texture_atlas::texture_atlas()
     : m_repack { false } { }
 
-texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
+texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
     m_repack = true;
 
     const rect_t        rect { to_r2d(surf.size()) };
     hal::static_texture tex { rnd, std::move(surf) };
 
-    id_t i { 0 };
+    std::underlying_type_t<id> i { 0 };
 
     // Can we reuse a slot in the vector?
     for (; i < m_data.size(); ++i) {
@@ -39,7 +40,7 @@ texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface
             d.tex    = std::move(tex);
             d.staged = rect;
 
-            return i;
+            return static_cast<id>(i);
         }
     }
 
@@ -48,11 +49,11 @@ texture_atlas::id_t texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface
         rect,
         std::move(tex));
 
-    return i;
+    return static_cast<id>(i);
 }
 
-void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
-    data& d { m_data[id] };
+void texture_atlas::replace(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+    data& d { m_data[std::to_underlying(id)] };
 
     if (surf.size() == d.area) {
         return replace_exact(id, rnd, std::move(surf));
@@ -64,15 +65,15 @@ void texture_atlas::replace(id_t id, hal::ref<hal::renderer> rnd, hal::surface s
     d.tex    = { rnd, std::move(surf) };
 }
 
-void texture_atlas::replace_exact(id_t id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+void texture_atlas::replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {
     hal::guard::target  _ { rnd, texture };
     hal::static_texture tex { rnd, std::move(surf) };
 
-    rnd->draw(tex).to(m_data[id].area).render();
+    rnd->draw(tex).to(m_data[std::to_underlying(id)].area).render();
 }
 
-void texture_atlas::free(id_t id) {
-    m_data[id].invalidate();
+void texture_atlas::free(id id) {
+    m_data[std::to_underlying(id)].invalidate();
 }
 
 void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
@@ -97,6 +98,14 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
 
     // ...then create the texture itself.
     texture = create(rnd, std::bit_cast<hal::pixel::point>(size));
+}
+
+void texture_atlas::gc() {
+    const auto subrange {
+        std::ranges::find_last_if(m_data, [](const data& d) { return !d.valid(); })
+    };
+
+    m_data.erase(subrange.begin(), subrange.end());
 }
 
 hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz) {
@@ -134,14 +143,14 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
     return canvas;
 }
 
-texture_atlas_copyer texture_atlas::draw(id_t id, hal::ref<hal::renderer> rnd) {
+texture_atlas_copyer texture_atlas::draw(id id, hal::ref<hal::renderer> rnd) {
     HAL_ASSERT(m_data[id].valid(), "Drawing invalid texture");
 
-    return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(m_data[id].area) };
+    return { hal::pass_key<texture_atlas> {}, rnd->draw(texture).from(m_data[std::to_underlying(id)].area) };
 }
 
-hal::pixel::rect texture_atlas::area(id_t id) const {
-    return m_data[id].area;
+hal::pixel::rect texture_atlas::area(id id) const {
+    return m_data[std::to_underlying(id)].area;
 }
 
 void texture_atlas::debug_draw(

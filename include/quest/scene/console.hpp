@@ -89,7 +89,7 @@ namespace hq {
 
             hal::font m_font;
 
-            texture_atlas::id_t
+            texture_atlas::id
                 m_prefix,
                 m_line;
 

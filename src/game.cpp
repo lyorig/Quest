@@ -100,11 +100,11 @@ delta_t game::delta() const {
     return m_delta * timescale;
 }
 
-texture_atlas::id_t game::atlas_add(hal::surface s) {
+texture_atlas::id game::atlas_add(hal::surface s) {
     return atlas.add(renderer, std::move(s));
 }
 
-void game::atlas_replace(texture_atlas::id_t id, hal::surface s) {
+void game::atlas_replace(texture_atlas::id id, hal::surface s) {
     atlas.replace(id, renderer, std::move(s));
 }
 
@@ -112,7 +112,7 @@ void game::atlas_pack() {
     atlas.pack(renderer);
 }
 
-texture_atlas_copyer game::atlas_draw(texture_atlas::id_t id) {
+texture_atlas_copyer game::atlas_draw(texture_atlas::id id) {
     return atlas.draw(id, renderer);
 }
 

@@ -53,10 +53,10 @@ namespace hq {
         delta_t delta() const;
 
         // Convenience atlas functions.
-        texture_atlas::id_t  atlas_add(hal::surface s);
-        void                 atlas_replace(texture_atlas::id_t id, hal::surface s);
+        texture_atlas::id    atlas_add(hal::surface s);
+        void                 atlas_replace(texture_atlas::id id, hal::surface s);
         void                 atlas_pack();
-        texture_atlas_copyer atlas_draw(texture_atlas::id_t id);
+        texture_atlas_copyer atlas_draw(texture_atlas::id id);
 
     private:
         hal::event::variant m_eventHandler;
