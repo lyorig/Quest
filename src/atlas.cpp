@@ -24,8 +24,8 @@ namespace {
     std::future<hal::static_texture> create_async(hal::ref<hal::renderer> rnd, hal::surface surf) {
         // Capture by value, or `rnd` will get destructed and you'll
         // be left with a `nullptr` texture (or some sort of UB)!
-        return std::async(std::launch::async, [=] {
-            return hal::static_texture { rnd, std::move(surf) };
+        return std::async(std::launch::async, [rnd, surf = std::move(surf)] {
+            return hal::static_texture { rnd, surf };
         });
     }
 }
