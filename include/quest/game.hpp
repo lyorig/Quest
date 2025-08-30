@@ -1,10 +1,10 @@
 #pragma once
 
-#include "quest/atlas.hpp"
+#include <quest/atlas.hpp>
+#include <quest/scene/manager.hpp>
+
 #include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
-
-#include <quest/scene/manager.hpp>
 
 #include <vector>
 

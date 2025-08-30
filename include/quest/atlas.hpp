@@ -1,15 +1,16 @@
 #pragma once
 
-#include <future>
 #include <halcyon/video/renderer.hpp>
 
 #include <rectpack2D/finders_interface.h>
 
+#include <future>
 #include <vector>
 
 namespace hq {
     namespace r2d = rectpack2D;
 
+    class game;
     class texture_atlas_copyer;
 
     // A texture atlas.
@@ -38,11 +39,10 @@ namespace hq {
         id add(hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Replace a texture. Use if you're unsure whether their dimensions are gonna be different.
-        // Shorthand for `texture_atlas::free()` and `texture_atlas::add()`.
         void replace(id id, hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Replace a texture with an exact-size one.
-        // This is particularly efficient as you don't need to repack.
+        // This is particularly efficient as you can just draw directly onto the texture.
         void replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf);
 
         // Free a space from the atlas.
