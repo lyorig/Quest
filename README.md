@@ -3,8 +3,8 @@
 ## Zadání
 _Quest_ je 2D aplikace, která sice měla originálně být 2D videohra, ale její tvůrce rychle zjistil, že to fakt nebude procházka růžovým sadem.
 Z originálního nápadu tak vznikly dva projekty, které měly rozdělit problém na části a zajistit stabilní harmonogram:
-- **Halcyon**, C++ wrapper známé multimediální C knihovny [SDL3](https://github.com/libsdl-org/SDL), a
-- **Quest**, samotná hra, která využívá Halcyon.
+- **Halcyon** &ndash; C++ wrapper známé multimediální C knihovny [SDL3](https://github.com/libsdl-org/SDL)
+- **Quest** &ndash; 2D hra, která využívá Halcyon.
 
 Projekty dlouhou dobu sloužily zejména ke zlepšení znalostí jazyka C++.
 
