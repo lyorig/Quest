@@ -25,12 +25,12 @@ void thread_pool::worker() {
         std::unique_lock lk { m_mutex };
 
         m_cv.wait(lk, [this] {
-            return !m_jobs.empty() || m_stop;
+            return !m_tasks.empty() || m_stop;
         });
 
-        if (!m_jobs.empty()) {
-            move_only_function<void()> task { std::move(m_jobs.front()) };
-            m_jobs.pop();
+        if (!m_tasks.empty()) {
+            move_only_function<void()> task { std::move(m_tasks.front()) };
+            m_tasks.erase(m_tasks.begin());
             lk.unlock();
             task();
         } else {
