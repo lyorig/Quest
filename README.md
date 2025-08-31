@@ -70,7 +70,7 @@ index do řídkého pole souřadnic obdelníků náležícím dříve přidaným
 > Některé funkce vyžadují jako parametr `hal::renderer` pro tvorbu textur. Za účelem pohodlí třída `hq::game` (viz níže) obsahuje
 > metody ve formátu `atlas_foo(...)`, které uvnitř volají `this->atlas.foo(..., this->renderer)`.
 
-Scéna může během kterékoliv operace svůj bitmask modifikovat a přidávat/oddělávat modifikátory. Například `hq::scene::console` má vždy nastavený bit `enable_process`, aby mohl naslouchat pro stisk klávesy F1 a otevřít se. Tehdy nastaví bit `block_process`, aby se veškerý vstup nepropagoval do dalších scén.
+Scéna může během kterékoliv operace svůj bitmask modifikovat a přidávat/oddělávat modifikátory. Například `hq::scene::console` (přepnete klávesou F1) má vždy nastavený bit `enable_process`, aby mohl naslouchat pro stisk klávesy F1 a otevřít se. Tehdy nastaví bit `block_process`, aby se veškerý vstup nepropagoval do dalších scén.
 
 Samotná hra &ndash; třída `hq::game` &ndash; sice svou velikostí připomíná "God object", ale vyhýbá se elegantně statickým proměnným, které jsou
 nechvalně známým zdrojem problémů. Mnoho komponentů aplikace ale stále potřebuje komunikovat s různými jinými komponenty,
