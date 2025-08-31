@@ -13,7 +13,7 @@ using namespace hq::scene;
 using namespace hal::literals;
 
 namespace hq::consts {
-    constexpr std::string_view prefix_text { "root@Console ~ %" };
+    constexpr std::string_view prefix_text { "raine1@Arctic~ %" };
 
     constexpr hal::coord_t padding_pc { 0.015_crd };
 
