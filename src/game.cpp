@@ -60,13 +60,6 @@ game::game(args a) try
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
-    using hal::debug::severity::init;
-
-    HAL_PRINT(init, "<Game> Initialized.");
-    HAL_PRINT("<Game> Base path: ", loader.base());
-    HAL_PRINT("<Game> Pref path: ", hal::fs::pref_path("IdleFour", "HalodaQuest"));
-
-    pool.run([] { std::println("Hello World!"); });
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }

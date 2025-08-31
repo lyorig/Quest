@@ -35,8 +35,6 @@ main_menu::main_menu(game& g)
         std::get<0>(tuple) = { sprite { g, font.render_blended(std::get<1>(tuple), hal::colors::white), { offset, accum } } };
         accum += sz;
     }
-
-    HAL_PRINT("<Main menu> Initialized.");
 }
 
 void main_menu::process(game& g) {

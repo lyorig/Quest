@@ -49,7 +49,6 @@ console::console(game& g)
     std::iota(std::begin(m_placeholderOrder), std::end(m_placeholderOrder), 0);
 
     HAL_WARN_IF(!m_font.mono(), "<Console> \"", m_font.family(), "\" is not a mono font. Character spacing will probably be incorrect.");
-    HAL_PRINT("<Console> Initialized. Supports up to ", hal::to_printable_int(m_maxChars), " chars.");
 }
 
 void console::process(game& g) {

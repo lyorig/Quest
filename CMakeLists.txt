@@ -44,6 +44,10 @@ target_link_libraries(game PRIVATE
  rectpack2D::rectpack2D
 )
 
+include(ProcessorCount)
+ProcessorCount(CPU_COUNT)
+target_compile_definitions(game PRIVATE HQ_CPU_COUNT=${CPU_COUNT})
+
 set(BinPath ${CMAKE_SOURCE_DIR})
 cmake_path(APPEND BinPath bin)
 
