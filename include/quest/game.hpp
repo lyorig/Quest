@@ -73,9 +73,9 @@ namespace hq {
 
         texture_atlas atlas;
 
-        scene::manager scenes;
-
         thread_pool pool;
+
+        scene::manager scenes;
 
     private:
         event_vector m_polled;

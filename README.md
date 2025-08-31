@@ -61,7 +61,7 @@ Scéna má k dispozici také bitmask _scénových modifikátorů_ (zděděná z 
 #### Atlas API
 Atlas nabízí funkce, s nimiž se bitmapa (`hal::surface`) vloží do fronty, ze které se poté metodou `texture_atlas::pack()` vytvoří atlas.
 V té knihovna _rectpack2D_ určí pro dané bitmapy optimální velikost atlasové textury a rozložení na něm, a třída následovně texturu dle těchto
-parametrů vytvoří a bitmapy ve frontě na ni narýsuje.
+parametrů vytvoří **paralelně pomocí třídy `hq::thread_pool`** a bitmapy ve frontě na ni narýsuje.
 
 Uživatel API získá po přidání textury do fronty ID, které později předává funkci `texture_atlas::draw()`. Pro třídu ovšem ID není nic více než
 index do řídkého pole souřadnic obdelníků náležícím dříve přidaným bitmapám. 🚀

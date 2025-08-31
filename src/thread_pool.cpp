@@ -1,7 +1,5 @@
 #include <quest/thread_pool.hpp>
 
-#include <halcyon/debug.hpp>
-
 #include <mutex>
 
 using namespace hq;

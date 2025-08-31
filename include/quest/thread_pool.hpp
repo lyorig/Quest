@@ -1,6 +1,5 @@
 #pragma once
 
-#include <halcyon/debug.hpp>
 #include <quest/util/move_only_function.hpp>
 
 #include <condition_variable>
@@ -32,7 +31,6 @@ namespace hq {
 
             {
                 std::unique_lock lock { m_mutex };
-                HAL_WARN_IF(m_stop, "Trying to run on a stopped TPool");
                 m_jobs.emplace([&, pt = std::move(pt)] mutable {
                     pt();
                 });
@@ -54,6 +52,6 @@ namespace hq {
         std::queue<move_only_function<void()>> m_jobs;
 
         // We could use `std::stop_source`, but that's just more overhead.
-        std::atomic_bool m_stop;
+        bool m_stop;
     };
 }
