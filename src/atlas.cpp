@@ -25,20 +25,18 @@ namespace {
     }
 
     std::future<hal::static_texture> create_async(game& g, hal::surface s) {
-        namespace pf = hal::platform;
-
-        // Linux doesn't play well with textures being created in a separate thread.
-        if constexpr (pf::current[pf::type::linux_]) {
-            hal::static_texture t { g.renderer, s };
-
-            return g.pool.run([t = std::move(t)] mutable {
-                return std::move(t);
-            });
-        } else {
+        // Linux & Windows both don't play well with textures being created in a separate thread.
+        if constexpr (hal::platform::is_macos()) {
             // Capture by value, or `rnd` will get destructed and you'll
             // be left with a `nullptr` texture (or some sort of UB)!
             return g.pool.run([rnd = hal::ref { g.renderer }, s = std::move(s)] {
                 return hal::static_texture { rnd, s };
+            });
+        } else {
+            hal::static_texture t { g.renderer, s };
+
+            return g.pool.run([t = std::move(t)] mutable {
+                return std::move(t);
             });
         }
     }
