@@ -1,7 +1,9 @@
-#include "halcyon/system.hpp"
 #include <quest/atlas.hpp>
 
+#include <quest/game.hpp>
+
 #include <halcyon/surface.hpp>
+#include <halcyon/system.hpp>
 #include <halcyon/utility/guard.hpp>
 #include <halcyon/utility/timer.hpp>
 #include <halcyon/video/renderer.hpp>
@@ -22,24 +24,22 @@ namespace {
         return { 0, 0, size.x, size.y };
     }
 
-    std::future<hal::static_texture> create_async(hal::ref<hal::renderer> rnd, hal::surface s) {
+    std::future<hal::static_texture> create_async(game& g, hal::surface s) {
         namespace pf = hal::platform;
 
         // Linux doesn't play well with textures being created in a separate thread.
         if constexpr (pf::current[pf::type::linux_]) {
-            hal::static_texture t { rnd, s };
+            hal::static_texture t { g.renderer, s };
 
-            return std::async(std::launch::async,
-                [t = std::move(t)] mutable {
-                    return std::move(t);
-                });
+            return g.pool.run([t = std::move(t)] mutable {
+                return std::move(t);
+            });
         } else {
             // Capture by value, or `rnd` will get destructed and you'll
             // be left with a `nullptr` texture (or some sort of UB)!
-            return std::async(std::launch::async,
-                [rnd, s = std::move(s)] {
-                    return hal::static_texture { rnd, s };
-                });
+            return g.pool.run([rnd = hal::ref { g.renderer }, s = std::move(s)] {
+                return hal::static_texture { rnd, s };
+            });
         }
     }
 }
@@ -47,11 +47,11 @@ namespace {
 texture_atlas::texture_atlas()
     : m_repack { false } { }
 
-texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface surf) {
+texture_atlas::id texture_atlas::add(game& g, hal::surface surf) {
     m_repack = true;
 
     const rect_t        rect { to_r2d(surf.size()) };
-    hal::static_texture tex { rnd, std::move(surf) };
+    hal::static_texture tex { g.renderer, std::move(surf) };
 
     std::underlying_type_t<id> i { 0 };
 
@@ -60,7 +60,7 @@ texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface s
         data& d { m_data[i] };
 
         if (!d.valid()) {
-            d.tex    = create_async(rnd, std::move(surf));
+            d.tex    = create_async(g, std::move(surf));
             d.staged = rect;
 
             return static_cast<id>(i);
@@ -70,22 +70,22 @@ texture_atlas::id texture_atlas::add(hal::ref<hal::renderer> rnd, hal::surface s
     m_data.emplace_back(
         hal::pixel::rect {},
         rect,
-        create_async(rnd, std::move(surf)));
+        create_async(g, std::move(surf)));
 
     return static_cast<id>(i);
 }
 
-void texture_atlas::replace(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {
+void texture_atlas::replace(id id, game& g, hal::surface surf) {
     data& d { m_data[std::to_underlying(id)] };
 
     if (surf.size() == d.area) {
-        return replace_exact(id, rnd, std::move(surf));
+        return replace_exact(id, g.renderer, std::move(surf));
     }
 
     m_repack = true;
 
     d.staged = to_r2d(surf.size());
-    d.tex    = create_async(rnd, std::move(surf));
+    d.tex    = create_async(g, std::move(surf));
 }
 
 void texture_atlas::replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {

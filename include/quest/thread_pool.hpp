@@ -1,7 +1,9 @@
 #pragma once
 
+#include <halcyon/debug.hpp>
+#include <quest/util/move_only_function.hpp>
+
 #include <condition_variable>
-#include <functional>
 #include <future>
 #include <mutex>
 #include <queue>
@@ -16,6 +18,8 @@ namespace hq {
 
         // Default-initializes all threads.
         thread_pool();
+
+        // Stops all threads.
         ~thread_pool();
 
         template <typename F>
@@ -23,19 +27,20 @@ namespace hq {
             using ret_t    = std::invoke_result_t<F>;
             using future_t = std::future<ret_t>;
 
-            std::packaged_task pt { std::forward<F>(f) };
-            future_t           future_object { pt.get_future() };
+            std::packaged_task<ret_t()> pt { std::forward<F>(f) };
+            future_t                    fut { pt.get_future() };
 
             {
                 std::unique_lock lock { m_mutex };
-                m_taskQueue.emplace([pt = std::move(pt)] mutable {
+                HAL_WARN_IF(m_stop, "Trying to run on a stopped TPool");
+                m_jobs.emplace([&, pt = std::move(pt)] mutable {
                     pt();
                 });
             }
 
             m_cv.notify_one();
 
-            return future_object;
+            return fut;
         }
 
     private:
@@ -46,8 +51,9 @@ namespace hq {
 
         std::condition_variable m_cv;
 
-        std::queue<std::function<void()>> m_taskQueue;
+        std::queue<move_only_function<void()>> m_jobs;
 
-        bool m_shouldStop;
+        // We could use `std::stop_source`, but that's just more overhead.
+        std::atomic_bool m_stop;
     };
 }

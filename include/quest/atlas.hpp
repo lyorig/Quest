@@ -36,10 +36,10 @@ namespace hq {
 
         // Create and queue a texture for this atlas.
         // Returns the texture ID to draw with.
-        id add(hal::ref<hal::renderer> rnd, hal::surface surf);
+        id add(game& g, hal::surface surf);
 
         // Replace a texture. Use if you're unsure whether their dimensions are gonna be different.
-        void replace(id id, hal::ref<hal::renderer> rnd, hal::surface surf);
+        void replace(id id, game& g, hal::surface surf);
 
         // Replace a texture with an exact-size one.
         // This is particularly efficient as you can just draw directly onto the texture.

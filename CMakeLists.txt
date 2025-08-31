@@ -29,6 +29,8 @@ add_executable(game WIN32
  ${SOURCES}
 )
 
+target_compile_features(game PRIVATE cxx_std_23)
+
 target_compile_options(game PRIVATE
  $<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
 )
@@ -37,21 +39,12 @@ target_include_directories(game PRIVATE
  include
 )
 
-# Is there a strip utility?
-if (CMAKE_STRIP)
-    add_custom_command(TARGET game POST_BUILD
-  COMMAND
-  "$<$<NOT:$<CONFIG:Debug,RelWithDebInfo>>:${CMAKE_STRIP};$<TARGET_FILE:game>>"
-  COMMAND_EXPAND_LISTS VERBATIM
- )
-endif()
-
 target_link_libraries(game PRIVATE
  Halcyon::Halcyon
  rectpack2D::rectpack2D
 )
 
-set(BinPath ${CMAKE_CURRENT_SOURCE_DIR})
+set(BinPath ${CMAKE_SOURCE_DIR})
 cmake_path(APPEND BinPath bin)
 
 # Enable LTO.

@@ -1,4 +1,3 @@
-#include <print>
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <halcyon/hint.hpp>
@@ -104,11 +103,11 @@ delta_t game::delta() const {
 }
 
 texture_atlas::id game::atlas_add(hal::surface s) {
-    return atlas.add(renderer, std::move(s));
+    return atlas.add(*this, std::move(s));
 }
 
 void game::atlas_replace(texture_atlas::id id, hal::surface s) {
-    atlas.replace(id, renderer, std::move(s));
+    atlas.replace(id, *this, std::move(s));
 }
 
 void game::atlas_pack() {
