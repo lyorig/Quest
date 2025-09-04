@@ -75,7 +75,10 @@ namespace hq {
             void process(std::string_view inp);
 
             // Is the console active?
-            bool active();
+            bool is_active();
+
+            // Command API
+            void write(std::string_view text);
 
         private:
             void set_cursor();
@@ -84,6 +87,8 @@ namespace hq {
             hal::surface make_placeholder();
 
             std::string_view generate_placeholder();
+
+            std::stringstream m_stream;
 
             field m_field;
 

@@ -2,6 +2,7 @@
 
 #include <halcyon/utility/guard.hpp>
 
+#include <quest/commands/defs.hpp>
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
 #include <quest/helpers.hpp>
@@ -9,38 +10,59 @@
 #include <numeric>
 #include <random>
 
+using namespace hq;
 using namespace hq::scene;
 using namespace hal::literals;
 
-namespace hq::consts {
-    constexpr std::string_view prefix_text { "raine1@Arctic~ %" };
+namespace {
+    constexpr std::string_view PREFIX_TEXT { "raine1@Arctic~ %" };
 
-    constexpr hal::coord_t padding_pc { 0.015_crd };
+    constexpr hal::coord_t PADDING_PC { 0.015_crd };
 
-    constexpr hal::color input_color { hal::colors::white },
-        background_color { hal::colors::black, 128 },
-        cursor_color { hal::colors::white, 128 },
-        placeholder_color { 0x808080 },
-        prefix_color { hal::colors::green };
+    constexpr hal::color
+        INPUT_COLOR { hal::colors::white },
+        BACKGROUND_COLOR { hal::colors::black, 128 },
+        CURSOR_COLOR { hal::colors::white, 128 },
+        PLACEHOLDER_COLOR { 0x808080 },
+        PREFIX_COLOR { hal::colors::green };
 
-    constexpr hal::coord::point text_offset { 10, 10 };
+    constexpr hal::coord::point TEXT_OFFSET { 10, 10 };
+    constexpr delta_t           CURSOR_BLINK_TIME { 0.5 };
+    constexpr std::size_t       DESIRED_MAX_CHARS { 128 };
+    constexpr flag_bitmask      ENABLERS { flag::enable_draw, flag::enable_update, flag::block_process };
 
-    constexpr delta_t cursor_blink_time { 0.5 };
+    cmd::status cmd_build(HQ_CMD_PARAMS) {
+        static_cast<void>(g);
 
-    constexpr std::size_t desired_max_chars { 128 };
+        out << "Quest v0.1 built @ " __TIMESTAMP__ << '\n';
+        return cmd::status::ok;
+    }
 
-    constexpr flag_bitmask enablers { flag::enable_draw, flag::enable_update, flag::block_process };
+    cmd::status cmd_exit(HQ_CMD_PARAMS) {
+        static_cast<void>(out);
+
+        g.running = false;
+        return cmd::status::ok;
+    }
+
+    struct {
+        std::string_view                               name;
+        hal::func_ptr<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
+    } constexpr commands[] {
+        { "build", cmd_build },
+        { "exit", cmd_exit }
+    };
 }
 
 console::console(game& g)
     : base { flag::enable_process }
     , m_placeholderIndex { std::size(console_placeholders) }
     , m_font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
-    , m_padding { g.renderer.size()->x * consts::padding_pc }
-    , m_texBegin { consts::text_offset.x + size_text(m_font, consts::prefix_text).x + m_padding }
+    , m_padding { g.renderer.size()->x * PADDING_PC }
+    , m_texBegin { TEXT_OFFSET.x + size_text(m_font, PREFIX_TEXT).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
-    , m_outline { { m_texBegin, consts::text_offset.y }, size_text(m_font, " ") }
-    , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.props().max_texture_size() / m_outline.size.x, static_cast<hal::coord_t>(consts::desired_max_chars))) }
+    , m_outline { { m_texBegin, TEXT_OFFSET.y }, size_text(m_font, " ") }
+    , m_maxChars { static_cast<std::uint16_t>(std::min(g.renderer.props().max_texture_size() / m_outline.size.x, static_cast<hal::coord_t>(DESIRED_MAX_CHARS))) }
     , m_lineChars { static_cast<std::uint8_t>(m_wrap / m_outline.size.x) }
     , m_repaint { false }
     , m_cursorVis { true } {
@@ -58,18 +80,18 @@ void console::process(game& g) {
 
         case key_pressed:
             if (process(g, evt.keyboard().key(), g.systems)) {
-                if (flags.all(consts::enablers)) {
-                    flags -= consts::enablers;
+                if (flags.all(ENABLERS)) {
+                    flags -= ENABLERS;
                     deactivate(g);
                 } else {
-                    flags += consts::enablers;
+                    flags += ENABLERS;
                     activate(g);
                 }
             };
             break;
 
         case text_input:
-            if (active()) {
+            if (is_active()) {
                 process(evt.text_input().text());
             }
 
@@ -85,7 +107,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_prefix = g.atlas_add(m_font.render_blended(consts::prefix_text, consts::prefix_color));
+    m_prefix = g.atlas_add(m_font.render_blended(PREFIX_TEXT, PREFIX_COLOR));
     m_line   = g.atlas_add(make_placeholder());
 
     g.systems.events.text_input_start(g.window);
@@ -109,7 +131,7 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
         return true;
 
     case F12:
-        if (flags[consts::enablers]) {
+        if (flags[ENABLERS]) {
             g.screenshot = false; // Intercept screenshot requests.
         }
         break;
@@ -145,8 +167,8 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
 void console::update(game& g) {
     m_cursorTime += g.delta();
 
-    if (m_cursorTime >= consts::cursor_blink_time) {
-        m_cursorTime -= consts::cursor_blink_time;
+    if (m_cursorTime >= CURSOR_BLINK_TIME) {
+        m_cursorTime -= CURSOR_BLINK_TIME;
         m_cursorVis = !m_cursorVis;
     }
 }
@@ -154,12 +176,12 @@ void console::update(game& g) {
 void console::draw(game& g) {
     hal::lref<hal::renderer> rnd { g.renderer };
 
-    hal::guard::color lock { rnd, consts::background_color };
+    hal::guard::color lock { rnd, BACKGROUND_COLOR };
     rnd->fill();
 
-    g.atlas_draw(m_prefix).to(consts::text_offset).render();
+    g.atlas_draw(m_prefix).to(TEXT_OFFSET).render();
 
-    hal::coord::point where { m_texBegin, consts::text_offset.y };
+    hal::coord::point where { m_texBegin, TEXT_OFFSET.y };
 
     hal::coord::rect   crd;
     const hal::pixel_t m_line_size_x = g.atlas.area(m_line).size.x;
@@ -177,7 +199,7 @@ void console::draw(game& g) {
     }
 
     if (m_cursorVis) {
-        lock.set(consts::cursor_color);
+        lock.set(CURSOR_COLOR);
         rnd->fill(m_outline);
     }
 
@@ -197,20 +219,24 @@ void console::process(std::string_view inp) {
     set_cursor();
 }
 
-bool console::active() {
-    return flags[consts::enablers];
+bool console::is_active() {
+    return flags[ENABLERS];
+}
+
+void console::write(std::string_view data) {
+    // TODO
 }
 
 hal::surface console::make_line() {
     if (m_field.text.empty()) {
         return make_placeholder();
     } else {
-        return m_font.render_blended(m_field.text, consts::input_color);
+        return m_font.render_blended(m_field.text, INPUT_COLOR);
     }
 }
 
 hal::surface console::make_placeholder() {
-    return m_font.render_blended(generate_placeholder(), consts::placeholder_color);
+    return m_font.render_blended(generate_placeholder(), PLACEHOLDER_COLOR);
 }
 
 std::string_view console::generate_placeholder() {
@@ -225,8 +251,8 @@ std::string_view console::generate_placeholder() {
 
 void console::set_cursor() {
     m_outline.pos.x = m_texBegin + (m_field.cursor % m_lineChars) * m_outline.size.x;
-    m_outline.pos.y = consts::text_offset.y + m_outline.size.y * static_cast<std::uint8_t>(m_field.cursor / m_lineChars);
+    m_outline.pos.y = TEXT_OFFSET.y + m_outline.size.y * static_cast<std::uint8_t>(m_field.cursor / m_lineChars);
 
-    m_cursorTime = consts::cursor_blink_time / 2.0;
+    m_cursorTime = CURSOR_BLINK_TIME / 2.0;
     m_cursorVis  = true;
 }
