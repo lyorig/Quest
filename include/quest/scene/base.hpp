@@ -18,6 +18,8 @@ namespace hq {
         }
 
         enum class flag : flag_t {
+            none = 0,
+
             // Enabling flags:
             enable_process = make_flag(0), // This scene can listen to events.
             enable_update  = make_flag(1), // This scene can perform delta updates.

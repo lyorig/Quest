@@ -15,7 +15,7 @@ namespace hq {
         { T::none } -> std::same_as<T>;
     };
 
-    // Return the [val] enum if [v] is true, else the enum's "none" value.
+    // Returns `val` if `v == true`, otherwise returns `T::none`.
     template <has_none T>
     constexpr T cond_enum(T val, bool v) {
         return v ? val : T::none;

@@ -16,21 +16,28 @@ using namespace hq::scene;
 using namespace hal::literals;
 
 namespace {
+    // The bash-like prompt prefix.
     constexpr std::string_view PREFIX_TEXT { "raine1@Arctic~ %" };
 
+    // Okay, I honestly cannot tell what this was supposed to mean.
     constexpr hal::coord_t PADDING_PC { 0.015_crd };
 
     constexpr hal::color
-        INPUT_COLOR { hal::colors::white },
-        BACKGROUND_COLOR { hal::colors::black, 128 },
-        CURSOR_COLOR { hal::colors::white, 128 },
-        PLACEHOLDER_COLOR { 0x808080 },
-        PREFIX_COLOR { hal::colors::green };
+        COLOR_INPUT { hal::colors::white },       // Console input.
+        COLOR_BG { hal::colors::black, 128 },     // Scene background.
+        COLOR_CURSOR { hal::colors::white, 128 }, // Input field cursor.
+        COLOR_PLACEHOLDER { 0x808080 },           // Input field placeholder.
+        COLOR_PREFIX { hal::colors::green };      // Prompt prefix.
 
     constexpr hal::coord::point TEXT_OFFSET { 10, 10 };
     constexpr delta_t           CURSOR_BLINK_TIME { 0.5 };
     constexpr std::size_t       DESIRED_MAX_CHARS { 128 };
-    constexpr flag_bitmask      ENABLERS { flag::enable_draw, flag::enable_update, flag::block_process };
+    constexpr flag_bitmask      ENABLERS {
+        flag::enable_draw,
+        flag::enable_update,
+        flag::block_process,
+        cond_enum(flag::block_draw, COLOR_BG.a == hal::color::opaque)
+    };
 
     cmd::status cmd_build(HQ_CMD_PARAMS) {
         g.con_write("Quest v0.1 built @ " __DATE__ " " __TIME__);
@@ -55,11 +62,60 @@ namespace {
         { "exit", cmd_exit },
         { "cpuinfo", cmd_cpuinfo },
     };
+
+    constexpr auto find_command(std::string_view name) {
+        return std::ranges::find_if(COMMANDS, [&](const command& c) { return c.name == name; });
+    }
+
+    constexpr std::string_view PLACEHOLDERS[NUM_PLACEHOLDERS] {
+        "[meow]",
+        "[redacted]",
+        "[your turn]",
+        "[womp womp]",
+        "[one big CVE]",
+        "[kevin's heart]",
+        "[lods of emone]",
+        "[be not afraid]",
+        "[see you again]",
+        "[forget me not]",
+        "[sudo deez nuts]",
+        "[openest source]",
+        "[at your service]",
+        "[with eye serene]",
+        "[is anyone there?]",
+        "[food for thought]",
+        "[made with Halcyon]",
+        "[49.0481N, 17.4838E]",
+        "[are you satisfied?]",
+        "[enter command here]",
+        "[running out of time]",
+        "[not actually random]",
+        "[watch?v=lo5cG0FhWro]",
+        "[not POSIX compliant]",
+        "[start typing, please]",
+        "[commands not included]",
+        "[segfaulting since 2021]",
+        "[waiting for user input]",
+        "[non-euclidean interface]",
+        "[who needs documentation]",
+        "[sudo pacman -S lyofetch]",
+        "[no man page here, sorry]",
+        "[ševalicious out tomorrow]",
+        "[licensed under the WTFPL]",
+        "[streets and sodium lights]",
+        "[quoth the raven, nevermore]",
+        "[docker? I barely know 'er!]",
+        "[rm -rf / --no-preserve-root]",
+
+#ifdef SDL_PLATFORM_WINDOWS
+        "[MSVC is the real final boss]",
+#endif
+    };
 }
 
 console::console(game& g)
     : base { flag::enable_process }
-    , m_placeholderIndex { std::size(console_placeholders) }
+    , m_placeholderIndex { std::size(PLACEHOLDERS) }
     , m_font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
     , m_padding { g.renderer.size()->x * PADDING_PC }
     , m_texBegin { TEXT_OFFSET.x + size_text(m_font, PREFIX_TEXT).x + m_padding }
@@ -110,7 +166,7 @@ void console::activate(game& g) {
     m_cursorTime = 0.0;
     m_cursorVis  = true;
 
-    m_prefix = g.atlas_add(m_font.render_blended(PREFIX_TEXT, PREFIX_COLOR));
+    m_prefix = g.atlas_add(m_font.render_blended(PREFIX_TEXT, COLOR_PREFIX));
     m_line   = g.atlas_add(make_placeholder());
 
     g.systems.events.text_input_start(g.window);
@@ -145,10 +201,14 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
             std::ranges::find(m_field.text, ' ').base()
         };
 
-        const auto iter = std::ranges::find_if(COMMANDS, [&](const command& cmd) { return cmd.name == argv0; });
+        const auto iter = find_command(argv0);
         if (iter == std::ranges::end(COMMANDS)) {
             break;
         }
+
+        m_field.clear();
+        set_cursor();
+        m_repaint = true;
 
         iter->cmd(g);
     } break;
@@ -193,7 +253,7 @@ void console::update(game& g) {
 void console::draw(game& g) {
     hal::lref<hal::renderer> rnd { g.renderer };
 
-    hal::guard::color lock { rnd, BACKGROUND_COLOR };
+    hal::guard::color lock { rnd, COLOR_BG };
     rnd->fill();
 
     g.atlas_draw(m_prefix).to(TEXT_OFFSET).render();
@@ -216,7 +276,7 @@ void console::draw(game& g) {
     }
 
     if (m_cursorVis) {
-        lock.set(CURSOR_COLOR);
+        lock.set(COLOR_CURSOR);
         rnd->fill(m_outline);
     }
 
@@ -248,22 +308,22 @@ hal::surface console::make_line() {
     if (m_field.text.empty()) {
         return make_placeholder();
     } else {
-        return m_font.render_blended(m_field.text, INPUT_COLOR);
+        return m_font.render_blended(m_field.text, COLOR_INPUT);
     }
 }
 
 hal::surface console::make_placeholder() {
-    return m_font.render_blended(generate_placeholder(), PLACEHOLDER_COLOR);
+    return m_font.render_blended(generate_placeholder(), COLOR_PLACEHOLDER);
 }
 
 std::string_view console::generate_placeholder() {
-    if (m_placeholderIndex == std::size(console_placeholders)) { // Need to refresh.
+    if (m_placeholderIndex == std::size(PLACEHOLDERS)) { // Need to refresh.
         HAL_PRINT("<Console> Shuffling placeholder indices...");
         std::shuffle(std::begin(m_placeholderOrder), std::end(m_placeholderOrder), std::mt19937_64 { std::random_device {}() });
         m_placeholderIndex = 0;
     }
 
-    return console_placeholders[m_placeholderOrder[m_placeholderIndex++]];
+    return PLACEHOLDERS[m_placeholderOrder[m_placeholderIndex++]];
 }
 
 void console::set_cursor() {

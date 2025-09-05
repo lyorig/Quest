@@ -5,54 +5,12 @@
 #include <quest/scene/base.hpp>
 #include <quest/types.hpp>
 
+#include <halcyon/system.hpp>
 #include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 
 namespace hq {
-    constexpr std::string_view console_placeholders[] {
-        "[meow]",
-        "[redacted]",
-        "[your turn]",
-        "[womp womp]",
-        "[one big CVE]",
-        "[kevin's heart]",
-        "[lods of emone]",
-        "[be not afraid]",
-        "[see you again]",
-        "[forget me not]",
-        "[sudo deez nuts]",
-        "[openest source]",
-        "[at your service]",
-        "[with eye serene]",
-        "[is anyone there?]",
-        "[food for thought]",
-        "[made with Halcyon]",
-        "[49.0481N, 17.4838E]",
-        "[are you satisfied?]",
-        "[enter command here]",
-        "[running out of time]",
-        "[not actually random]",
-        "[watch?v=lo5cG0FhWro]",
-        "[not POSIX compliant]",
-        "[start typing, please]",
-        "[commands not included]",
-        "[segfaulting since 2021]",
-        "[waiting for user input]",
-        "[non-euclidean interface]",
-        "[who needs documentation]",
-        "[sudo pacman -S lyofetch]",
-        "[no man page here, sorry]",
-        "[ševalicious out tomorrow]",
-        "[licensed under the WTFPL]",
-        "[streets and sodium lights]",
-        "[quoth the raven, nevermore]",
-        "[docker? I barely know 'er!]",
-        "[rm -rf / --no-preserve-root]",
-
-#ifdef SDL_PLATFORM_WINDOWS
-        "[MSVC is the real final boss]",
-#endif
-    };
+    constexpr std::size_t NUM_PLACEHOLDERS { 38 + hal::platform::is_windows() };
 
     namespace scene {
         // A console. Designed for use with mono fonts.
@@ -77,7 +35,8 @@ namespace hq {
             // Is the console active?
             bool is_active();
 
-            // Command API
+            // Write a string to the console.
+            // This currently just calls `HAL_PRINT()`.
             void write(std::string_view text);
 
         private:
@@ -94,7 +53,7 @@ namespace hq {
 
             std::uint8_t
                 m_placeholderIndex,
-                m_placeholderOrder[std::size(console_placeholders)];
+                m_placeholderOrder[NUM_PLACEHOLDERS];
 
             hal::font m_font;
 
