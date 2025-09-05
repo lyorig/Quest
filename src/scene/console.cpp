@@ -12,6 +12,7 @@
 
 using namespace hq;
 using namespace hq::scene;
+
 using namespace hal::literals;
 
 namespace {
@@ -32,7 +33,7 @@ namespace {
     constexpr flag_bitmask      ENABLERS { flag::enable_draw, flag::enable_update, flag::block_process };
 
     cmd::status cmd_build(HQ_CMD_PARAMS) {
-        g.con_write("Quest v0.1 built @ " __TIMESTAMP__);
+        g.con_write("Quest v0.1 built @ " __DATE__ " " __TIME__);
         return cmd::status::ok;
     }
 
@@ -41,12 +42,18 @@ namespace {
         return cmd::status::ok;
     }
 
+    cmd::status cmd_cpuinfo(HQ_CMD_PARAMS) {
+        g.con_write(hal::string_from_pack(hal::cpu::info));
+        return cmd::status::ok;
+    }
+
     struct command {
         std::string_view                               name;
         hal::func_ref<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
     } constexpr COMMANDS[] {
         { "build", cmd_build },
-        { "exit", cmd_exit }
+        { "exit", cmd_exit },
+        { "cpuinfo", cmd_cpuinfo },
     };
 }
 
