@@ -59,6 +59,9 @@ namespace hq {
         void                 atlas_pack();
         texture_atlas_copyer atlas_draw(texture_atlas::id id);
 
+        // Convenience console functions.
+        void con_write(std::string_view data);
+
     private:
         hal::event::variant m_eventHandler;
 

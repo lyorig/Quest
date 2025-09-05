@@ -111,6 +111,10 @@ texture_atlas_copyer game::atlas_draw(texture_atlas::id id) {
     return atlas.draw(id, renderer);
 }
 
+void game::con_write(std::string_view data) {
+    scenes.get<scene::console>().write(data);
+}
+
 void game::take_screenshot() const {
     namespace fs = std::filesystem;
 

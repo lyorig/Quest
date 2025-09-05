@@ -22,6 +22,11 @@ namespace hq {
             // Also packs the game's texture atlas.
             void update(game& g);
 
+            template <typename T, typename Self>
+            T& get(this Self&& s) {
+                return std::forward_like<Self>(std::get<T>(s.m_tuple));
+            }
+
         private:
             std::tuple<main_menu, console> m_tuple;
 

@@ -32,23 +32,19 @@ namespace {
     constexpr flag_bitmask      ENABLERS { flag::enable_draw, flag::enable_update, flag::block_process };
 
     cmd::status cmd_build(HQ_CMD_PARAMS) {
-        static_cast<void>(g);
-
-        out << "Quest v0.1 built @ " __TIMESTAMP__ << '\n';
+        g.con_write("Quest v0.1 built @ " __TIMESTAMP__);
         return cmd::status::ok;
     }
 
     cmd::status cmd_exit(HQ_CMD_PARAMS) {
-        static_cast<void>(out);
-
         g.running = false;
         return cmd::status::ok;
     }
 
-    struct {
+    struct command {
         std::string_view                               name;
-        hal::func_ptr<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
-    } constexpr commands[] {
+        hal::func_ref<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
+    } constexpr COMMANDS[] {
         { "build", cmd_build },
         { "exit", cmd_exit }
     };
@@ -135,6 +131,20 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
             g.screenshot = false; // Intercept screenshot requests.
         }
         break;
+
+    case enter: {
+        const std::string_view argv0 {
+            m_field.text.data(),
+            std::ranges::find(m_field.text, ' ').base()
+        };
+
+        const auto iter = std::ranges::find_if(COMMANDS, [&](const command& cmd) { return cmd.name == argv0; });
+        if (iter == std::ranges::end(COMMANDS)) {
+            break;
+        }
+
+        iter->cmd(g);
+    } break;
 
     default: {
         const field::action op { m_field.process(k, vid) };
@@ -223,8 +233,8 @@ bool console::is_active() {
     return flags[ENABLERS];
 }
 
-void console::write(std::string_view data) {
-    // TODO
+void console::write([[maybe_unused]] std::string_view data) {
+    HAL_PRINT(data);
 }
 
 hal::surface console::make_line() {
