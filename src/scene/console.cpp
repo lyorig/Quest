@@ -40,31 +40,68 @@ namespace {
     };
 
     cmd::status cmd_build(HQ_CMD_PARAMS) {
+        (void)args;
+
         g.con_write("Quest v0.1 built @ " __DATE__ " " __TIME__);
         return cmd::status::ok;
     }
 
     cmd::status cmd_exit(HQ_CMD_PARAMS) {
+        (void)args;
+
         g.running = false;
         return cmd::status::ok;
     }
 
     cmd::status cmd_cpuinfo(HQ_CMD_PARAMS) {
+        (void)args;
+
         g.con_write(hal::string_from_pack(hal::cpu::info));
+        return cmd::status::ok;
+    }
+
+    cmd::status cmd_test_args(HQ_CMD_PARAMS) {
+        (void)g;
+
+        for (std::size_t i { 0 }; i < args.size(); ++i) {
+            g.con_write(std::format("#{}: {}", i, args[i]));
+        }
+
         return cmd::status::ok;
     }
 
     struct command {
         std::string_view                               name;
         hal::func_ref<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
+        std::string_view                               help {};
     } constexpr COMMANDS[] {
-        { "build", cmd_build },
-        { "exit", cmd_exit },
-        { "cpuinfo", cmd_cpuinfo },
+        { "build", cmd_build, "Query build info for this executable." },
+        { "exit", cmd_exit, "Exit the game." },
+        { "cpuinfo", cmd_cpuinfo, "Get CPU information via Halcyon." },
+        { "test-args", cmd_test_args, "Prints its arguments." },
     };
 
     constexpr auto find_command(std::string_view name) {
         return std::ranges::find_if(COMMANDS, [&](const command& c) { return c.name == name; });
+    }
+
+    // Splits a string (console input) into an array of arguments.
+    // Currently VERY primitive--it only splits at spaces.
+    std::vector<std::string_view> parse_command_line(std::string_view input) {
+        std::vector<std::string_view> ret;
+
+        using ci = std::string_view::const_iterator;
+
+        ci start { input.begin() };
+        while (start != input.end()) {
+            // Finds nearest space
+            const ci it { std::find(start, input.end(), ' ') };
+            ret.emplace_back(start, it);
+
+            start = std::find_if(it, input.end(), [](char c) { return c != ' '; });
+        }
+
+        return ret;
     }
 
     constexpr std::string_view PLACEHOLDERS[NUM_PLACEHOLDERS] {
@@ -195,23 +232,9 @@ bool console::process(game& g, hal::keyboard::key k, hal::proxy::video vid) {
         }
         break;
 
-    case enter: {
-        const std::string_view argv0 {
-            m_field.text.data(),
-            std::ranges::find(m_field.text, ' ').base()
-        };
-
-        const auto iter = find_command(argv0);
-        if (iter == std::ranges::end(COMMANDS)) {
-            break;
-        }
-
-        m_field.clear();
-        set_cursor();
-        m_repaint = true;
-
-        iter->cmd(g);
-    } break;
+    case enter:
+        execute_command(g);
+        break;
 
     default: {
         const field::action op { m_field.process(k, vid) };
@@ -324,6 +347,37 @@ std::string_view console::generate_placeholder() {
     }
 
     return PLACEHOLDERS[m_placeholderOrder[m_placeholderIndex++]];
+}
+
+void console::execute_command(game& g) {
+    const auto args = parse_command_line(m_field.text);
+    if (args.empty()) {
+        return;
+    }
+
+    const bool help = args.front() == "help";
+
+    const auto srch = args[help];
+    const auto iter = find_command(srch);
+
+    if (iter == std::ranges::end(COMMANDS)) {
+        g.con_write("command \"{}\" not found", srch);
+        return;
+    }
+
+    m_field.clear();
+    set_cursor();
+    m_repaint = true;
+
+    if (help) {
+        if (iter->help.data() == nullptr) {
+            g.con_write("No help provided for \"{}\".", iter->help);
+        } else {
+            g.con_write(iter->help);
+        }
+    } else {
+        iter->cmd(g, { args.begin() + 1, args.end() });
+    }
 }
 
 void console::set_cursor() {

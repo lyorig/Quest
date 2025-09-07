@@ -10,6 +10,8 @@
 #include <halcyon/video.hpp>
 
 namespace hq {
+    // The placeholders are only necessary in the implementation, but their size
+    // is also used for `m_placeholderOrder` -- oof!
     constexpr std::size_t NUM_PLACEHOLDERS { 38 + hal::platform::is_windows() };
 
     namespace scene {
@@ -46,6 +48,8 @@ namespace hq {
             hal::surface make_placeholder();
 
             std::string_view generate_placeholder();
+
+            void execute_command(game& g);
 
             std::stringstream m_stream;
 

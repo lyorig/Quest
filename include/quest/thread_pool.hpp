@@ -24,7 +24,7 @@ namespace hq {
         ~thread_pool();
 
         // Queue a task.
-        // This returns a futu
+        // This returns a future corresponding to the return value of `f`.
         template <std::invocable F>
         future_of<F> run(F&& f) {
             std::packaged_task pt { std::forward<F>(f) };
@@ -32,7 +32,7 @@ namespace hq {
 
             {
                 std::unique_lock lock { m_mutex };
-                m_tasks.emplace_back([&, pt = std::move(pt)] mutable {
+                m_tasks.emplace_back([pt = std::move(pt)] mutable {
                     pt();
                 });
             }

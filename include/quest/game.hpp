@@ -38,7 +38,7 @@ namespace hq {
         hal::c_string operator[](pos_t pos) const;
 
     private:
-        std::span<const char*> m_span;
+        std::span<const char* const> m_span;
     };
 
     class game {
@@ -61,6 +61,11 @@ namespace hq {
 
         // Convenience console functions.
         void con_write(std::string_view data);
+
+        template <typename... Args>
+        void con_write(std::format_string<Args...> fmt, Args&&... args) {
+            con_write(std::format(fmt, std::forward<Args>(args)...));
+        }
 
     private:
         hal::event::variant m_eventHandler;
