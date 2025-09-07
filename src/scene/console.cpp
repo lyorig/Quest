@@ -44,15 +44,15 @@ namespace {
         (void)args;
 
         g.con_write("Quest v0.1 built @ " __DATE__ " " __TIME__);
+
         return cmd::status::ok;
     }
 
     cmd::status cmd_exit(HQ_CMD_PARAMS) {
-        if (std::ranges::contains(args, "--exit")) {
-            std::exit(EXIT_SUCCESS);
-        }
+        (void)args;
 
         g.running = false;
+
         return cmd::status::ok;
     }
 
@@ -60,6 +60,7 @@ namespace {
         (void)args;
 
         g.con_write(hal::string_from_pack(hal::cpu::info));
+
         return cmd::status::ok;
     }
 
@@ -359,17 +360,15 @@ void console::execute_command(game& g) {
 
     const bool help { args.front() == "help" };
 
-    if (help && args.size() < 2) {
-        g.con_write("usage: help <command>");
-        return;
+    if (help && (args.size() < 2 || args[1] == "help")) {
+        return g.con_write("Prints the help string for a given command.");
     }
 
     const auto srch = args[help];
     const auto iter = find_command(srch);
 
     if (iter == std::ranges::end(COMMANDS)) {
-        g.con_write("command \"{}\" not found", srch);
-        return;
+        return g.con_write("command \"{}\" not found", srch);
     }
 
     m_field.clear();

@@ -34,7 +34,8 @@ namespace hq {
             // Process entered text.
             void process(std::string_view inp);
 
-            // Is the console active?
+            // Returns whether the console is active.
+            // This is detected via flags.
             bool is_active();
 
             // Write a string to the console.
@@ -42,6 +43,7 @@ namespace hq {
             void write(std::string_view text);
 
         private:
+            // Places the cursor to an appropriate location on the screen.
             void set_cursor();
 
             hal::surface make_line();
@@ -49,9 +51,9 @@ namespace hq {
 
             std::string_view generate_placeholder();
 
+            // Parses `m_field` into a command + arguments, and attempts
+            // to execute it.
             void execute_command(game& g);
-
-            std::stringstream m_stream;
 
             field m_field;
 
