@@ -1,6 +1,7 @@
 #include <quest/scene/console.hpp>
 
 #include <halcyon/utility/guard.hpp>
+#include <halcyon/utility/strutil.hpp>
 
 #include <quest/commands/defs.hpp>
 #include <quest/constants.hpp>
@@ -47,7 +48,9 @@ namespace {
     }
 
     cmd::status cmd_exit(HQ_CMD_PARAMS) {
-        (void)args;
+        if (std::ranges::contains(args, "--exit")) {
+            std::exit(EXIT_SUCCESS);
+        }
 
         g.running = false;
         return cmd::status::ok;
@@ -94,7 +97,6 @@ namespace {
 
         ci start { input.begin() };
         while (start != input.end()) {
-            // Finds nearest space
             const ci it { std::find(start, input.end(), ' ') };
             ret.emplace_back(start, it);
 
@@ -274,7 +276,7 @@ void console::update(game& g) {
 }
 
 void console::draw(game& g) {
-    hal::lref<hal::renderer> rnd { g.renderer };
+    hal::ref rnd { g.renderer };
 
     hal::guard::color lock { rnd, COLOR_BG };
     rnd->fill();
@@ -355,7 +357,12 @@ void console::execute_command(game& g) {
         return;
     }
 
-    const bool help = args.front() == "help";
+    const bool help { args.front() == "help" };
+
+    if (help && args.size() < 2) {
+        g.con_write("usage: help <command>");
+        return;
+    }
 
     const auto srch = args[help];
     const auto iter = find_command(srch);
