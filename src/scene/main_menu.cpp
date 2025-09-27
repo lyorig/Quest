@@ -22,7 +22,7 @@ namespace {
 
 main_menu::main_menu(game& g)
     : base { flag::all_enable } {
-    const hal::font font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
+    const hal::font font { find_sized_font(g, "assets/UbuntuMono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.1)) };
 
     constexpr std::string_view texts[] { "New game", "Continue", "Settings", "Exit" };
     static_assert(hal::meta::array_size<decltype(m_widgets)> == std::size(texts));

@@ -156,7 +156,7 @@ namespace {
 console::console(game& g)
     : base { flag::enable_process }
     , m_placeholderIndex { std::size(PLACEHOLDERS) }
-    , m_font { find_sized_font(g, "assets/Ubuntu Mono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
+    , m_font { find_sized_font(g, "assets/UbuntuMono.ttf", static_cast<hal::pixel_t>(g.renderer.size()->y * 0.045)) }
     , m_padding { g.renderer.size()->x * PADDING_PC }
     , m_texBegin { TEXT_OFFSET.x + size_text(m_font, PREFIX_TEXT).x + m_padding }
     , m_wrap { static_cast<hal::pixel_t>(g.renderer.size()->x - m_texBegin - m_padding) }
