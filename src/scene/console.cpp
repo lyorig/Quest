@@ -42,35 +42,34 @@ namespace {
 
     cmd::status cmd_build(HQ_CMD_PARAMS) {
         (void)args;
-
         g.con_write("Quest v0.1 built @ " __DATE__ " " __TIME__);
-
         return cmd::status::ok;
     }
 
     cmd::status cmd_exit(HQ_CMD_PARAMS) {
         (void)args;
-
         g.running = false;
-
         return cmd::status::ok;
     }
 
     cmd::status cmd_cpuinfo(HQ_CMD_PARAMS) {
         (void)args;
-
         g.con_write(hal::string_from_pack(hal::cpu::info));
-
         return cmd::status::ok;
     }
 
     cmd::status cmd_test_args(HQ_CMD_PARAMS) {
         (void)g;
 
-        for (std::size_t i { 0 }; i < args.size(); ++i) {
+        for (std::size_t i { 0 }; i < args.size(); ++i)
             g.con_write(std::format("#{}: {}", i, args[i]));
-        }
 
+        return cmd::status::ok;
+    }
+
+    cmd::status cmd_errno(HQ_CMD_PARAMS) {
+        (void)args;
+        g.con_write(std::strerror(errno));
         return cmd::status::ok;
     }
 
@@ -83,6 +82,7 @@ namespace {
         { "exit", cmd_exit, "Exit the game." },
         { "cpuinfo", cmd_cpuinfo, "Get CPU information via Halcyon." },
         { "test-args", cmd_test_args, "Prints its arguments." },
+        { "errno", cmd_errno, "Prints std::strerror(errno)." },
     };
 
     constexpr auto find_command(std::string_view name) {
