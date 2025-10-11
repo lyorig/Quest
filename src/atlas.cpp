@@ -131,8 +131,9 @@ void texture_atlas::gc() {
 
 hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixel::point sz) {
     hal::target_texture canvas { rnd, sz };
+    canvas.blend(hal::blend_mode::additive_premul);
 
-    // FIXME Metal apparently waits for VSync upon setting the render target.
+    // FIXME: Metal apparently waits for VSync upon setting the render target.
     // https://discourse.libsdl.org/t/sdl-setrendertargets-metal-implementation-apparently-waits-for-vsync/62009.
     hal::guard::target _ { rnd, canvas };
 
