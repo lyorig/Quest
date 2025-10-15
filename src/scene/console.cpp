@@ -73,6 +73,23 @@ namespace {
         return cmd::status::ok;
     }
 
+    cmd::status cmd_get_error(HQ_CMD_PARAMS) {
+        (void)args;
+        g.con_write(SDL_GetError());
+        return cmd::status::ok;
+    }
+
+    cmd::status cmd_set_error(HQ_CMD_PARAMS) {
+        if (args.size() < 1) {
+            g.con_write("usage: set-error [value]");
+            return cmd::status::err;
+        }
+
+        SDL_SetError("%s", args.front().data());
+
+        return cmd::status::ok;
+    }
+
     struct command {
         std::string_view                               name;
         hal::func_ref<cmd::status, HQ_CMD_PARAM_TYPES> cmd;
@@ -83,6 +100,8 @@ namespace {
         { "cpuinfo", cmd_cpuinfo, "Get CPU information via Halcyon." },
         { "test-args", cmd_test_args, "Prints its arguments." },
         { "errno", cmd_errno, "Prints std::strerror(errno)." },
+        { "get-error", cmd_get_error, "Prints SDL_GetError()." },
+        { "set-error", cmd_set_error, "Sets the SDL error via SDL_SetError()." },
     };
 
     constexpr auto find_command(std::string_view name) {

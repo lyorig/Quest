@@ -12,6 +12,7 @@
 
 namespace hq::cmd {
     enum class status {
-        ok
+        ok,
+        err
     };
 }
