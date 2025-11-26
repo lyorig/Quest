@@ -1,3 +1,4 @@
+#include "halcyon/video/texture.hpp"
 #include <quest/atlas.hpp>
 
 #include <quest/game.hpp>
@@ -23,30 +24,13 @@ namespace {
     constexpr texture_atlas::rect_t to_r2d(hal::pixel::point size) {
         return { 0, 0, size.x, size.y };
     }
-
-    std::future<hal::static_texture> create_async(game& g, hal::surface s) {
-        // Linux & Windows both don't play well with textures being created in a separate thread.
-        if constexpr (hal::platform::is_macos()) {
-            // Capture by value, or `rnd` will get destructed and you'll
-            // be left with a `nullptr` texture (or some sort of UB)!
-            return g.pool.run([rnd = hal::ref { g.renderer }, s = std::move(s)] {
-                return hal::static_texture { rnd, s };
-            });
-        } else {
-            hal::static_texture t { g.renderer, s };
-
-            return g.pool.run([t = std::move(t)] mutable {
-                return std::move(t);
-            });
-        }
-    }
 }
 
 texture_atlas::texture_atlas()
-    : m_repack { false } { }
+    : m_shouldRepack { false } { }
 
 texture_atlas::id texture_atlas::add(game& g, hal::surface surf) {
-    m_repack = true;
+    m_shouldRepack = true;
 
     const rect_t        rect { to_r2d(surf.size()) };
     hal::static_texture tex { g.renderer, std::move(surf) };
@@ -58,7 +42,7 @@ texture_atlas::id texture_atlas::add(game& g, hal::surface surf) {
         data& d { m_data[i] };
 
         if (!d.valid()) {
-            d.tex    = create_async(g, std::move(surf));
+            d.tex    = hal::static_texture { g.renderer, std::move(surf) };
             d.staged = rect;
 
             return static_cast<id>(i);
@@ -68,7 +52,7 @@ texture_atlas::id texture_atlas::add(game& g, hal::surface surf) {
     m_data.emplace_back(
         hal::pixel::rect {},
         rect,
-        create_async(g, std::move(surf)));
+        hal::static_texture { g.renderer, std::move(surf) });
 
     return static_cast<id>(i);
 }
@@ -80,10 +64,10 @@ void texture_atlas::replace(id id, game& g, hal::surface surf) {
         return replace_exact(id, g.renderer, std::move(surf));
     }
 
-    m_repack = true;
+    m_shouldRepack = true;
 
     d.staged = to_r2d(surf.size());
-    d.tex    = create_async(g, std::move(surf));
+    d.tex    = hal::static_texture { g.renderer, std::move(surf) };
 }
 
 void texture_atlas::replace_exact(id id, hal::ref<hal::renderer> rnd, hal::surface surf) {
@@ -101,11 +85,11 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
     using cr = r2d::callback_result;
 
     // Check whether there's actually anything to do.
-    if (!m_repack) {
+    if (!m_shouldRepack) {
         return;
     }
 
-    m_repack = false;
+    m_shouldRepack = false;
 
     // Find the best possible packing for these rects...
     const r2d::rect_wh size { r2d::find_best_packing<spaces_t>(
@@ -147,7 +131,7 @@ hal::target_texture texture_atlas::create(hal::ref<hal::renderer> rnd, hal::pixe
         }
 
         if (d.tex.valid()) { // Newly added.
-            rnd->draw(d.tex.get())
+            rnd->draw(d.tex)
                 .to(to_hal(d.staged))
                 .render();
         } else { // Present in the old atlas texture.

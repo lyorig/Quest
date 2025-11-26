@@ -4,7 +4,6 @@
 
 #include <rectpack2D/finders_interface.h>
 
-#include <future>
 #include <vector>
 
 namespace hq {
@@ -74,8 +73,7 @@ namespace hq {
             rect_t           staged; // Temporary storage for repacking.
 
             // The texture source.
-            // Textures are created asynchronously.
-            std::future<hal::static_texture> tex;
+            hal::static_texture tex;
 
             rect_t&       get_rect();
             const rect_t& get_rect() const;
@@ -90,7 +88,10 @@ namespace hq {
         hal::target_texture texture;
 
     private:
-        bool m_repack;
+        // If `false`, `pack()` is a no-op.
+        // Used to optimize game loop iterations in which
+        // no textures are queued to be added.
+        bool m_shouldRepack;
 
         hal::target_texture create(hal::ref<hal::renderer> rnd, hal::pixel::point sz);
     };
