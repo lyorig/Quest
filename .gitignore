@@ -4,7 +4,7 @@
 bin/*
 !bin/assets/
 
-build/
+build*/
 
 .DS_Store
 CMakeSettings.json
