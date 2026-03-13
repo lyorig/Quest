@@ -2,7 +2,6 @@
 
 #include <quest/atlas.hpp>
 #include <quest/scene/manager.hpp>
-#include <quest/thread_pool.hpp>
 
 #include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
@@ -80,8 +79,6 @@ namespace hq {
         hal::fs::resource_loader loader;
 
         texture_atlas atlas;
-
-        thread_pool pool;
 
         scene::manager scenes;
 

@@ -16,7 +16,6 @@ set(QUEST_SOURCES
 	helpers
 	main
 	sprite
-	thread_pool
 )
 
 list(TRANSFORM QUEST_SOURCES PREPEND src/)
