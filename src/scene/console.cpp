@@ -1,3 +1,6 @@
+// MSVC complains about using std::strerror().
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <quest/scene/console.hpp>
 
 #include <halcyon/utility/guard.hpp>
