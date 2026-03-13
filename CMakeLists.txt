@@ -9,7 +9,7 @@ project(Quest
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/halcyon/cmake)
 include(HalcyonHelpers)
 
-set(QUEST_SOURCES
+Halcyon_CreateSourceList(QUEST_SOURCES src cpp
 	scene/console
 	scene/dummy
 	scene/main_menu
@@ -23,10 +23,7 @@ set(QUEST_SOURCES
 	sprite
 )
 
-list(TRANSFORM QUEST_SOURCES PREPEND src/)
-list(TRANSFORM QUEST_SOURCES APPEND .cpp)
-
-set(QUEST_HEADERS
+Halcyon_CreateSourceList(QUEST_HEADERS include/quest hpp
 	commands/defs
 	scene/base
 	scene/console
@@ -48,9 +45,6 @@ set(QUEST_HEADERS
 	types
 )
 
-list(TRANSFORM QUEST_HEADERS PREPEND include/quest/)
-list(TRANSFORM QUEST_HEADERS APPEND .hpp)
-
 add_executable(game WIN32)
 target_sources(game
 	PRIVATE ${QUEST_SOURCES}
@@ -64,7 +58,7 @@ target_compile_options(game PRIVATE
 	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
 )
 
-set_std_no_ext(game 23)
+Halcyon_SetStandardWithoutExtensions(game 23)
 
 add_subdirectory(halcyon)
 add_subdirectory(rectpack2D)
