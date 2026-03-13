@@ -1,9 +1,9 @@
 #pragma once
 
 #include <quest/atlas.hpp>
+#include <quest/data_loader.hpp>
 #include <quest/scene/manager.hpp>
 
-#include <halcyon/filesystem.hpp>
 #include <halcyon/video.hpp>
 
 #include <vector>
@@ -76,7 +76,7 @@ namespace hq {
         hal::window   window;
         hal::renderer renderer;
 
-        hal::fs::resource_loader loader;
+        data_loader loader;
 
         texture_atlas atlas;
 

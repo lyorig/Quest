@@ -5,12 +5,17 @@ project(Quest
 	LANGUAGES CXX
 )
 
+# Halcyon has nifty helper functions that we'd like to use as well.
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/halcyon/cmake)
+include(HalcyonHelpers)
+
 set(QUEST_SOURCES
 	scene/console
 	scene/dummy
 	scene/main_menu
 	scene/manager
 	atlas
+	data_loader
 	field
 	game
 	helpers
@@ -32,6 +37,7 @@ set(QUEST_HEADERS
 	animatable
 	atlas
 	constants
+	data_loader
 	entity_manager
 	field
 	game
@@ -46,7 +52,6 @@ list(TRANSFORM QUEST_HEADERS PREPEND include/quest/)
 list(TRANSFORM QUEST_HEADERS APPEND .hpp)
 
 add_executable(game WIN32)
-
 target_sources(game
 	PRIVATE ${QUEST_SOURCES}
 	PUBLIC
@@ -59,7 +64,7 @@ target_compile_options(game PRIVATE
 	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
 )
 
-target_compile_features(game PUBLIC cxx_std_23)
+set_std_no_ext(game 23)
 
 add_subdirectory(halcyon)
 add_subdirectory(rectpack2D)
@@ -69,14 +74,13 @@ target_link_libraries(game PUBLIC
 	rectpack2D::rectpack2D
 )
 
-set(QUEST_BIN_PATH ${CMAKE_SOURCE_DIR})
-cmake_path(APPEND QUEST_BIN_PATH bin)
-
 # Enable LTO in release modes.
 set_target_properties(game PROPERTIES
-	RUNTIME_OUTPUT_DIRECTORY ${QUEST_BIN_PATH}
 	$<NOT:$<CONFIG:Debug>:INTERPROCEDURAL_OPTIMIZATION TRUE>
 )
 
 # On Windows, ensure the system can find the necessary DLLs.
 install(FILES $<TARGET_RUNTIME_DLLS:game> TYPE BIN)
+
+install(TARGETS game DESTINATION bin)
+install(DIRECTORY data DESTINATION .)
