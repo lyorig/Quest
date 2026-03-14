@@ -9,6 +9,8 @@ project(Quest
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/halcyon/cmake)
 include(HalcyonHelpers)
 
+Halcyon_SetupBuildType(Release)
+
 Halcyon_CreateSourceList(QUEST_SOURCES src cpp
 	scene/console
 	scene/dummy
@@ -55,7 +57,7 @@ target_sources(game
 )
 
 target_compile_options(game PRIVATE
-	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra -Wno-c++98-compat>
+	$<IF:$<CXX_COMPILER_FRONTEND_VARIANT:MSVC>,/Wall,-Wall -Wpedantic -Wextra>
 )
 
 Halcyon_SetStandardWithoutExtensions(game 23)
