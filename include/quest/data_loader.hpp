@@ -11,7 +11,5 @@ namespace hq {
 
     private:
         std::string m_base;
-
-        hal::fs::resource_loader m_loader;
     };
 }

@@ -12,10 +12,9 @@ namespace {
 }
 
 data_loader::data_loader()
-    : m_base { data_path() }
-    , m_loader { m_base } {
+    : m_base { data_path() } {
 }
 
 std::string data_loader::resolve(std::string_view path) const {
-    return m_loader.resolve(path);
+    return hal::fs::resource_loader::resolve(m_base, path);
 }
