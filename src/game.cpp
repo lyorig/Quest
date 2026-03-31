@@ -47,7 +47,7 @@ args::info args::operator[](std::string_view what) const {
     return { info::invalid_pos() };
 }
 
-hal::c_string args::operator[](pos_t p) const {
+std::string_view args::operator[](pos_t p) const {
     return m_span[p];
 }
 

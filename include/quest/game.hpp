@@ -33,8 +33,8 @@ namespace hq {
             }
         };
 
-        info          operator[](std::string_view what) const;
-        hal::c_string operator[](pos_t pos) const;
+        info             operator[](std::string_view what) const;
+        std::string_view operator[](pos_t pos) const;
 
     private:
         std::span<const char* const> m_span;
