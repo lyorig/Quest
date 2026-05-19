@@ -107,7 +107,7 @@ void texture_atlas::pack(hal::ref<hal::renderer> rnd) {
 
 void texture_atlas::gc() {
     const auto subrange {
-        std::ranges::find_last_if(m_data, [](const data& d) { return !d.valid(); })
+        std::ranges::find_last_if_not(m_data, &data::valid)
     };
 
     m_data.erase(subrange.begin(), subrange.end());

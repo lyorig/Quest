@@ -108,7 +108,7 @@ namespace {
     };
 
     constexpr auto find_command(std::string_view name) {
-        return std::ranges::find_if(COMMANDS, [&](const command& c) { return c.name == name; });
+        return std::ranges::find(COMMANDS, name, &command::name);
     }
 
     // Splits a string (console input) into an array of arguments.
