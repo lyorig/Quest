@@ -1,0 +1,30 @@
+[
+  {
+    "label": "CMake: configure",
+    "command": "cmake -B build",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "CMake: build",
+    "command": "cmake -B build && cmake --build build -j",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "CMake: run",
+    "command": "cmake -B build && cmake --build build -j && ./build/game",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "show_summary": false,
+    "show_command": false,
+  },
+  {
+    "label": "CMake: clean",
+    "command": "cmake --build build --target clean",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "show_summary": false,
+    "show_command": false,
+  },
+]
