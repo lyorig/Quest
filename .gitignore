@@ -4,9 +4,8 @@
 bin/*
 !bin/assets/
 
-build*/
-build*
+build/
 
 .DS_Store
-CMakeSettings.json
-halcyon_debug_output.txt
+
+/compile_commands.json
