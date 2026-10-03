@@ -4,67 +4,156 @@
   "version": 10,
 
   "cmakeMinimumRequired": {
-    "major": 4,
-    "minor": 2,
+    "major": 3,
+    "minor": 30,
     "patch": 0
   },
 
   "configurePresets": [
     {
-      "name": "debug",
-      "displayName": "Debug",
-      "description": "Includes debug information and no optimizations",
-      "binaryDir": "${sourceDir}/build/debug",
+      "name": "common",
+      "hidden": true,
+      "binaryDir": "build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "${presetName}"
       }
     },
     {
-      "name": "release",
-      "displayName": "Release",
-      "description": "Release configuration with optimizations",
-      "binaryDir": "${sourceDir}/build/release",
+      "name": "Debug",
+      "inherits": "common"
+    },
+    {
+      "name": "Release",
+      "inherits": "common"
+    },
+    {
+      "name": "MinSizeRel",
+      "inherits": "common"
+    },
+    {
+      "name": "RelWithDebInfo",
+      "inherits": "common"
+    },
+    {
+      "name": "Test",
+      "inherits": "RelWithDebInfo",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "BUILD_TESTING": "ON"
       }
     }
   ],
 
   "buildPresets": [
     {
-      "name": "debug",
-      "configurePreset": "debug"
+      "name": "Common",
+      "hidden": true,
+      "jobs": 4
     },
     {
-      "name": "release",
-      "configurePreset": "release"
+      "name": "Debug",
+      "inherits": "Common",
+      "configurePreset": "Debug"
+    },
+    {
+      "name": "Release",
+      "inherits": "Common",
+      "configurePreset": "Release"
+    },
+    {
+      "name": "MinSizeRel",
+      "inherits": "Common",
+      "configurePreset": "MinSizeRel"
+    },
+    {
+      "name": "RelWithDebInfo",
+      "inherits": "Common",
+      "configurePreset": "RelWithDebInfo"
+    },
+    {
+      "name": "Test",
+      "inherits": "Common",
+      "configurePreset": "Test"
+    }
+  ],
+
+  "testPresets": [
+    {
+      "name": "Default",
+      "displayName": "${presetName}",
+      "configurePreset": "Test",
+      "execution": {
+        "jobs": 4
+      }
     }
   ],
 
   "workflowPresets": [
     {
-      "name": "debug",
+      "name": "Debug",
       "steps": [
         {
           "type": "configure",
-          "name": "debug"
+          "name": "Debug"
         },
         {
           "type": "build",
-          "name": "debug"
+          "name": "Debug"
         }
       ]
     },
     {
-      "name": "release",
+      "name": "Release",
       "steps": [
         {
           "type": "configure",
-          "name": "release"
+          "name": "Release"
         },
         {
           "type": "build",
-          "name": "release"
+          "name": "Release"
+        }
+      ]
+    },
+    {
+      "name": "MinSizeRel",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "MinSizeRel"
+        },
+        {
+          "type": "build",
+          "name": "MinSizeRel"
+        }
+      ]
+    },
+    {
+      "name": "RelWithDebInfo",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "RelWithDebInfo"
+        },
+        {
+          "type": "build",
+          "name": "RelWithDebInfo"
+        }
+      ]
+    },
+    {
+      "name": "Test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "Test"
+        },
+        {
+          "type": "build",
+          "name": "Test"
+        },
+        {
+          "type": "test",
+          "name": "Default"
         }
       ]
     }
