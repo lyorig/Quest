@@ -8,7 +8,7 @@
 #include <halcyon/utility/timer.hpp>
 
 #include <quest/game.hpp>
-#include <quest/helpers.hpp>
+import quest.helpers;
 
 #include <charconv>
 #include <filesystem>

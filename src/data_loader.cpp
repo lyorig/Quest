@@ -1,6 +1,11 @@
-#include <quest/data_loader.hpp>
+module;
 
-using namespace hq;
+#include <string>
+#include <string_view>
+
+#include <halcyon/filesystem.hpp>
+
+export module quest.data_loader;
 
 namespace {
     std::string data_path() {
@@ -11,10 +16,18 @@ namespace {
     }
 }
 
-data_loader::data_loader()
-    : m_base { data_path() } {
-}
+namespace hq {
+    export class data_loader {
+    public:
+        data_loader()
+            : m_base { data_path() } {
+        }
 
-std::string data_loader::resolve(std::string_view path) const {
-    return hal::fs::resource_loader::resolve(m_base, path);
+        std::string resolve(std::string_view path) const {
+            return hal::fs::resource_loader::resolve(m_base, path);
+        }
+
+    private:
+        std::string m_base;
+    };
 }

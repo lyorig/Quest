@@ -9,7 +9,7 @@
 #include <quest/commands/defs.hpp>
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
-#include <quest/helpers.hpp>
+import quest.helpers;
 
 #include <numeric>
 #include <random>

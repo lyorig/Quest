@@ -1,12 +1,13 @@
 #pragma once
 
 #include <quest/atlas.hpp>
-#include <quest/data_loader.hpp>
 #include <quest/scene/manager.hpp>
 
 #include <halcyon/video.hpp>
 
 #include <vector>
+
+import quest.data_loader;
 
 namespace hq {
     class args {

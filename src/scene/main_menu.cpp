@@ -4,7 +4,7 @@
 
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
-#include <quest/helpers.hpp>
+import quest.helpers;
 #include <ranges>
 
 using namespace hq::scene;
