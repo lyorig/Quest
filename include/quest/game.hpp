@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quest/atlas.hpp>
+import quest.atlas;
 #include <quest/types.hpp>
 
 #include <halcyon/ttf.hpp>

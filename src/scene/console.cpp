@@ -6,10 +6,10 @@
 #include <halcyon/utility/guard.hpp>
 #include <halcyon/utility/strutil.hpp>
 
-#include <quest/commands/defs.hpp>
 #include <quest/constants.hpp>
 #include <quest/game.hpp>
 import quest.helpers;
+import quest.commands.defs;
 
 #include <numeric>
 #include <random>
@@ -18,6 +18,14 @@ using namespace hq;
 using namespace hq::scene;
 
 using namespace hal::literals;
+
+// The types passed to Quest console commands.
+// Intended to be used in function declarations or as type parameters.
+#define HQ_CMD_PARAM_TYPES game&, std::span<const std::string_view>
+
+// The parameters passed to Quest console commands.
+// Intended to be used in function definitions.
+#define HQ_CMD_PARAMS game &g, std::span<const std::string_view> args
 
 namespace {
     // The bash-like prompt prefix.

@@ -9,6 +9,7 @@
 
 #include <quest/game.hpp>
 #include <quest/scene/manager.hpp>
+
 import quest.helpers;
 
 #include <charconv>
@@ -100,11 +101,11 @@ delta_t game::delta() const {
 }
 
 texture_atlas::id game::atlas_add(hal::surface s) {
-    return atlas.add(*this, std::move(s));
+    return atlas.add(renderer, std::move(s));
 }
 
 void game::atlas_replace(texture_atlas::id id, hal::surface s) {
-    atlas.replace(id, *this, std::move(s));
+    atlas.replace(id, renderer, std::move(s));
 }
 
 void game::atlas_pack() {

@@ -14,13 +14,11 @@ halcyon_createsourcelist(QUEST_SOURCES src cpp
     scene/dummy
     scene/main_menu
     scene/manager
-    atlas
     game
     main
 )
 
 halcyon_createsourcelist(QUEST_HEADERS include/quest hpp
-    commands/defs
     scene/base
     scene/console
     scene/dummy
@@ -28,13 +26,21 @@ halcyon_createsourcelist(QUEST_HEADERS include/quest hpp
     scene/manager
     util/move_only_function
     animatable
-    atlas
     constants
     entity_manager
     game
     rfem
     static_vector
     types
+)
+
+halcyon_createsourcelist(QUEST_MODULES src cpp
+    atlas
+    commands/defs
+    data_loader
+    field
+    helpers
+    sprite
 )
 
 add_executable(game WIN32)
@@ -47,7 +53,7 @@ target_sources(
     PRIVATE
         FILE_SET CXX_MODULES #
             BASE_DIRS src
-            FILES src/data_loader.cpp src/field.cpp src/helpers.cpp src/sprite.cpp
+            FILES ${QUEST_MODULES}
     PUBLIC
         FILE_SET HEADERS #
             BASE_DIRS include

@@ -1,6 +1,5 @@
 module;
 
-#include <quest/atlas.hpp>
 #include <quest/game.hpp>
 
 #include <halcyon/video/texture.hpp>

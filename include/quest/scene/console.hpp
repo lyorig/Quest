@@ -1,6 +1,6 @@
 #pragma once
 
-#include <quest/atlas.hpp>
+import quest.atlas;
 import quest.field;
 #include <quest/scene/base.hpp>
 #include <quest/types.hpp>

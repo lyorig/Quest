@@ -16,8 +16,8 @@ namespace {
     }
 }
 
-namespace hq {
-    export class data_loader {
+export namespace hq {
+    class data_loader {
     public:
         data_loader()
             : m_base { data_path() } {
