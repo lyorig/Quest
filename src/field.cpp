@@ -1,142 +1,171 @@
-#include <quest/field.hpp>
+module;
 
-using namespace hq;
+#include <halcyon/video.hpp>
+
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <string_view>
+
+export module quest.field;
 
 namespace consts {
     constexpr std::size_t tab_size { 4 };
 }
 
-field::field()
-    : cursor { 0 } { }
+export namespace hq {
+    // A text field manipulated via keystrokes.
+    class field {
+    public:
+        enum class action {
+            nothing,
+            text_added,
+            text_removed,
+            cursor_moved
+        };
 
-bool field::process(std::string_view inp) {
-    text.insert(cursor, inp);
-    cursor += inp.size();
+        field()
+            : cursor { 0 } { }
 
-    for (const char ch : inp) {
-        if (!std::isspace(ch)) {
-            return true;
-        }
-    }
+        // Process some text. Returns whether visual changes have been made.
+        bool process(std::string_view inp) {
+            text.insert(cursor, inp);
+            cursor += inp.size();
 
-    return false;
-}
-
-field::action field::process(hal::keyboard::key k, hal::proxy::video vid) {
-    switch (k) {
-        using key = hal::keyboard::key;
-        using mod = hal::keyboard::mod;
-
-    case key::backspace:
-        if (text.empty())
-            break;
-
-        if (vid.events.keyboard_mod().any(mod::ctrl_both)) {
-            std::size_t begin, end;
-
-            if (cursor == 0) { // delete from beginning
-                begin = end = 0;
-
-                const char curr { text[begin] };
-
-                if (curr == ' ') { // delete spaces
-                    for (; end != text.size() && text[end] == ' '; ++end)
-                        ;
-                } else if (std::isalpha(curr)) { // delete letters
-                    for (; end != text.size() && std::isalpha(text[end]); ++end)
-                        ;
-                } else { // delete... not letters?
-                    for (; end != text.size() && !std::isalpha(text[end]) && text[end] != ' '; ++end)
-                        ;
+            for (const char ch : inp) {
+                if (!std::isspace(ch)) {
+                    return true;
                 }
             }
 
-            else { // delete from cursor
-                begin = cursor - 1;
-                end   = cursor;
+            return false;
+        }
 
-                const char curr { text[begin] };
+        // Process a key. Returns what happened to the field.
+        action process(hal::keyboard::key k, hal::proxy::video vid) {
+            switch (k) {
+                using key = hal::keyboard::key;
+                using mod = hal::keyboard::mod;
 
-                if (curr == ' ') { // delete spaces
-                    for (; begin != 0 && text[begin] == ' '; --begin)
-                        ;
-                } else if (std::isalpha(curr)) { // delete letters
-                    for (; begin != 0 && std::isalpha(text[begin]); --begin)
-                        ;
-                } else { // delete... not letters?
-                    for (; begin != 0 && !std::isalpha(text[begin]) && text[begin] != ' '; --begin)
-                        ;
+            case key::backspace:
+                if (text.empty())
+                    break;
 
-                    if (begin != 0)
-                        ++begin;
+                if (vid.events.keyboard_mod().any(mod::ctrl_both)) {
+                    std::size_t begin, end;
+
+                    if (cursor == 0) { // delete from beginning
+                        begin = end = 0;
+
+                        const char curr { text[begin] };
+
+                        if (curr == ' ') { // delete spaces
+                            for (; end != text.size() && text[end] == ' '; ++end)
+                                ;
+                        } else if (std::isalpha(curr)) { // delete letters
+                            for (; end != text.size() && std::isalpha(text[end]); ++end)
+                                ;
+                        } else { // delete... not letters?
+                            for (; end != text.size() && !std::isalpha(text[end]) && text[end] != ' '; ++end)
+                                ;
+                        }
+                    }
+
+                    else { // delete from cursor
+                        begin = cursor - 1;
+                        end   = cursor;
+
+                        const char curr { text[begin] };
+
+                        if (curr == ' ') { // delete spaces
+                            for (; begin != 0 && text[begin] == ' '; --begin)
+                                ;
+                        } else if (std::isalpha(curr)) { // delete letters
+                            for (; begin != 0 && std::isalpha(text[begin]); --begin)
+                                ;
+                        } else { // delete... not letters?
+                            for (; begin != 0 && !std::isalpha(text[begin]) && text[begin] != ' '; --begin)
+                                ;
+
+                            if (begin != 0)
+                                ++begin;
+                        }
+
+                        cursor -= end - begin;
+                    }
+
+                    text.erase(text.begin() + begin, text.begin() + end);
+
+                    return action::text_removed;
+
+                } else { // delete one character
+                    if (cursor != 0) {
+                        --cursor;
+                    }
+
+                    text.erase(text.begin() + cursor);
+
+                    return action::text_removed;
                 }
 
-                cursor -= end - begin;
+            case key::left_arrow:
+                if (cursor != 0) {
+                    --cursor;
+                }
+
+                return action::cursor_moved;
+
+            case key::right_arrow:
+                cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
+
+                return action::cursor_moved;
+
+            case key::tab:
+                text.insert(cursor, consts::tab_size, ' ');
+                cursor += consts::tab_size;
+
+                return action::text_added;
+
+            case key::V:
+                if ((vid.events.keyboard_mod().any(mod::ctrl_both)) && vid.clipboard_has_text()) {
+                    const auto        str = vid.clipboard();
+                    const std::size_t sz { str.size() }; // one-time size calculation
+
+                    text.insert(cursor, str.c_str(), sz);
+                    cursor += sz;
+
+                    return action::text_added;
+                }
+
+                break;
+
+            default:
+                break;
             }
 
-            text.erase(text.begin() + begin, text.begin() + end);
+            HAL_WARN_IF(cursor > text.size(), "<Text Field> Cursor is OOB @ ", cursor);
 
-            return action::text_removed;
+            return action::nothing;
+        }
 
-        } else { // delete one character
-            if (cursor != 0) {
-                --cursor;
+        // Trim the field from `off` to the end.
+        void trim(std::size_t off) {
+            if (cursor > off) {
+                cursor -= cursor - off;
             }
 
-            text.erase(text.begin() + cursor);
-
-            return action::text_removed;
+            text.erase(off);
         }
 
-    case key::left_arrow:
-        if (cursor != 0) {
-            --cursor;
+        // Clear the string and reset the cursor.
+        void clear() {
+            text.clear();
+            cursor = 0;
         }
 
-        return action::cursor_moved;
-
-    case key::right_arrow:
-        cursor = std::min(static_cast<std::size_t>(cursor + 1), text.size());
-
-        return action::cursor_moved;
-
-    case key::tab:
-        text.insert(cursor, consts::tab_size, ' ');
-        cursor += consts::tab_size;
-
-        return action::text_added;
-
-    case key::V:
-        if ((vid.events.keyboard_mod().any(mod::ctrl_both)) && vid.clipboard_has_text()) {
-            const auto        str = vid.clipboard();
-            const std::size_t sz { str.size() }; // one-time size calculation
-
-            text.insert(cursor, str.c_str(), sz);
-            cursor += sz;
-
-            return action::text_added;
-        }
-
-        break;
-
-    default:
-        break;
-    }
-
-    HAL_WARN_IF(cursor > text.size(), "<Text Field> Cursor is OOB @ ", cursor);
-
-    return action::nothing;
+        std::string text;
+        std::size_t cursor;
+    };
 }
 
-void field::trim(std::size_t off) {
-    if (cursor > off) {
-        cursor -= cursor - off;
-    }
 
-    text.erase(off);
-}
-
-void field::clear() {
-    text.clear();
-    cursor = 0;
-}

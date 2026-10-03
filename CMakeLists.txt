@@ -15,10 +15,8 @@ halcyon_createsourcelist(QUEST_SOURCES src cpp
     scene/main_menu
     scene/manager
     atlas
-    field
     game
     main
-    sprite
 )
 
 halcyon_createsourcelist(QUEST_HEADERS include/quest hpp
@@ -33,10 +31,8 @@ halcyon_createsourcelist(QUEST_HEADERS include/quest hpp
     atlas
     constants
     entity_manager
-    field
     game
     rfem
-    sprite
     static_vector
     types
 )
@@ -51,7 +47,7 @@ target_sources(
     PRIVATE
         FILE_SET CXX_MODULES #
             BASE_DIRS src
-            FILES src/data_loader.cpp src/helpers.cpp
+            FILES src/data_loader.cpp src/field.cpp src/helpers.cpp src/sprite.cpp
     PUBLIC
         FILE_SET HEADERS #
             BASE_DIRS include

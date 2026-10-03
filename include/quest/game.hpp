@@ -1,10 +1,12 @@
 #pragma once
 
 #include <quest/atlas.hpp>
-#include <quest/scene/manager.hpp>
+#include <quest/types.hpp>
 
+#include <halcyon/ttf.hpp>
 #include <halcyon/video.hpp>
 
+#include <memory>
 #include <vector>
 
 import quest.data_loader;
@@ -41,11 +43,16 @@ namespace hq {
         std::span<const char* const> m_span;
     };
 
+    namespace scene {
+        class manager;
+    }
+
     class game {
     public:
         using event_vector = std::vector<hal::event::variant>;
 
         game(args a);
+        ~game();
 
         void main_loop();
 
@@ -81,7 +88,11 @@ namespace hq {
 
         texture_atlas atlas;
 
-        scene::manager scenes;
+    private:
+        std::unique_ptr<scene::manager> m_scenes;
+
+    public:
+        scene::manager& scenes;
 
     private:
         event_vector m_polled;

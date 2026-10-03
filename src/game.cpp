@@ -8,6 +8,7 @@
 #include <halcyon/utility/timer.hpp>
 
 #include <quest/game.hpp>
+#include <quest/scene/manager.hpp>
 import quest.helpers;
 
 #include <charconv>
@@ -55,13 +56,16 @@ game::game(args a) try
     : systems{}
     , window{ create_window(systems) }
     , renderer{ create_renderer(window, a) }
-    , scenes{ *this }
+    , m_scenes{ std::make_unique<scene::manager>(*this) }
+    , scenes{ *m_scenes }
     , timescale{ 1.0 }
     , running{ true }
     , screenshot{ false } {
 } catch (hal::exception e) {
     HAL_PRINT("Exception raised: ", e.with_error());
 }
+
+game::~game() = default;
 
 void game::main_loop() {
     hal::timer timer;

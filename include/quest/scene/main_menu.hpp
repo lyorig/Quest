@@ -1,7 +1,7 @@
 #pragma once
 
 #include <quest/animatable.hpp>
-#include <quest/sprite.hpp>
+import quest.sprite;
 
 #include <quest/scene/base.hpp>
 
